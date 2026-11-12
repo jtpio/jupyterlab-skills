@@ -22,6 +22,7 @@ Node 22.
 ## Option A: the official template
 
 The template gives a full project: Python package, lint, CI, release setup.
+Its questions are interactive by default. This command answers them:
 
 ```bash
 uvx --with jinja2-time copier copy --trust --defaults \
@@ -67,35 +68,11 @@ jupyter labextension list
   browser. Or `jlpm watch` to rebuild on save.
 - `jlpm` must be on `PATH`: `export PATH=<env>/bin:$PATH`.
 
-The code is in `src/index.ts`:
-
-```ts
-import {
-  JupyterFrontEnd,
-  JupyterFrontEndPlugin
-} from '@jupyterlab/application';
-import { ICommandPalette } from '@jupyterlab/apputils';
-
-const plugin: JupyterFrontEndPlugin<void> = {
-  id: 'my-lab-ext:plugin',
-  description: 'A JupyterLab extension.',
-  autoStart: true,
-  optional: [ICommandPalette],
-  activate: (app: JupyterFrontEnd, palette: ICommandPalette | null) => {
-    app.commands.addCommand('my-lab-ext:hello', {
-      label: 'Hello',
-      execute: () => console.log('hello')
-    });
-    palette?.addItem({ command: 'my-lab-ext:hello', category: 'My Ext' });
-  }
-};
-
-export default plugin;
-```
-
-Every pattern of `patterns.md` works here: replace `lab['<package>']` with an
-`import`, and add the package to `dependencies` in `package.json`
-(`jlpm add @jupyterlab/notebook`).
+The template writes `src/index.ts` with one plugin. Every pattern of
+`patterns.md` works there: replace `lab['<package>']` with an `import`, and
+add the package to `dependencies` in `package.json`
+(`jlpm add @jupyterlab/notebook`). The extension tutorial of the JupyterLab
+documentation explains the project step by step (link at the end).
 
 Build a wheel:
 
@@ -164,7 +141,31 @@ nodeLinker: node-modules
 enableScripts: false
 ```
 
-`src/index.ts`: as in option A.
+`src/index.ts`:
+
+```ts
+import {
+  JupyterFrontEnd,
+  JupyterFrontEndPlugin
+} from '@jupyterlab/application';
+import { ICommandPalette } from '@jupyterlab/apputils';
+
+const plugin: JupyterFrontEndPlugin<void> = {
+  id: 'my-lab-ext:plugin',
+  description: 'A JupyterLab extension.',
+  autoStart: true,
+  optional: [ICommandPalette],
+  activate: (app: JupyterFrontEnd, palette: ICommandPalette | null) => {
+    app.commands.addCommand('my-lab-ext:hello', {
+      label: 'Hello',
+      execute: () => console.log('hello')
+    });
+    palette?.addItem({ command: 'my-lab-ext:hello', category: 'My Ext' });
+  }
+};
+
+export default plugin;
+```
 
 ```bash
 jlpm install

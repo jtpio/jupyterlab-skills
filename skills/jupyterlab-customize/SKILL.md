@@ -27,6 +27,20 @@ a different layout, or only a part of the core in the bundle.
 Two more skills support the work: `jupyterlab-inspect` finds the IDs and the
 folders, `jupyterlab-verify` proves in a real browser that the change works.
 
+## Where the facts come from
+
+These skills hold the procedure, the traps, tested snippets and the scripts.
+They do not copy what has a better source:
+
+| Need | Source |
+| --- | --- |
+| The ID of a plugin, setting, menu, toolbar item, shortcut, CSS variable | The installation: `jlab_inspect.py` (skill `jupyterlab-inspect`) |
+| The commands, service tokens and widgets of the running application | The browser probe: `jlab_probe.cjs --list …` (skill `jupyterlab-verify`) |
+| The meaning and the format of a JupyterLab feature | The JupyterLab documentation: each skill links to the page |
+
+IDs change between versions and with the installed extensions. Do not write
+one from memory.
+
 ## Step 1: choose the delivery mode
 
 | The user wants | Mode | Write to |
