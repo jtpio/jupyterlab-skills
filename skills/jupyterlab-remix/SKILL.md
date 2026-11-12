@@ -164,8 +164,10 @@ The planner sees required services only. After the build, run the probe with
 | `Command '<id>' not registered` | A plugin calls a command of a missing package | Register a command with that ID that does the job, or nothing (`src/plugins/launcher.js` does this for `launcher:create`), or add the package |
 | A feature is absent with no error | Its plugin is in a package that you did not select, or it is an optional service | Add the package |
 
-What the packages give is in `core-plugins.md` of the skill
-`jupyterlab-inspect`. Three packages are the base of each `lab` remix:
+To see what a package gives, list its plugins with their descriptions from
+an installed JupyterLab of the same version (skill `jupyterlab-inspect`):
+`jlab_inspect.py plugins notebook-extension`. Three packages are the base of
+each `lab` remix:
 `application-extension`, `apputils-extension`, `translation-extension`.
 
 ## Your own plugins

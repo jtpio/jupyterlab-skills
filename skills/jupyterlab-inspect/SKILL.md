@@ -10,6 +10,10 @@ A wrong plugin ID or setting key fails silently in JupyterLab. Look up every
 ID before you write it. `scripts/jlab_inspect.py` reads the installation from
 disk. It needs no server and no browser.
 
+This skill has no lists of IDs. The IDs change between versions and with the
+installed extensions, so each one comes from a command that reads the
+installation.
+
 Run it with the Python of the target environment:
 
 ```bash
@@ -26,9 +30,15 @@ is not installed (its `jupyter-config` and `labextensions` folders).
 | --- | --- |
 | `paths` | Which folders does JupyterLab read? Where do I write for the environment scope and the user scope? |
 | `extensions` | Which prebuilt extensions are installed? Which core plugins do they disable? |
-| `plugins [text]` | Which plugin IDs exist? Which are disabled? Which have settings? |
+| `plugins [text]` | Which plugin IDs exist, and what does each one do? Which are disabled? Which have settings? |
 | `schema <plugin-id>` | Which settings does this plugin have, with type, default, and the override in effect? |
 | `find <text>` | Which plugin, setting, menu, toolbar item or command matches this word? |
+| `menus [menu-id]` | Which main menus and submenus exist? With an ID: which items does the menu have (command, rank, args)? |
+| `toolbars [text]` | Which items does each toolbar have, and which plugin has the `toolbar` setting? |
+| `context-menu [text]` | Which items does the context menu have (command, selector, rank)? |
+| `shortcuts [text]` | Which default shortcuts exist (command, keys, selector, args)? |
+| `css-variables [text]` | Which CSS variables do the themes define, with the light and dark values? `--theme <name>` selects other installed themes |
+| `shared [text]` | Which npm packages, at which version, does the application share with extensions? |
 | `page-config` | Which files set `disabledExtensions`, `appName`…, and what is the merged result? |
 | `overrides` | Which files change setting defaults, and what is the merged result? Flags unknown IDs and keys. |
 | `user-settings` | Which settings did the user save? These hide all defaults. |
@@ -48,32 +58,30 @@ Typical start of a task:
 ```
 
 `find` matches `lineNumbers` for the text "line numbers". It searches plugin
-IDs and titles, setting keys and descriptions, keys inside object defaults
-(`codeCellConfig.lineNumbers`), menu IDs, toolbar item names and the commands
-that the schemas use.
+IDs, titles and descriptions, setting keys and descriptions, keys inside
+object defaults (`codeCellConfig.lineNumbers`), menu IDs, toolbar item names
+and the commands that the schemas use.
+
+The optional text of a list command keeps the rows that contain it:
+`shortcuts "Accel S"`, `toolbars Notebook`, `css-variables font`.
 
 ## How JupyterLab finds its files
 
-`jupyter --paths` prints two lists, highest priority first.
+`paths` prints the folders, marks what is writable, and names the write
+targets for each scope. The rules are in the JupyterLab documentation:
+https://jupyterlab.readthedocs.io/en/stable/user/directories.html
 
-- **config** folders. Each can hold `labconfig/page_config.d/`,
-  `labconfig/default_setting_overrides.d/`, `jupyter_server_config.json` and
-  `jupyter_server_config.d/`. Order: environment (`<sys.prefix>/etc/jupyter`),
-  user (`~/.jupyter`, or `JUPYTER_CONFIG_DIR`), then system folders.
-- **data** folders. Each can hold `labextensions/<name>/`. Order: environment
-  (`<sys.prefix>/share/jupyter`), user, system.
+What to keep in mind:
 
-Three more folders belong to JupyterLab (`jupyter lab path`):
-
-- **Application directory** `<sys.prefix>/share/jupyter/lab`: the built core
-  application, its `schemas/` and `themes/`. Read it, never write to it.
-- **User settings directory** `~/.jupyter/lab/user-settings`
-  (`JUPYTERLAB_SETTINGS_DIR`): what the Settings Editor saves.
-- **Workspaces directory** `~/.jupyter/lab/workspaces`
-  (`JUPYTERLAB_WORKSPACES_DIR`): saved layouts and open tabs.
-
-`paths` prints all of this, marks what is writable, and names the write
-targets for each scope.
+- **Config** folders hold `labconfig/page_config.d/`,
+  `labconfig/default_setting_overrides.d/` and the server config. **Data**
+  folders hold `labextensions/<name>/`. In both lists the environment
+  (`<sys.prefix>`) is before the user folder.
+- The **application directory** (`<sys.prefix>/share/jupyter/lab`) holds the
+  built core application, its `schemas/` and `themes/`. Read it, never write
+  to it.
+- Environment variables can move each folder. `paths` lists the ones that
+  are set.
 
 ## Plugin IDs
 
@@ -82,28 +90,46 @@ A plugin ID is `<npm package>:<name>`, for example
 `jupyter labextension list` shows packages only, and only the prebuilt ones:
 it does not list the core plugins.
 
-Sources of IDs, from fastest to most exact:
+1. `jlab_inspect.py plugins <text>` or `find <text>`: the IDs in the files of
+   this installation, extensions included, with the description of each
+   plugin. The text matches the ID and the description
+   (`plugins news` finds `@jupyterlab/apputils-extension:announcements`).
+2. `jlab_probe.cjs --list plugins --grep <text>` (skill `jupyterlab-verify`,
+   needs a running server): the plugins that the application registered,
+   with the service that each one provides and the plugins that need it.
+   Use it before you disable or replace a plugin.
 
-1. [references/core-plugins.md](references/core-plugins.md): all plugins of a
-   stock JupyterLab 4.6, with description, provided service, and the plugins
-   that break when it is disabled. Search it with grep.
-2. `jlab_inspect.py plugins <text>`: the IDs in the files of this
-   installation, including extensions.
-3. The browser probe of `jupyterlab-verify` (`--dump`): the plugins that the
-   running application registered, with their service tokens.
+The documentation has the same list for the last release, without the
+dependencies:
+https://jupyterlab.readthedocs.io/en/stable/extension/extension_points.html#core-plugins
 
 ## Command IDs
 
 Menus, toolbars, context menus, shortcuts and launcher cards all refer to
 commands by ID, for example `notebook:run-all-cells`.
 
-1. [references/core-commands.md](references/core-commands.md): all commands
-   of a stock JupyterLab 4.6 with their labels.
-2. The browser probe (`--dump`): the commands of the running application,
-   including those of extensions.
+1. `jlab_inspect.py find <text>`: the commands that a menu, a toolbar or a
+   shortcut uses. `menus <menu-id>` shows the commands of one menu in order.
+2. `jlab_probe.cjs --list commands --grep <text>` (needs a running server):
+   all commands of the application, with their labels, extensions included.
 
 A command belongs to a plugin. When the plugin is disabled, the command does
 not exist, and menu items that use it disappear.
+
+## Menus, toolbars, shortcuts, widgets, CSS variables
+
+| To find | Command |
+| --- | --- |
+| The ID of a menu, the items of a menu | `jlab_inspect.py menus`, `jlab_inspect.py menus jp-mainmenu-file` |
+| The name of a toolbar item | `jlab_inspect.py toolbars [text]` |
+| A context menu item and its selector | `jlab_inspect.py context-menu [text]` |
+| The command that has a key, the keys of a command | `jlab_inspect.py shortcuts [text]` |
+| A theme variable and its values | `jlab_inspect.py css-variables [text]` |
+| The ID of a sidebar panel or another widget of the shell | `jlab_probe.cjs --list widgets` (needs a running server) |
+| The service tokens and the plugins that provide them | `jlab_probe.cjs --list tokens --grep <text>` (needs a running server) |
+
+These commands print what the schemas define, before your overrides. The
+`overrides` command prints your changes.
 
 ## When a customization does not apply
 
@@ -131,11 +157,7 @@ Check in this order:
 - Source of a core plugin: `packages/<name>-extension/src/index.ts(x)` in
   https://github.com/jupyterlab/jupyterlab. Read it to learn what a plugin
   requires, which commands it adds, and which CSS classes it uses.
-- Core plugin and token list in the documentation:
+- Lists of the core plugins, tokens and commands of the last release, in the
+  documentation:
   https://jupyterlab.readthedocs.io/en/stable/extension/extension_points.html
-
-## Regenerate the catalogs
-
-The catalogs in `references/` come from a live stock JupyterLab. The script
-`tools/generate_references.py` at the root of the repository writes them again
-for a new version.
+  and https://jupyterlab.readthedocs.io/en/stable/user/commands.html#commands-list

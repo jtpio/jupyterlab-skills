@@ -27,6 +27,11 @@ Output
   --areas <a,b>                more shell areas to list, for an application with its own shell
   --full                       print the full dump on stdout, not the summary
   --dependents <plugin id>     print the plugins that need this plugin (or package), then exit
+  --list <kind>                print a list of the running application, then exit. Kinds:
+                               plugins (description, provided service, plugins that need it),
+                               commands (label), tokens (service and its plugin),
+                               widgets (shell area, ID, label), shortcuts (keys, selector)
+  --grep <text>                with --list: only the rows that contain the text
 
 Actions and checks run in the given order. The screenshot is taken last.
 
@@ -77,6 +82,8 @@ function parseArgs(argv) {
     'color-scheme',
     'timeout',
     'dependents',
+    'list',
+    'grep',
     'server',
     'areas'
   ]);
@@ -290,6 +297,53 @@ function dependents(state, target) {
     loseOptionalFeature: degraded,
     known: roots.length > 0 && byId.size > 0
   };
+}
+
+/*
+ * Rows of one list of the running application, as text.
+ */
+function listRows(state, kind) {
+  if (kind === 'plugins') {
+    return state.plugins.map(plugin => {
+      const broken = dependents(state, plugin.id).failToActivate.map(item => item.id);
+      const notes = [];
+      if (plugin.provides) {
+        notes.push(`provides ${plugin.provides}`);
+      }
+      if (broken.length > 6) {
+        notes.push(`${broken.length} plugins need it`);
+      } else if (broken.length) {
+        notes.push(`needed by ${broken.join(', ')}`);
+      }
+      if (!plugin.activated) {
+        notes.push('not activated');
+      }
+      const detail = [plugin.description, ...notes].filter(Boolean).join(' | ');
+      return `${plugin.id}\n    ${detail}`;
+    });
+  }
+  if (kind === 'commands') {
+    return state.commands.map(command => `${command.id}  ${command.label || command.caption}`.trimEnd());
+  }
+  if (kind === 'tokens') {
+    return state.plugins
+      .filter(plugin => plugin.provides)
+      .map(plugin => `${plugin.provides}  <- ${plugin.id}`)
+      .sort();
+  }
+  if (kind === 'widgets') {
+    return Object.entries(state.shell).flatMap(([area, widgets]) =>
+      widgets.map(widget =>
+        `${area}  ${widget.id}  ${widget.label || widget.caption}${widget.visible ? '' : '  (hidden)'}`
+      )
+    );
+  }
+  if (kind === 'shortcuts') {
+    return state.shortcuts
+      .map(item => `${item.command}  ${item.keys.join(', ')}  ${item.selector}`)
+      .sort();
+  }
+  throw new Error(`Unknown list: ${kind}. Use plugins, commands, tokens, widgets or shortcuts.`);
 }
 
 /*
@@ -593,6 +647,15 @@ async function main() {
 
     if (options.dependents) {
       console.log(JSON.stringify(dependents(state, options.dependents), null, 2));
+      await browser.close();
+      process.exit(0);
+    }
+
+    if (options.list) {
+      const needle = (options.grep || '').toLowerCase();
+      const rows = listRows(state, options.list).filter(row => row.toLowerCase().includes(needle));
+      console.log(rows.join('\n'));
+      console.error(`\n${rows.length} ${options.list} of ${state.appName} ${state.appVersion}`);
       await browser.close();
       process.exit(0);
     }

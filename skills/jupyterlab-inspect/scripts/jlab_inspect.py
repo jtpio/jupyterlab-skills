@@ -63,6 +63,11 @@ except ImportError:
     json5 = None
 
 PLUGIN_ID = re.compile(r"""\bid:\s*["'`]((?:@[\w.-]+/)?[\w.-]+:[\w:./-]+)["'`]""")
+# The description follows the ID in most plugin definitions.
+PLUGIN_DESCRIPTION = re.compile(
+    r"""\bid:\s*["'`]((?:@[\w.-]+/)?[\w.-]+:[\w:./-]+)["'`],\s*description:\s*"""
+    r"""(?:"((?:[^"\\]|\\.)*)"|'((?:[^'\\]|\\.)*)'|`((?:[^`\\]|\\.)*)`)"""
+)
 # Some core plugins keep their ID in a constant: match the literal too.
 CORE_PLUGIN_ID = re.compile(r"""["'`](@jupyterlab/[\w-]+-extension:[\w-]+)["'`]""")
 
@@ -185,11 +190,14 @@ def schema_files() -> dict[str, Path]:
     return found
 
 
-def bundle_plugin_ids() -> dict[str, str]:
+def bundle_plugins() -> dict[str, dict]:
     """
-    Find plugin IDs in the JavaScript bundles. Map each ID to its source.
+    Find plugins in the JavaScript bundles: source and description of each ID.
+
+    The bundles are minified, so a plugin that keeps its ID in a constant has
+    no description here. The browser probe has the complete data.
     """
-    found: dict[str, str] = {}
+    found: dict[str, dict] = {}
     sources = [("core", Path(get_app_dir()) / "static")]
     for name, data in get_federated_extensions(labextensions_path()).items():
         sources.append((name, Path(data["ext_path"]) / "static"))
@@ -197,11 +205,48 @@ def bundle_plugin_ids() -> dict[str, str]:
         for path in folder.glob("*.js"):
             text = path.read_text(encoding="utf-8", errors="ignore")
             for match in PLUGIN_ID.finditer(text):
-                found.setdefault(match.group(1), source)
+                found.setdefault(match.group(1), {"source": source, "description": ""})
             if source == "core":
                 for match in CORE_PLUGIN_ID.finditer(text):
-                    found.setdefault(match.group(1), source)
+                    found.setdefault(match.group(1), {"source": source, "description": ""})
+            for match in PLUGIN_DESCRIPTION.finditer(text):
+                description = next(group for group in match.groups()[1:] if group is not None)
+                if match.group(1) in found and description:
+                    found[match.group(1)]["description"] = description.replace("\\", "")
     return found
+
+
+def schema_parts(key: str) -> list[tuple[str, object]]:
+    """
+    The value of one top-level key in each settings schema that has it.
+    """
+    parts = []
+    for plugin_id, path in sorted(schema_files().items()):
+        value = load_json(path).get(key)
+        if value:
+            parts.append((plugin_id, value))
+    return parts
+
+
+def keep(row: dict, text: str | None) -> bool:
+    """
+    Tell if a row matches the filter text of the command line.
+    """
+    return not text or text.lower() in json.dumps(row).lower()
+
+
+def show(rows: list[dict], columns: list[str], args: argparse.Namespace, note: str = "") -> None:
+    """
+    Print rows as JSON or as aligned columns, with a count on stderr.
+    """
+    if args.json:
+        print(json.dumps(rows, indent=2))
+        return
+    table = [[("" if row.get(c) is None else str(row[c])) for c in columns] for row in rows]
+    widths = [max([len(c)] + [len(line[i]) for line in table]) for i, c in enumerate(columns)]
+    for line in [columns] + table:
+        print("  ".join(value.ljust(width) for value, width in zip(line, widths)).rstrip())
+    print(f"\n{len(rows)} row(s). {note}".rstrip(), file=sys.stderr)
 
 
 def effective_page_config() -> dict:
@@ -296,24 +341,23 @@ def cmd_plugins(args: argparse.Namespace) -> None:
     List plugin IDs, with their source and state.
     """
     schemas = schema_files()
-    bundles = bundle_plugin_ids()
+    bundles = bundle_plugins()
     disabled = effective_page_config().get("disabledExtensions", [])
     rows = []
     for plugin_id in sorted(set(schemas) | set(bundles)):
-        if args.pattern and args.pattern.lower() not in plugin_id.lower():
-            continue
         title = ""
         if plugin_id in schemas:
             title = load_json(schemas[plugin_id]).get("title", "")
-        rows.append(
-            {
-                "id": plugin_id,
-                "disabled": is_disabled(plugin_id, disabled),
-                "has_settings": plugin_id in schemas,
-                "title": title,
-                "source": bundles.get(plugin_id, "schema"),
-            }
-        )
+        bundle = bundles.get(plugin_id, {})
+        row = {
+            "id": plugin_id,
+            "disabled": is_disabled(plugin_id, disabled),
+            "has_settings": plugin_id in schemas,
+            "title": bundle.get("description") or title,
+            "source": bundle.get("source", "schema"),
+        }
+        if not args.pattern or args.pattern.lower() in f"{plugin_id} {row['title']}".lower():
+            rows.append(row)
     if args.json:
         print(json.dumps(rows, indent=2))
         return
@@ -329,8 +373,9 @@ def cmd_plugins(args: argparse.Namespace) -> None:
         title = f"  - {row['title']}" if row["title"] else ""
         print(f"{row['id']}{suffix}{title}")
     print(
-        f"\n{len(rows)} plugin(s). The list comes from the files on disk; "
-        "the browser probe of the jupyterlab-verify skill gives the exact list.",
+        f"\n{len(rows)} plugin(s), from the files on disk. For the service that a "
+        "plugin provides and the plugins that need it, use the browser probe of "
+        "the jupyterlab-verify skill: jlab_probe.cjs --list plugins --grep <text>.",
         file=sys.stderr,
     )
 
@@ -478,6 +523,226 @@ def cmd_user_settings(args: argparse.Namespace) -> None:
         print("  (no user settings: the defaults apply)")
 
 
+def menu_data() -> dict[str, dict]:
+    """
+    The main menus and submenus that the schemas define, with their items.
+    """
+    menus: dict[str, dict] = {}
+
+    def add(menu: dict, plugin_id: str, parent: str | None) -> None:
+        entry = menus.setdefault(
+            menu["id"], {"id": menu["id"], "label": "", "rank": None, "parent": parent, "items": []}
+        )
+        if menu.get("label") and not entry["label"]:
+            entry.update(label=menu["label"], rank=menu.get("rank"), defined_in=plugin_id)
+        for item in menu.get("items", []):
+            if item.get("type") == "submenu" and "submenu" in item:
+                name = item["submenu"].get("id")
+                if not any(other.get("submenu") == name for other in entry["items"]):
+                    entry["items"].append({"submenu": name, "rank": item.get("rank"), "plugin": plugin_id})
+                add(item["submenu"], plugin_id, menu["id"])
+            elif "command" in item:
+                entry["items"].append(
+                    {
+                        "command": item["command"],
+                        "rank": item.get("rank"),
+                        "args": item.get("args"),
+                        "plugin": plugin_id,
+                    }
+                )
+
+    for plugin_id, value in schema_parts("jupyter.lab.menus"):
+        for menu in value.get("main", []):
+            add(menu, plugin_id, None)
+    return menus
+
+
+def cmd_menus(args: argparse.Namespace) -> None:
+    """
+    List the main menus, or the items of one menu.
+    """
+    menus = menu_data()
+    if not args.menu:
+        rows = []
+
+        def add_rows(parent: str | None) -> None:
+            children = [menu for menu in menus.values() if menu["parent"] == parent]
+            for menu in sorted(children, key=lambda menu: (menu["rank"] is None, menu["rank"] or 0)):
+                rows.append(
+                    {
+                        "menu": menu["id"],
+                        "label": menu["label"],
+                        "rank": menu["rank"],
+                        "submenu_of": menu["parent"],
+                        "items": len(menu["items"]),
+                    }
+                )
+                add_rows(menu["id"])
+
+        add_rows(None)
+        show(rows, ["menu", "label", "rank", "submenu_of", "items"], args, "Items: menus <menu id>.")
+        return
+    if args.menu not in menus:
+        close = [name for name in menus if args.menu.lower() in name.lower()]
+        print(f"error: no menu '{args.menu}'. Menus: {', '.join(close or menus)}", file=sys.stderr)
+        sys.exit(1)
+    rows = sorted(
+        (
+            {
+                "item": item.get("command") or f"submenu {item['submenu']}",
+                "rank": item["rank"],
+                "args": json.dumps(item["args"]) if item.get("args") else "",
+                "added_by": item["plugin"],
+            }
+            for item in menus[args.menu]["items"]
+        ),
+        key=lambda row: (row["rank"] is None, row["rank"] or 0),
+    )
+    show(
+        rows,
+        ["item", "rank", "args", "added_by"],
+        args,
+        "Rank orders the items, lowest first. To remove an item, copy its command and args.",
+    )
+
+
+def cmd_toolbars(args: argparse.Namespace) -> None:
+    """
+    List the toolbar items that the schemas define.
+    """
+    rows = []
+    for plugin_id, value in schema_parts("jupyter.lab.toolbars"):
+        for toolbar, items in value.items():
+            for item in items:
+                row = {
+                    "toolbar": toolbar,
+                    "item": item.get("name"),
+                    "command": item.get("command", ""),
+                    "rank": item.get("rank"),
+                    "setting_of": plugin_id,
+                }
+                if keep(row, args.text):
+                    rows.append(row)
+    show(
+        rows,
+        ["toolbar", "item", "command", "rank", "setting_of"],
+        args,
+        "Change a toolbar with the 'toolbar' setting of the plugin in the last column.",
+    )
+
+
+def cmd_context_menu(args: argparse.Namespace) -> None:
+    """
+    List the context menu items that the schemas define.
+    """
+    rows = []
+    for plugin_id, value in schema_parts("jupyter.lab.menus"):
+        for item in value.get("context", []):
+            target = item.get("command") or item.get("type", "")
+            if item.get("type") == "submenu":
+                target = f"submenu {item.get('submenu', {}).get('id', '')}"
+            row = {
+                "item": target,
+                "selector": item.get("selector", ""),
+                "rank": item.get("rank"),
+                "args": json.dumps(item["args"]) if item.get("args") else "",
+                "added_by": plugin_id,
+            }
+            if keep(row, args.text):
+                rows.append(row)
+    show(
+        rows,
+        ["item", "selector", "rank", "args", "added_by"],
+        args,
+        "Change them with the 'contextMenu' setting of @jupyterlab/application-extension:context-menu.",
+    )
+
+
+def cmd_shortcuts(args: argparse.Namespace) -> None:
+    """
+    List the default keyboard shortcuts that the schemas define.
+    """
+    rows = []
+    for plugin_id, value in schema_parts("jupyter.lab.shortcuts"):
+        for item in value:
+            row = {
+                "command": item.get("command"),
+                "keys": ", ".join(item.get("keys", [])),
+                "selector": item.get("selector", ""),
+                "args": json.dumps(item["args"]) if item.get("args") else "",
+                "added_by": plugin_id,
+            }
+            if args.json:
+                row["keys"] = item.get("keys", [])
+            if keep(row, args.text):
+                rows.append(row)
+    rows.sort(key=lambda row: (row["command"], str(row["keys"])))
+    show(
+        rows,
+        ["command", "keys", "selector", "args"],
+        args,
+        "Accel is Cmd on macOS and Ctrl on other systems. "
+        "A shortcut is identified by its keys and selector: copy both exactly.",
+    )
+
+
+def theme_variables(theme: str) -> dict[str, str]:
+    """
+    The CSS variables that an installed theme defines.
+    """
+    roots = [Path(get_app_dir()) / "themes"]
+    roots += [Path(data["ext_path"]) / "themes" for data in get_federated_extensions(labextensions_path()).values()]
+    for root in roots:
+        for path in root.glob("**/index.css"):
+            if theme in path.parent.relative_to(root).as_posix():
+                text = path.read_text(encoding="utf-8", errors="ignore")
+                return dict(re.findall(r"(--jp-[\w-]+)\s*:\s*([^;}]+)", text))
+    print(f"error: no installed theme matches '{theme}'.", file=sys.stderr)
+    sys.exit(1)
+
+
+def cmd_css_variables(args: argparse.Namespace) -> None:
+    """
+    List the CSS variables of the built-in themes, with their values.
+    """
+    themes = args.theme or ["theme-light-extension", "theme-dark-extension"]
+    values = {theme: theme_variables(theme) for theme in themes}
+    names = list(dict.fromkeys(name for theme in themes for name in values[theme]))
+    labels = {theme: theme.replace("theme-", "").replace("-extension", "") for theme in themes}
+    rows = []
+    for name in names:
+        row = {"variable": name, **{labels[theme]: values[theme].get(name, "").strip() for theme in themes}}
+        if not args.text or args.text.lower() in name.lower():
+            rows.append(row)
+    show(
+        rows,
+        ["variable"] + list(labels.values()),
+        args,
+        "A value such as var(--md-grey-300,#e0e0e0) falls back to the color after the comma.",
+    )
+
+
+def cmd_shared(args: argparse.Namespace) -> None:
+    """
+    List the packages that the application shares with extensions.
+    """
+    import jupyterlab
+
+    staging = Path(jupyterlab.__file__).parent / "staging" / "package.json"
+    resolutions = load_json(staging).get("resolutions", {})
+    rows = [
+        {"package": name, "version": version.lstrip("~^")}
+        for name, version in sorted(resolutions.items())
+        if not args.text or args.text.lower() in name.lower()
+    ]
+    show(
+        rows,
+        ["package", "version"],
+        args,
+        "A no-build extension takes these from the application; a remix pins them.",
+    )
+
+
 def cmd_find(args: argparse.Namespace) -> None:
     """
     Search plugin IDs, setting keys, menu IDs and command IDs for a text.
@@ -486,10 +751,14 @@ def cmd_find(args: argparse.Namespace) -> None:
     # "line numbers" must also match the key lineNumbers.
     compact = needle.replace(" ", "").replace("-", "")
     schemas = schema_files()
+    bundles = bundle_plugins()
     hits: list[str] = []
-    for plugin_id in sorted(set(schemas) | set(bundle_plugin_ids())):
+    for plugin_id in sorted(set(schemas) | set(bundles)):
+        description = bundles.get(plugin_id, {}).get("description", "")
         if needle in plugin_id.lower():
             hits.append(f"plugin   {plugin_id}")
+        elif needle in description.lower():
+            hits.append(f"plugin   {plugin_id}  - {description}")
     commands: set[str] = set()
     for plugin_id, path in sorted(schemas.items()):
         schema = load_json(path)
@@ -538,8 +807,8 @@ def main() -> int:
     sub = parser.add_subparsers(dest="action", required=True)
     sub.add_parser("paths", help="folders, and where to write").set_defaults(func=cmd_paths)
     sub.add_parser("extensions", help="prebuilt extensions").set_defaults(func=cmd_extensions)
-    p_plugins = sub.add_parser("plugins", help="plugin IDs")
-    p_plugins.add_argument("pattern", nargs="?", help="text that the ID must contain")
+    p_plugins = sub.add_parser("plugins", help="plugin IDs, with a description")
+    p_plugins.add_argument("pattern", nargs="?", help="text that the ID or the description must contain")
     p_plugins.set_defaults(func=cmd_plugins)
     p_schema = sub.add_parser("schema", help="settings of one plugin")
     p_schema.add_argument("plugin", help="plugin ID, for example @jupyterlab/notebook-extension:tracker")
@@ -547,6 +816,29 @@ def main() -> int:
     sub.add_parser("page-config", help="effective page config").set_defaults(func=cmd_page_config)
     sub.add_parser("overrides", help="effective default overrides").set_defaults(func=cmd_overrides)
     sub.add_parser("user-settings", help="user settings files").set_defaults(func=cmd_user_settings)
+    p_menus = sub.add_parser("menus", help="main menus, or the items of one menu")
+    p_menus.add_argument("menu", nargs="?", help="menu ID, for example jp-mainmenu-file")
+    p_menus.set_defaults(func=cmd_menus)
+    for name, func, text in (
+        ("toolbars", cmd_toolbars, "toolbar items"),
+        ("context-menu", cmd_context_menu, "context menu items"),
+        ("shortcuts", cmd_shortcuts, "default keyboard shortcuts"),
+    ):
+        p_list = sub.add_parser(name, help=text)
+        p_list.add_argument("text", nargs="?", help="text that the row must contain")
+        p_list.set_defaults(func=func)
+    p_shared = sub.add_parser("shared", help="packages that extensions take from the application")
+    p_shared.add_argument("text", nargs="?", help="text that the package name must contain")
+    p_shared.set_defaults(func=cmd_shared)
+    p_css = sub.add_parser("css-variables", help="CSS variables of the themes, with values")
+    p_css.add_argument("text", nargs="?", help="text that the variable name must contain")
+    p_css.add_argument(
+        "--theme",
+        action="append",
+        help="part of the folder name of an installed theme; repeat to compare "
+        "(default: the built-in light and dark themes)",
+    )
+    p_css.set_defaults(func=cmd_css_variables)
     p_find = sub.add_parser("find", help="search IDs, settings, menus, commands")
     p_find.add_argument("text")
     p_find.set_defaults(func=cmd_find)

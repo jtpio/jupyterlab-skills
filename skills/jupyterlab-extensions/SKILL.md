@@ -135,6 +135,9 @@ function createPlugins(lab) {
 Prefer `optional` over `requires` for every service the plugin can work
 without: the user or a distribution can then disable that service.
 
+The concepts (plugins, tokens, services) are in the JupyterLab documentation:
+https://jupyterlab.readthedocs.io/en/stable/extension/extension_dev.html#plugins
+
 The `app` object (`JupyterFrontEnd`):
 
 | Member | Use |
@@ -148,6 +151,9 @@ The `app` object (`JupyterFrontEnd`):
 
 Shell areas: `top` (the bar with the menus), `left`, `right`, `main`, `down`,
 `bottom` (below the main area), `header`, `menu`.
+
+Each extension point, with TypeScript examples:
+https://jupyterlab.readthedocs.io/en/stable/extension/extension_points.html
 
 ## Declare menus, toolbars and shortcuts in a schema
 
@@ -189,10 +195,15 @@ settings, and it adds UI items without code:
   one plugin with that ID in the extension.
 - To read the settings, require `ISettingRegistry` and call
   `registry.load('<name>:plugin')` (pattern in the reference).
-- To add to an existing menu, use its ID (`jp-mainmenu-file`). Menu IDs and
-  toolbar names are in `ui-identifiers.md` of the skill `jupyterlab-settings`.
+- To add to an existing menu, use its ID (`jp-mainmenu-file`). The skill
+  `jupyterlab-inspect` lists them: `jlab_inspect.py menus` for the menu IDs,
+  `jlab_inspect.py toolbars` for the toolbar names.
 - A toolbar button shows the `icon` of the command. Without an icon it shows
   the `label`.
+- The schema keys are in the documentation:
+  [menus](https://jupyterlab.readthedocs.io/en/stable/extension/extension_points.html#mainmenu),
+  [toolbars](https://jupyterlab.readthedocs.io/en/stable/extension/extension_points.html#toolbar-registry),
+  and "Keyboard Shortcuts" on the same page.
 
 ## Replace a core plugin
 

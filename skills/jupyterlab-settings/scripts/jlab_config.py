@@ -253,17 +253,39 @@ def check_plugin(target: str, plugins: set[str]) -> None:
     warn(f"'{target}' matches no plugin or package of this installation.{hint}")
 
 
-def dependents(targets: list[str], already: set[str]) -> dict[str, str]:
+def plugin_graph(dump: str | None) -> dict:
     """
-    Core plugins that cannot activate when the targets are disabled.
+    The service that each plugin provides and the services that it requires.
 
-    Maps each dependent to the service token that it loses. The data comes
-    from a stock JupyterLab (core_plugins.json), so it knows core plugins only.
+    A dump of the browser probe is exact for the installation. Without one,
+    the data of a stock JupyterLab (core_plugins.json) knows core plugins only.
     """
+    if dump:
+        plugins = json.loads(Path(dump).read_text())["plugins"]
+        return {p["id"]: {"provides": p["provides"], "requires": p["requires"]} for p in plugins}
     path = Path(__file__).with_name("core_plugins.json")
     if not path.is_file():
         return {}
-    graph = json.loads(path.read_text())["plugins"]
+    data = json.loads(path.read_text())
+    try:
+        from jupyterlab import __version__ as installed
+    except ImportError:
+        return data["plugins"]
+    if installed.split(".")[:2] != data["jupyterlab"].split(".")[:2]:
+        warn(
+            f"the plugin dependency data is from JupyterLab {data['jupyterlab']}, and this "
+            f"is {installed}. For exact data, save a dump with the browser probe "
+            "(jlab_probe.cjs --dump lab.json) and pass --graph lab.json."
+        )
+    return data["plugins"]
+
+
+def dependents(targets: list[str], already: set[str], graph: dict) -> dict[str, str]:
+    """
+    Plugins that cannot activate when the targets are disabled.
+
+    Maps each dependent to the service token that it loses.
+    """
 
     def matches(plugin: str, names: set[str]) -> bool:
         return plugin in names or plugin.split(":", 1)[0] in names
@@ -346,7 +368,7 @@ def cascade(args: argparse.Namespace, disabled: dict, plugins: set[str]) -> None
     Add the plugins that require a disabled plugin, or only report them.
     """
     targets = [target for target, off in disabled.items() if off]
-    lost = dependents(targets, set())
+    lost = dependents(targets, set(), plugin_graph(args.graph))
     lost = {plugin: token for plugin, token in lost.items() if not plugins or plugin in plugins}
     if not lost:
         return
@@ -552,6 +574,12 @@ def main() -> int:
     parser.add_argument("--name", default="50-custom", help="base name of the snippet files")
     parser.add_argument(
         "--no-validate", action="store_true", help="do not check IDs and values"
+    )
+    parser.add_argument(
+        "--graph",
+        metavar="DUMP",
+        help="a dump of the browser probe (jlab_probe.cjs --dump): find the plugins that "
+        "require a disabled plugin from the running application, extensions included",
     )
     parser.add_argument(
         "--no-cascade",

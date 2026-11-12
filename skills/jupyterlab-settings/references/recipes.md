@@ -461,8 +461,8 @@ Notebook toolbar, plugin `@jupyterlab/notebook-extension:panel`:
 
 Built-in item names of the notebook toolbar: `save`, `insert`, `cut`, `copy`,
 `paste`, `run`, `interrupt`, `restart`, `restart-and-run`, `cellType`,
-`spacer`, `kernelName`, `executionProgress`. More toolbars and names are in
-`ui-identifiers.md`.
+`spacer`, `kernelName`, `executionProgress`. For the other toolbars and the
+names of this installation: `jlab_inspect.py toolbars [text]`.
 
 A toolbar item can set `label`, `icon` (name of a registered icon, for
 example `ui-components:run`), `caption` and `args`.
@@ -511,7 +511,8 @@ Overrides, plugin `@jupyterlab/application-extension:context-menu`.
 ```
 
 To disable a built-in item, the `command`, `selector` and `args` must be the
-same as in the built-in definition (`ui-identifiers.md`). Turn the custom
+same as in the built-in definition (`jlab_inspect.py context-menu [text]`).
+Turn the custom
 context menu off, so that the browser menu shows:
 
 ```json
@@ -554,7 +555,7 @@ Overrides, plugin `@jupyterlab/shortcuts-extension:shortcuts`.
   `body` for a global shortcut. Common ones: `.jp-Notebook`,
   `.jp-Notebook.jp-mod-commandMode:not(.jp-mod-readWrite) :focus`,
   `.jp-Notebook.jp-mod-editMode`, `.jp-FileEditor`, `.jp-CodeConsole`.
-- The default list is in `default-shortcuts.md`.
+- The default shortcuts: `jlab_inspect.py shortcuts [text]`.
 
 Take a key that another command uses. JupyterLab identifies a shortcut by
 keys and selector, so the disabled entry would also remove a new shortcut

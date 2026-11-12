@@ -129,9 +129,9 @@ Plugins that do not work outside JupyterLab, with their message:
 | `<id> must be activated in JupyterLab.` | application `dirty`, `info`, `main`, `paths`, `status` |
 | `No provider for: <token>` | A plugin that requires a package that is not in the bundle (status bar, search, table of contents, form registry, file browser) |
 
-To add a feature, find its plugin in `core-plugins.md` (skill
-`jupyterlab-inspect`), add its name to `pick()`, build, and read the
-console. Provide the token that it requires with a small plugin of your own,
+To add a feature, find its plugin with `jlab_inspect.py plugins <text>`
+(skill `jupyterlab-inspect`, run with an installed JupyterLab of the same
+version), add its name to `pick()`, build, and read the console. Provide the token that it requires with a small plugin of your own,
 or leave the plugin out.
 
 `jlab_remix.py plan` describes the JupyterLab shell. For a custom shell, use

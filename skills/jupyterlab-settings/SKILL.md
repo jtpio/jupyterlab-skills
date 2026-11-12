@@ -82,9 +82,10 @@ with `jlab_inspect.py page-config` and `jlab_inspect.py overrides`.
 }
 ```
 
-A key matches in four ways: a plugin ID, a package name (all its plugins), or
-a regular expression on either. `true` disables. `false` re-enables what a
-file of lower priority disables.
+A key is a plugin ID, a package name (all its plugins), or a regular
+expression on either
+([matching rules](https://jupyterlab.readthedocs.io/en/stable/user/directories.html#labconfig-directories)).
+`true` disables. `false` re-enables what a file of lower priority disables.
 
 Before you disable a plugin:
 
@@ -102,9 +103,10 @@ Before you disable a plugin:
    dependents to the snippet (it prints them; `--no-cascade` turns this
    off). For plugins of other extensions, ask the running application:
    `jlab_probe.cjs --dependents <id>` (skill `jupyterlab-verify`).
-3. **Keep the foundations.** Do not disable plugins marked "core service" in
-   the catalog (`:paths`, `:router`, `:shell`, `:settings`, `:state`,
-   `:translator`, `:resolver`…).
+3. **Keep the foundations.** Do not disable a plugin that many plugins need
+   (`:paths`, `:router`, `:shell`, `:settings`, `:state`, `:translator`,
+   `:resolver`…). `jlab_probe.cjs --list plugins --grep <text>` prints, for
+   each plugin, the service that it provides and the plugins that need it.
 
 Hide one sidebar tab without disabling its plugin: there is no general
 setting. Disable the plugin that adds the panel
@@ -114,7 +116,8 @@ setting. Disable the plugin that adds the panel
 CSS (skill `jupyterlab-theming`). The cookbook has the full table.
 
 `lockedExtensions` has the same format. A locked plugin cannot be toggled by
-the user in the Plugin Manager or with `jupyter labextension enable`.
+the user in the Plugin Manager or with `jupyter labextension enable`
+([docs](https://jupyterlab.readthedocs.io/en/stable/user/extensions.html#locking-plugins)).
 
 The official CLI does the same for one plugin and writes
 `labconfig/page_config.json`:
@@ -174,8 +177,12 @@ Plugin `@jupyterlab/application-extension:shell`.
   `options.rank` orders the tabs of a side area.
 - `activityBarPosition`: `side`, `top` or `bottom`. `startMode`: `""`,
   `single` or `multiple`.
-- Widget IDs and types: [references/ui-identifiers.md](references/ui-identifiers.md).
-  For extensions, read them from the probe summary (`shell`).
+- Widget IDs: `jlab_probe.cjs --list widgets` (skill `jupyterlab-verify`)
+  prints the area, the ID and the label of each widget of the running
+  application, extensions included.
+- The meaning of each key:
+  [Layout](https://jupyterlab.readthedocs.io/en/stable/user/interface_customization.html#layout-customization)
+  in the JupyterLab documentation.
 
 A layout that the user changed by hand is stored in the workspace and wins
 over these defaults for that workspace.
@@ -191,7 +198,7 @@ only your changes. To remove a built-in item, repeat its identity with
 | Main menu | `@jupyterlab/mainmenu-extension:plugin` | `menus` | menu `id`; inside a menu: `command` + `args` |
 | Context menu | `@jupyterlab/application-extension:context-menu` | `contextMenu` | `command` + `selector` + `args` |
 | Notebook toolbar | `@jupyterlab/notebook-extension:panel` | `toolbar` | `name` |
-| Other toolbars | see `ui-identifiers.md` | `toolbar` | `name` |
+| Other toolbars | last column of `jlab_inspect.py toolbars` | `toolbar` | `name` |
 | Shortcuts | `@jupyterlab/shortcuts-extension:shortcuts` | `shortcuts` | `keys` + `selector` (not the command) |
 
 ```json
@@ -230,11 +237,24 @@ only your changes. To remove a built-in item, repeat its identity with
 }
 ```
 
-- Menu IDs, toolbar item names, context menu selectors:
-  [references/ui-identifiers.md](references/ui-identifiers.md).
-- Default shortcuts: [references/default-shortcuts.md](references/default-shortcuts.md).
-  `Accel` is Cmd on macOS and Ctrl elsewhere.
-- Command IDs: `core-commands.md` of the skill `jupyterlab-inspect`.
+Read the identity of a built-in item from the installation. Do not write it
+from memory: the names change between versions.
+
+| To find | Command (skill `jupyterlab-inspect`) |
+| --- | --- |
+| Menu IDs, labels, ranks | `jlab_inspect.py menus` |
+| Items of one menu: command, rank, args | `jlab_inspect.py menus jp-mainmenu-file` |
+| Toolbar item names, and the plugin whose `toolbar` setting changes them | `jlab_inspect.py toolbars [text]` |
+| Context menu items: command, selector, rank | `jlab_inspect.py context-menu [text]` |
+| Default shortcuts: keys, selector, args | `jlab_inspect.py shortcuts [text]` |
+| A command ID that a menu, toolbar or shortcut uses | `jlab_inspect.py find <text>` |
+| All commands of the running application, with labels | `jlab_probe.cjs --list commands --grep <text>` (skill `jupyterlab-verify`) |
+
+- `Accel` is Cmd on macOS and Ctrl elsewhere.
+- The format of each list is in the JupyterLab documentation:
+  [toolbars](https://jupyterlab.readthedocs.io/en/stable/user/interface_customization.html#toolbars-customization),
+  [menu bar](https://jupyterlab.readthedocs.io/en/stable/user/interface_customization.html#menu-bar-customization),
+  [context menu](https://jupyterlab.readthedocs.io/en/stable/user/interface_customization.html#context-menu-customization).
 - A menu item or toolbar button for a command that does not exist is not
   shown. A new command needs an extension (skill `jupyterlab-extensions`).
 - The top bar (right of the menus) is the toolbar `TopBar`, setting
@@ -271,9 +291,8 @@ The new shortcut has a selector that matches the same elements but is a
 different text (`html body` for `body`, `body .jp-Notebook` for
 `.jp-Notebook`). Rule 1 then does not remove it.
 
-- Before you choose keys, look for them in
-  [references/default-shortcuts.md](references/default-shortcuts.md). Copy
-  `keys` and `selector` from there exactly (`Accel`, not `Ctrl`).
+- Before you choose keys, look for them: `jlab_inspect.py shortcuts "Accel P"`.
+  Copy `keys` and `selector` from the output exactly (`Accel`, not `Ctrl`).
 - `jlab_config.py set … shortcuts …` warns about both cases.
 - A free key needs one entry. To move a command to a free key: one entry
   that disables the old keys, one entry with the new keys.

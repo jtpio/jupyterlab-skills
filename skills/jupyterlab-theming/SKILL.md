@@ -1,6 +1,6 @@
 ---
 name: jupyterlab-theming
-description: Change the look of JupyterLab - colors, fonts, spacing, density, the style of tabs, toolbars, sidebars, notebook cells and the launcher, and which elements show. Use it to create a custom theme (light, dark, or a pair) without a build step, to set it as the default, to restyle or hide parts of the interface with CSS, to bundle fonts, and to choose between a theme, an extension stylesheet and custom.css. Gives a script that scaffolds a complete theme extension from a built-in theme, the catalog of theme CSS variables, and the selectors of the main interface parts. Use it for requests such as "make it look like…", "change the colors", "use this font", "dark mode by default", "make the UI more compact", "brand it".
+description: Change the look of JupyterLab - colors, fonts, spacing, density, the style of tabs, toolbars, sidebars, notebook cells and the launcher, and which elements show. Use it to create a custom theme (light, dark, or a pair) without a build step, to set it as the default, to restyle or hide parts of the interface with CSS, to bundle fonts, and to choose between a theme, an extension stylesheet and custom.css. Gives a script that scaffolds a complete theme extension from a built-in theme, the command that lists the theme CSS variables, and the selectors of the main interface parts. Use it for requests such as "make it look like…", "change the colors", "use this font", "dark mode by default", "make the UI more compact", "brand it".
 compatibility: JupyterLab 4.x (tested with 4.6). The script needs the Python of an environment that has JupyterLab.
 ---
 
@@ -50,7 +50,8 @@ server once. Later edits need only a browser reload. If the skill
    in `jupyter_server_config.json`.
 
 `custom.css` is read from the user config folder only. It cannot ship in an
-environment or a package.
+environment or a package. Documentation:
+https://jupyterlab.readthedocs.io/en/stable/user/custom_css.html
 
 Rules for both:
 
@@ -203,7 +204,8 @@ Also restyle, when the palette changes a lot:
 
 - **Editor syntax colors**: `--jp-mirror-editor-keyword-color`,
   `-string-color`, `-comment-color`, `-number-color`, `-def-color`,
-  `-variable-color`, `-operator-color`, `-builtin-color`… (22 variables).
+  `-variable-color`, `-operator-color`, `-builtin-color`… List them with
+  `jlab_inspect.py css-variables mirror-editor`.
 - **State colors**: `--jp-warn-color*`, `--jp-error-color*`,
   `--jp-success-color*`, `--jp-info-color*`.
 - **Icons**: `--jp-icon-contrast-color0…3`, and the file type colors
@@ -214,8 +216,18 @@ Also restyle, when the palette changes a lot:
   built-in light theme leaves them empty: a light theme with themed
   scrollbars must set its own values.
 
-The full list with the light and dark values:
-[references/css-variables.md](references/css-variables.md).
+The full list comes from the installation, with the light and dark values
+(skill `jupyterlab-inspect`). Give a text to filter by name:
+
+```bash
+<env>/bin/python ../jupyterlab-inspect/scripts/jlab_inspect.py css-variables layout-color
+```
+
+Many values refer to other variables or to the Material palette
+(`var(--md-grey-300,#e0e0e0)`: the fallback after the comma is the real
+color). Change the variables at the start of a chain and the rest follows.
+To compare your installed theme with its base, name both:
+`css-variables --theme theme-light-extension --theme paper`.
 
 ### Fonts
 

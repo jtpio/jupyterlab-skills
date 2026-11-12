@@ -150,6 +150,8 @@ Output:
 | `--areas home,text` | More shell areas to list in the summary. The probe knows the areas of JupyterLab only; an application with its own shell names its areas here |
 | `--full` | Print the full data instead of the summary |
 | `--dependents <id>` | Print the plugins that need this plugin or package, then exit |
+| `--list <kind>` | Print one list of the running application as text, then exit. Kinds: `plugins`, `commands`, `tokens`, `widgets`, `shortcuts` |
+| `--grep <text>` | With `--list`: only the rows that contain the text |
 
 ### Examples
 
@@ -196,12 +198,20 @@ plugin is still enabled.
 Find IDs in a running application (also those of third-party extensions):
 
 ```bash
-node scripts/jlab_probe.cjs --dump /tmp/lab.json
+node scripts/jlab_probe.cjs --list commands --grep theme
 ```
 
-```bash
-python -c "import json; d = json.load(open('/tmp/lab.json')); print('\n'.join(c['id'] + '  ' + c['label'] for c in d['commands'] if 'theme' in c['id']))"
-```
+| List | Each row has |
+| --- | --- |
+| `--list plugins` | Plugin ID, description, the service that it provides, the plugins that need it |
+| `--list commands` | Command ID and label |
+| `--list tokens` | Service token and the plugin that provides it |
+| `--list widgets` | Shell area, widget ID, label, and `(hidden)` for a closed panel |
+| `--list shortcuts` | Command, keys, selector, as the browser has them. `Accel` shows as `Ctrl` or `Cmd`: for the form to write in a file, use `jlab_inspect.py shortcuts` |
+
+The skill `jupyterlab-inspect` has the lists that need no browser: menus,
+toolbars, context menu, default shortcuts, CSS variables. `--dump <file>`
+saves all the data as JSON, for a script.
 
 A shortcut works, and a sidebar panel shows:
 
