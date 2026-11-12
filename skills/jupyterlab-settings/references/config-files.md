@@ -60,6 +60,9 @@ Traps:
 
 - The format is an **object**, not a list, in `labconfig`. A list is silently
   wrong there.
+- A running JupyterLab can create `labconfig/page_config.json` with
+  `{"lockedExtensions": {}}` in the environment. The file is harmless: leave
+  it.
 - Two more sources add to `disabledExtensions`, and
   `jlab_inspect.py page-config` shows both: an installed extension that names
   plugins in its `package.json` (`jupyterlab.disabledExtensions`), and the
@@ -135,6 +138,8 @@ and https://jupyterlab.readthedocs.io/en/stable/user/urls.html
 | `<config>/jupyter_server_config.json` or `.py` | By class and option; higher priority folder wins | Any `ServerApp`, `LabApp`, `ContentsManager`… option |
 | `<config>/jupyter_lab_config.json` or `.py` | Same | `LabApp` options |
 | `<config>/jupyter_server_config.d/*.json` | Deep merge, but read only for `ServerApp.jpserver_extensions` | Turn a server extension on or off |
+
+`jlab_inspect.py paths` names both targets for each scope.
 
 Tested with Jupyter Server 2.21: an option such as `ServerApp.quit_button` or
 `LabApp.custom_css` in a `.d` file has no effect. Put it in

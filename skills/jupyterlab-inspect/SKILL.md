@@ -129,7 +129,14 @@ not exist, and menu items that use it disappear.
 | The service tokens and the plugins that provide them | `jlab_probe.cjs --list tokens --grep <text>` (needs a running server) |
 
 These commands print what the schemas define, before your overrides. The
-`overrides` command prints your changes.
+`overrides` command prints your changes. Two limits:
+
+- The schemas have command IDs, not labels. When the user names an item by
+  its label ("Log Out"), get the ID with
+  `jlab_probe.cjs --list commands --grep "Log Out"`.
+- Items that a plugin adds from code are not in the schemas (for example
+  the debugger button of the notebook toolbar). See them in the page:
+  `[data-jp-item-name]` is the attribute of each toolbar item.
 
 ## When a customization does not apply
 
@@ -144,7 +151,8 @@ Check in this order:
 4. `paths`: is the folder that you wrote to in the config path? An
    environment variable (`JUPYTER_CONFIG_DIR`, `JUPYTERLAB_SETTINGS_DIR`) can
    move it.
-5. Was the server restarted? Page config and overrides are read at startup.
+5. Was the server restarted? It reads default overrides and server config
+   only when it starts. Page config is read at each page load.
 6. The schema: lists such as `menus`, `toolbar`, `shortcuts` merge with the
    built-in items. An item needs `"disabled": true` to go away.
 

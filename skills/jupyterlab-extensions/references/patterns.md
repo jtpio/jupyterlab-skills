@@ -18,6 +18,7 @@ TypeScript extension, the same names are imports.
 - [Notebook toolbar button](#notebook-toolbar-button)
 - [Work with the active notebook](#work-with-the-active-notebook)
 - [Settings](#settings)
+- [Keep a value between sessions](#keep-a-value-between-sessions)
 - [Startup actions](#startup-actions)
 - [Server requests and files](#server-requests-and-files)
 - [Run code in a kernel](#run-code-in-a-kernel)
@@ -418,6 +419,41 @@ const plugin = {
   `registry.load('@jupyterlab/apputils-extension:themes')`.
 - A distribution sets the default of your setting in
   `default_setting_overrides.d`, like any other setting.
+
+## Keep a value between sessions
+
+`SHARED`: `@jupyterlab/statedb`
+
+The state database is a small key-value store of the application. It is
+saved with the workspace. The name of the token is
+`@jupyterlab/coreutils:IStateDB`, but the object comes from
+`@jupyterlab/statedb`.
+
+```js
+const { IStateDB } = lab['@jupyterlab/statedb'];
+
+const plugin = {
+  id: `${NAME}:counter`,
+  autoStart: true,
+  requires: [IStateDB],
+  activate: (app, state) => {
+    const key = `${NAME}:count`;
+    app.commands.addCommand(`${NAME}:count`, {
+      label: 'Count',
+      execute: async () => {
+        // fetch returns undefined when the key does not exist.
+        const value = await state.fetch(key);
+        const count = (typeof value === 'number' ? value : 0) + 1;
+        await state.save(key, count);
+        return count;
+      }
+    });
+  }
+};
+```
+
+`state.remove(key)` deletes a value. Values are JSON. For a value that the
+user must see and edit, use a setting instead.
 
 ## Startup actions
 

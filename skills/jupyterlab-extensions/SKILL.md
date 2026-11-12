@@ -41,9 +41,9 @@ python scripts/jlab_ext.py install ./extensions/my-lab-tweaks --python <env>/bin
 4. `install <folder>` copies the folder into the labextensions folder of the
    environment (`--python`), of the user (`--user`), or into an explicit
    folder (`--labextensions-dir`). `--link` makes a symlink: edits are live.
-5. Restart the server once, so that it finds the new folder. After that, a
-   change in the JavaScript or CSS needs only a browser reload. A change in
-   `package.json` or in a schema needs a server restart.
+5. Reload the page: JupyterLab finds a new extension folder, and a change
+   in its JavaScript, CSS, `package.json` or schema, at each page load. If
+   the extension does not show, restart the server.
 6. Verify with the probe of `jupyterlab-verify`:
    `--expect-plugin my-lab-tweaks:plugin --fail-on-console-error`. A sidebar
    panel is hidden until its tab is active: add `--activate <widget id>`
@@ -242,6 +242,7 @@ favicon and the tab title.
 - notebook toolbar buttons and access to the active notebook and its cells
 - launcher cards
 - settings: read and react
+- a value that stays between sessions (state database)
 - panels that survive a page reload
 - startup actions
 - requests to the Jupyter Server, reading and writing files
@@ -262,7 +263,7 @@ The table of shared packages and tokens is in
 | `No provider for: <token>` | A `requires` token has no provider: the plugin that provides it is disabled. Move the token to `optional` |
 | `lab['…']` is undefined | The package is not in `SHARED` |
 | A menu item or toolbar button is missing | The command ID in the schema does not match a registered command, or the plugin ID does not match the schema file name |
-| Changes do not show | Browser cache: reload. `package.json` or schema change: restart the server. Copy install: run `install` again, or use `--link` |
+| Changes do not show | Browser cache: reload. Copy install: run `install` again, or use `--link`. Then restart the server |
 | Settings of the extension are not found | `schemas/<name>/plugin.json` or `schemas/<name>/package.json.orig` is missing |
 
 Always finish with the probe and `--fail-on-console-error`.

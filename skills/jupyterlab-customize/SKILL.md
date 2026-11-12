@@ -39,7 +39,11 @@ They do not copy what has a better source:
 | The meaning and the format of a JupyterLab feature | The JupyterLab documentation: each skill links to the page |
 
 IDs change between versions and with the installed extensions. Do not write
-one from memory.
+one from memory. The snippets of the skills carry IDs of JupyterLab 4.6:
+check each one with the commands before you use a snippet on another
+version. `jlab_config.py` refuses a plugin ID or a setting key that the
+installation does not have; it does not check the command, menu and item
+names inside a list value.
 
 ## Step 1: choose the delivery mode
 
@@ -100,9 +104,10 @@ back. A disabled plugin is gone for everyone. An extension is code to maintain.
 2. **One snippet file per concern**, with a clear name (`50-custom.json`,
    `my-lab.json`). JupyterLab merges all `*.json` files of a `.d` folder.
 3. **Valid JSON only.** No comments, no trailing commas.
-4. **Restart the server** after a change in page config, overrides, server
-   config, or after a new extension. A change in the JavaScript or CSS of an
-   installed extension needs only a browser reload.
+4. **Restart the server** after a change in default overrides or server
+   config: it reads them only when it starts. Page config, a new extension,
+   and the JavaScript or CSS of an extension need only a browser reload. A
+   restart is never wrong.
 5. **User settings win.** A value that the user saved in the Settings Editor
    hides your new default. Verify with a clean profile (`jupyterlab-verify`
    does this), and tell the user when a personal setting hides the change.

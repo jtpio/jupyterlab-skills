@@ -6,8 +6,9 @@ Snippets for common requests. Each block is the content of a file in
 that you need into one file per folder, or apply them with
 `jlab_config.py apply`.
 
-All IDs and keys are from JupyterLab 4.6. Check them on other versions with
-`jlab_inspect.py schema <plugin>`.
+All IDs and keys are from JupyterLab 4.6. On another version, check them
+before use: `jlab_inspect.py schema <plugin>` for setting keys, `plugins`,
+`menus`, `toolbars`, `context-menu` and `shortcuts` for the other names.
 
 ## Contents
 

@@ -38,6 +38,7 @@ Actions and checks run in the given order. The screenshot is taken last.
 Actions
   --exec <command[:json]>      run an application command, with optional JSON args
   --click <css selector>       click the first visible element that matches
+  --right-click <css selector> open the context menu of the first visible element that matches
   --press <keys>               press a key or a chord, for example Control+Shift+P or Escape
   --type <text>                type text into the focused element
   --activate <widget id>       show a widget: open its sidebar or select its tab
@@ -54,6 +55,8 @@ sequence; exit code 1 when one fails)
   --expect-no-command <id>     the command does not exist
   --expect-selector <css>      at least one visible element matches
   --expect-no-selector <css>   no visible element matches
+  --expect-text <text>         the visible text of the page contains the text (an open menu counts)
+  --expect-no-text <text>      the visible text of the page does not contain the text
   --expect-title <text>        the page title contains the text
   --expect-theme <name>        the active theme has this name
   --expect-setting <id>:<key>=<json>   the value in effect of a setting. <key> can be a
@@ -69,7 +72,17 @@ Browser
   --timeout <ms>               time limit for the application to start (default 60000)
 `;
 
-const ACTIONS = ['exec', 'click', 'eval', 'press', 'type', 'activate', 'pause', 'drag'];
+const ACTIONS = ['exec', 'click', 'right-click', 'eval', 'press', 'type', 'activate', 'pause', 'drag'];
+
+/*
+ * Tokens whose name does not give the package that exports them.
+ */
+const TOKEN_PACKAGES = {
+  '@jupyterlab/coreutils:ISettingRegistry': '@jupyterlab/settingregistry',
+  '@jupyterlab/coreutils:ISettingConnector': '@jupyterlab/settingregistry',
+  '@jupyterlab/coreutils:IStateDB': '@jupyterlab/statedb',
+  '@jupyterlab/application:IConnectionStatus': '@jupyterlab/services'
+};
 
 function parseArgs(argv) {
   const single = new Set([
@@ -103,12 +116,14 @@ function parseArgs(argv) {
     if (value === undefined) {
       throw new Error(`Missing value for ${arg}`);
     }
+    // The index tells which step failed when two checks have the same text.
+    const index = options.steps.length + 1;
     if (single.has(key)) {
       options[key] = value;
     } else if (ACTIONS.includes(key)) {
-      options.steps.push({ kind: 'action', type: key, value });
+      options.steps.push({ kind: 'action', type: key, value, index });
     } else if (key.startsWith('expect-')) {
-      options.steps.push({ kind: 'check', type: key.slice('expect-'.length), value });
+      options.steps.push({ kind: 'check', type: key.slice('expect-'.length), value, index });
     } else {
       throw new Error(`Unknown option: ${arg}`);
     }
@@ -328,7 +343,11 @@ function listRows(state, kind) {
   if (kind === 'tokens') {
     return state.plugins
       .filter(plugin => plugin.provides)
-      .map(plugin => `${plugin.provides}  <- ${plugin.id}`)
+      .map(plugin => {
+        const source = TOKEN_PACKAGES[plugin.provides];
+        const note = source ? `  (take it from ${source})` : '';
+        return `${plugin.provides}  <- ${plugin.id}${note}`;
+      })
       .sort();
   }
   if (kind === 'widgets') {
@@ -404,6 +423,13 @@ async function runChecks(page, state, checks) {
       const count = await visibleCount(value);
       ok = count === 0;
       detail = `${count} visible`;
+    } else if (type === 'text' || type === 'no-text') {
+      const found = await page.evaluate(
+        needle => document.body.innerText.includes(needle),
+        value
+      );
+      ok = type === 'text' ? found : !found;
+      detail = found ? 'the text is on the page' : 'the text is not on the page';
     } else if (type === 'title') {
       ok = state.title.includes(value);
       detail = `title is "${state.title}"`;
@@ -475,7 +501,8 @@ async function runChecks(page, state, checks) {
       detail = 'unknown check';
     }
     if (!ok) {
-      failures.push(`expect-${type} ${value}${detail ? ` (${detail})` : ''}`);
+      const place = check.index ? `step ${check.index}: ` : '';
+      failures.push(`${place}expect-${type} ${value}${detail ? ` (${detail})` : ''}`);
     }
   }
   return failures;
@@ -552,6 +579,13 @@ async function main() {
       await page
         .waitForSelector('#jupyterlab-splash', { state: 'detached', timeout: 15000 })
         .catch(() => undefined);
+      // The first widget takes the focus a moment after the layout is restored.
+      // An action before that loses its effect: a palette or a menu closes.
+      await page
+        .waitForFunction(() => document.activeElement !== document.body, null, {
+          timeout: 1500
+        })
+        .catch(() => undefined);
     }
     await page.waitForTimeout(500);
 
@@ -596,9 +630,13 @@ async function main() {
         if (!finished) {
           console.error(`exec: ${id} did not finish in 5 s (an open dialog?). The probe continues.`);
         }
-      } else if (action.type === 'click') {
+      } else if (action.type === 'click' || action.type === 'right-click') {
         // Hidden copies of an element exist in the tabs that are not active.
-        await page.locator(action.value).locator('visible=true').first().click();
+        await page
+          .locator(action.value)
+          .locator('visible=true')
+          .first()
+          .click({ button: action.type === 'click' ? 'left' : 'right' });
       } else if (action.type === 'press') {
         await page.keyboard.press(action.value);
       } else if (action.type === 'type') {

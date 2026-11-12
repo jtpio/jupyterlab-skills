@@ -229,6 +229,20 @@ color). Change the variables at the start of a chain and the rest follows.
 To compare your installed theme with its base, name both:
 `css-variables --theme theme-light-extension --theme paper`.
 
+The list does not say where a variable applies. A variable applies in each
+place where a stylesheet uses it: `--jp-cell-editor-background` is for the
+editors of code, Markdown and raw cells, and
+`--jp-cell-editor-active-background` replaces it while an editor has the
+focus. To limit a change, set the variable on a narrower selector, and
+check the computed style with the probe:
+
+```css
+body[data-jp-theme-light='true'] .jp-CodeCell {
+  --jp-cell-editor-background: #fff9c4;
+  --jp-cell-editor-active-background: #fffde7;
+}
+```
+
 ### Fonts
 
 Do not link to a font CDN: many JupyterLab installations have no internet

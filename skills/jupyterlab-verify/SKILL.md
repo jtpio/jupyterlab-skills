@@ -81,10 +81,10 @@ python scripts/jlab_server.py start [--name NAME] [--python PY | --cmd CMD] [--a
 - "A server named … already runs": if it is not yours, do not stop it. Use
   another `--name`.
 
-Restart the server (`restart`) after each change to page config, overrides,
-server config, a `package.json` or a schema of an extension, and after you
-install or remove an extension. A change in JavaScript or CSS of an installed
-extension needs no restart: run the probe again.
+Restart the server (`restart`) after each change to default overrides or
+server config: the server reads them when it starts. Page config, extension
+folders, schemas, JavaScript and CSS are read at each page load: run the
+probe again. A restart is never wrong, and it gives a clean profile.
 
 The profile lives as long as the server. What a probe run saves as a user
 setting stays for the next runs: a theme change
@@ -118,10 +118,11 @@ Checks, each can repeat:
 | `--expect-no-plugin <id>` | The plugin is not registered: it is disabled |
 | `--expect-command <id>` / `--expect-no-command <id>` | The command exists / does not exist |
 | `--expect-selector <css>` / `--expect-no-selector <css>` | A visible element matches / none does |
+| `--expect-text '<text>'` / `--expect-no-text '<text>'` | The visible text of the page contains the text / does not. An open menu counts: use it for menu items |
 | `--expect-title <text>` | The page title contains the text |
 | `--expect-theme <name>` | The active theme has this name |
 | `--expect-eval '<js>'` | The JavaScript expression is true in the page; `app` is the application |
-| `--expect-setting '<plugin>:<key>=<json>'` | The value in effect of a setting matches the JSON. `<key>` can be a path (`codeCellConfig.lineNumbers=true`). An object matches when the setting has at least its keys and values |
+| `--expect-setting '<plugin>:<key>=<json>'` | The value in effect of a setting matches the JSON. `<key>` can be a path (`codeCellConfig.lineNumbers=true`). An object matches when the setting has at least its keys and values. A list must be equal as a whole: for one item of a list setting (`menus`, `toolbar`, `shortcuts`), check the result in the page instead |
 | `--fail-on-console-error` | The browser console has no error |
 
 Actions:
@@ -130,7 +131,8 @@ Actions:
 | --- | --- |
 | `--exec '<command>'` or `--exec '<command>:{"arg": 1}'` | Run an application command |
 | `--activate <widget id>` | Show a widget: open its sidebar, or select its tab |
-| `--click '<css>'` | Click the first visible element that matches |
+| `--click '<css>'` | Click the first visible element that matches. Playwright selectors work: `'li.lm-MenuBar-item:has-text("File")'` |
+| `--right-click '<css>'` | Open the context menu of the first visible element that matches |
 | `--press <keys>` | Press a key or a chord: `Control+Shift+P`, `Meta+K`, `Escape`. Proves that a shortcut works |
 | `--type '<text>'` | Type into the element that has the focus |
 | `--pause <ms>` | Wait between two steps, for example after a notebook opens |
@@ -223,13 +225,29 @@ node scripts/jlab_probe.cjs \
   --screenshot /tmp/panel.png
 ```
 
+A menu item is gone, and a context menu item is gone:
+
+```bash
+node scripts/jlab_probe.cjs \
+  --click 'li.lm-MenuBar-item:has-text("File")' \
+  --expect-text 'New Launcher' --expect-no-text 'Log Out' \
+  --press Escape \
+  --right-click '.jp-DirListing-item' --expect-no-text 'Copy Download Link'
+```
+
+A failure names its step: `step 3: expect-no-text Log Out`. The number is
+the position of the action or check on the command line.
+
 Notes for actions:
 
 - `Accel` of JupyterLab is `Control` on Linux and Windows and `Meta` on
   macOS. The probe runs Chromium on the machine of the server.
-- A command that opens a modal (the command palette) needs the focus: the
-  modal closes when another widget takes the focus. After
-  `notebook:create-new`, add `--pause 1500` before the key press.
+- A modal (the command palette) and a menu close when another widget takes
+  the focus. The probe waits at the start until the first widget has the
+  focus. After an action that opens a document (`notebook:create-new`,
+  `docmanager:open`), add `--pause 1500` before a key press or a menu click.
+- One toolbar item by its name: `[data-jp-item-name="<name>"]`, with the
+  names of `jlab_inspect.py toolbars`.
 - `--expect-selector` counts visible elements only. A sidebar panel is
   hidden until its tab is active (`--activate <widget id>`); a document is
   hidden when another tab is in front.
@@ -262,6 +280,7 @@ environment) and `--name after`, take the same screenshot of both
 | A 404 in the console | A stylesheet, font or icon path is wrong | Paths are relative to `static/` or to the theme CSS file |
 | A console error that you cannot link to your change | It can come from the automation itself, or from stock JupyterLab | Run the same steps on a stock environment (`--name before`). If the error is there too, it is not yours: say so in the report |
 | `Skipping … shortcut because it collides` (a warning, in the dump) | Two shortcuts have the same keys and selector | See "Keyboard shortcuts" in the skill `jupyterlab-settings` |
+| `Menu entry for command '<id>' is duplicated.` (a warning, in the dump) | An item of a menu or context menu has `"disabled": true` in an override | None: this is how JupyterLab reports a removed item |
 | The screenshot shows a "news" or "update" prompt | Stock behavior | Disable announcements or set `fetchNews` (skill `jupyterlab-settings`) |
 
 Console **warnings** do not fail a run. They are in the dump

@@ -11,7 +11,7 @@ Jupyter config folder. None needs a build.
 
 | Surface | File (below a config folder) | Controls | Read |
 | --- | --- | --- | --- |
-| **Page config** | `labconfig/page_config.d/*.json` | Which plugins load (`disabledExtensions`), `appName`, other page options | Server start |
+| **Page config** | `labconfig/page_config.d/*.json` | Which plugins load (`disabledExtensions`), `appName`, other page options | Page load |
 | **Default overrides** | `labconfig/default_setting_overrides.d/*.json` | The default value of any setting of any plugin | Server start |
 | **User settings** | `<user settings dir>/<package>/<plugin>.jupyterlab-settings` | The value for one user. Highest priority | Live |
 | **Server config** | `jupyter_server_config.json`, `jupyter_server_config.d/*.json` | Server and `LabApp` options, server extensions | Server start |
@@ -32,6 +32,10 @@ schema, and it only touches its own files (default name `50-custom.json`).
 ```bash
 <env>/bin/python scripts/jlab_config.py [--scope env|user] [--config-dir DIR] [--name NAME] <command>
 ```
+
+More options before the command: `--remix PROJECT` (below), `--graph DUMP`
+(find the dependents of a disabled plugin from a probe dump, extensions
+included), `--no-cascade`, `--no-validate`. `--help` lists all.
 
 | Command | Effect |
 | --- | --- |
@@ -248,6 +252,7 @@ from memory: the names change between versions.
 | Context menu items: command, selector, rank | `jlab_inspect.py context-menu [text]` |
 | Default shortcuts: keys, selector, args | `jlab_inspect.py shortcuts [text]` |
 | A command ID that a menu, toolbar or shortcut uses | `jlab_inspect.py find <text>` |
+| The command behind a label that the user names ("Log Out") | `jlab_probe.cjs --list commands --grep "Log Out"` (skill `jupyterlab-verify`). The schemas have no labels |
 | All commands of the running application, with labels | `jlab_probe.cjs --list commands --grep <text>` (skill `jupyterlab-verify`) |
 
 - `Accel` is Cmd on macOS and Ctrl elsewhere.
@@ -355,7 +360,8 @@ toolbars.
 
 1. `jlab_inspect.py page-config` and `overrides`: the change is in the merged
    result, no file is invalid, no ID is flagged.
-2. Restart the server.
+2. Restart the server. It reads default overrides and server config only
+   when it starts. Page config applies at the next page load.
 3. Probe in a browser with a clean profile (skill `jupyterlab-verify`):
    `--expect-no-plugin`, `--expect-setting`, `--fail-on-console-error`.
 4. Tell the user which files changed and how to undo: delete the snippet, or

@@ -11,7 +11,8 @@
 
   /*
    * Packages to take from JupyterLab. Only packages that JupyterLab shares
-   * are available (all of @jupyterlab/*, @lumino/*, react, react-dom, yjs).
+   * are available: all of @jupyterlab/* and @lumino/*, react, react-dom, yjs
+   * and some more. "jlab_inspect.py shared" lists them.
    */
   const SHARED = ['@jupyterlab/apputils', '@lumino/widgets'];
 

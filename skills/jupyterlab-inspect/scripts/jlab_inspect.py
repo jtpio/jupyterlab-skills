@@ -145,13 +145,15 @@ def paths() -> dict:
         "write_targets": {
             "environment": {
                 "labconfig": str(prefix_config / "labconfig"),
-                "server_config": str(prefix_config / "jupyter_server_config.d"),
+                "server_config": str(prefix_config / "jupyter_server_config.json"),
+                "server_extensions": str(prefix_config / "jupyter_server_config.d"),
                 "labextensions": str(Path(sys.prefix) / "share" / "jupyter" / "labextensions"),
                 "usable": env_listed and writable(prefix_config),
             },
             "user": {
                 "labconfig": str(Path(user_config) / "labconfig"),
-                "server_config": str(Path(user_config) / "jupyter_server_config.d"),
+                "server_config": str(Path(user_config) / "jupyter_server_config.json"),
+                "server_extensions": str(Path(user_config) / "jupyter_server_config.d"),
                 "labextensions": str(Path(jupyter_data_dir()) / "labextensions"),
                 "usable": writable(user_config),
             },
@@ -299,7 +301,8 @@ def cmd_paths(args: argparse.Namespace) -> None:
     for scope, target in data["write_targets"].items():
         print(f"  {scope}:{'' if target['usable'] else '  (not usable)'}")
         print(f"    page config and overrides: {target['labconfig']}/")
-        print(f"    server config:             {target['server_config']}/")
+        print(f"    server options:            {target['server_config']}")
+        print(f"    server extensions on/off:  {target['server_extensions']}/")
         print(f"    extensions:                {target['labextensions']}/")
     if data["environment_variables"]:
         print("Environment variables that change the paths:")
@@ -602,7 +605,8 @@ def cmd_menus(args: argparse.Namespace) -> None:
         rows,
         ["item", "rank", "args", "added_by"],
         args,
-        "Rank orders the items, lowest first. To remove an item, copy its command and args.",
+        "Rank orders the items, lowest first. To remove an item, copy its command and args. "
+        "The schemas have no labels: jlab_probe.cjs --list commands --grep <label> gives the ID.",
     )
 
 
@@ -627,7 +631,8 @@ def cmd_toolbars(args: argparse.Namespace) -> None:
         rows,
         ["toolbar", "item", "command", "rank", "setting_of"],
         args,
-        "Change a toolbar with the 'toolbar' setting of the plugin in the last column.",
+        "Change a toolbar with the 'toolbar' setting of the plugin in the last column. "
+        "Items that a plugin adds from code are not listed.",
     )
 
 
@@ -654,7 +659,8 @@ def cmd_context_menu(args: argparse.Namespace) -> None:
         rows,
         ["item", "selector", "rank", "args", "added_by"],
         args,
-        "Change them with the 'contextMenu' setting of @jupyterlab/application-extension:context-menu.",
+        "Change them with the 'contextMenu' setting of @jupyterlab/application-extension:context-menu. "
+        "The schemas have no labels: jlab_probe.cjs --list commands --grep <label> gives the ID.",
     )
 
 
@@ -790,6 +796,11 @@ def cmd_find(args: argparse.Namespace) -> None:
         if needle in command.lower():
             hits.append(f"command  {command}")
     print("\n".join(dict.fromkeys(hits)) or "No match.")
+    print(
+        "\nCommands that no menu, toolbar or shortcut uses are not searched: "
+        "jlab_probe.cjs --list commands --grep <text> has all commands, with labels.",
+        file=sys.stderr,
+    )
 
 
 def main() -> int:

@@ -53,7 +53,9 @@ A toolbar button is a `jp-button` web component: its inner parts are in a
 shadow DOM. Size, margin and color on the element work; layout rules for its
 content (`gap`) do not reach inside. In the probe, click it with
 `--click '<toolbar item selector> jp-button'`. Each toolbar also has one
-hidden item, `toolbar-popup-opener`: count the visible items only.
+hidden item, `toolbar-popup-opener`: count the visible items only. One
+item by its name: `[data-jp-item-name="restart-and-run"]`, with the names of
+`jlab_inspect.py toolbars`.
 
 Find more with the browser developer tools, or with the probe:
 `--eval "document.querySelector('<selector>').outerHTML.slice(0, 500)"`.
