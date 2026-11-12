@@ -18,6 +18,8 @@ Target
   --server <name>              a server that jlab_server.py started (default: "default")
   --url <url>                  any JupyterLab URL, with its token
   --keep-workspace             keep the tabs of the last run (default: start from a clean workspace)
+  --no-app                     a page with no application object (JupyterLab components in a
+                               page of your own): only the page checks and actions apply
 
 Output
   --screenshot <file.png>      save a screenshot (after --exec and --wait)
@@ -70,7 +72,7 @@ function parseArgs(argv) {
     'dependents',
     'server'
   ]);
-  const flags = new Set(['full', 'fail-on-console-error', 'help', 'keep-workspace']);
+  const flags = new Set(['full', 'fail-on-console-error', 'help', 'keep-workspace', 'no-app']);
   const options = { actions: [], checks: [] };
   for (let i = 0; i < argv.length; i++) {
     const arg = argv[i];
@@ -281,6 +283,29 @@ function dependents(state, target) {
   };
 }
 
+/*
+ * Runs in the page. State of a page that has no application object.
+ */
+function collectPage() {
+  const node = document.getElementById('jupyter-config-data');
+  const config = node ? JSON.parse(node.textContent || '{}') : {};
+  return {
+    title: document.title,
+    appName: config.appName || null,
+    appVersion: config.appVersion || null,
+    theme: document.body.dataset.jpThemeName || '',
+    pageConfig: config,
+    plugins: [],
+    commands: [],
+    shell: {},
+    menus: [],
+    shortcuts: [],
+    settings: [],
+    federatedExtensions: [],
+    disabledExtensions: []
+  };
+}
+
 async function runChecks(page, state, checks) {
   const failures = [];
   const pluginIds = new Set(state.plugins.map(plugin => plugin.id));
@@ -414,7 +439,8 @@ async function main() {
       process.exit(2);
     }
   }
-  if (!options['keep-workspace']) {
+  const noApp = !!options['no-app'];
+  if (!options['keep-workspace'] && !noApp) {
     options.url = withReset(options.url);
   }
   const { chromium } = loadPlaywright();
@@ -448,20 +474,28 @@ async function main() {
   let exitCode = 0;
   try {
     await page.goto(options.url, { waitUntil: 'domcontentloaded', timeout });
-    await page.waitForFunction(() => !!window.jupyterapp, null, { timeout }).catch(() => {
-      throw new Error(
-        'window.jupyterapp is missing. Start the server with ' +
-          '--LabApp.expose_app_in_browser=True (jlab_server.py does this).'
-      );
-    });
-    await page.evaluate(() => window.jupyterapp.restored);
-    // The splash screen hides the shell while the layout is restored.
-    await page
-      .waitForSelector('#jupyterlab-splash', { state: 'detached', timeout: 15000 })
-      .catch(() => undefined);
+    if (noApp) {
+      await page.waitForLoadState('load', { timeout });
+    } else {
+      await page.waitForFunction(() => !!window.jupyterapp, null, { timeout }).catch(() => {
+        throw new Error(
+          'window.jupyterapp is missing. Start the server with jlab_server.py; for a ' +
+            'remix, give it --app-class and --path. For a page with no application ' +
+            'object, use --no-app.'
+        );
+      });
+      await page.evaluate(() => window.jupyterapp.restored);
+      // The splash screen hides the shell while the layout is restored.
+      await page
+        .waitForSelector('#jupyterlab-splash', { state: 'detached', timeout: 15000 })
+        .catch(() => undefined);
+    }
     await page.waitForTimeout(500);
 
     for (const action of options.actions) {
+      if (noApp && ['exec', 'activate'].includes(action.type)) {
+        throw new Error(`--${action.type} needs the application object: it does not work with --no-app`);
+      }
       if (action.type === 'exec') {
         const index = action.value.indexOf(':{');
         const id = index === -1 ? action.value : action.value.slice(0, index);
@@ -512,7 +546,7 @@ async function main() {
     }
     await page.waitForTimeout(Number(options.wait || 500));
 
-    const state = await page.evaluate(collect);
+    const state = noApp ? await page.evaluate(collectPage) : await page.evaluate(collect);
     state.consoleErrors = consoleErrors;
     state.consoleWarnings = consoleWarnings;
 
@@ -538,6 +572,14 @@ async function main() {
 
     const summary = options.full
       ? state
+      : noApp
+      ? {
+          title: state.title,
+          consoleErrors,
+          screenshot: options.screenshot || null,
+          dump: options.dump || null,
+          failures
+        }
       : {
           title: state.title,
           appName: state.appName,

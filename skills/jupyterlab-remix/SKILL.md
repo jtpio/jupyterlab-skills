@@ -237,6 +237,74 @@ extensions from PyPI.
 
 Without the option, the server ignores the labextensions folders.
 
+## Kind `shell`: your own layout
+
+```bash
+python scripts/jlab_remix.py new solo-notebook --kind shell --app-name "Solo Notebook" --python <env>/bin/python
+```
+
+The template is a single-document notebook application: a top bar with a
+brand and two buttons, and one notebook that fills the page. The URL
+`/<name>/notebooks/<path>` opens a notebook; `/<name>` shows a start page
+with the notebooks of the folder.
+
+What differs from the kind `lab`:
+
+- `src/shell.js` is the shell and `src/app.js` the application class. Change
+  the areas and the layout there.
+- Core plugins are selected **by name** with `pick()` in `src/index.js`,
+  because many core plugins work only in the JupyterLab shell. Start from the
+  set of the template and add one plugin at a time.
+- Your plugins provide what the kept core plugins require (the template has
+  `paths`), and the function of the application (`opener`, `top`).
+- The build order and the wheel are the same. `uv build --wheel` also runs
+  the frontend build when `static/` is absent.
+
+Read [references/shell.md](references/shell.md) before you change the shell
+or the plugin set: it has the members that the shell must implement, the
+plugins that work outside JupyterLab, and the errors to expect.
+
+Verify a notebook URL with `--url`:
+
+```bash
+node <verify>/jlab_probe.cjs --url "http://127.0.0.1:<port>/solo-notebook/notebooks/demo.ipynb?token=<token>" --pause 3000 --exec notebook:run-all-cells --pause 4000 --expect-eval "document.querySelector('.jp-OutputArea-output') !== null" --fail-on-console-error
+```
+
+`jlab_server.py url --name <name>` prints the base URL with the token.
+
+## Kind `widget`: components in a page
+
+```bash
+python scripts/jlab_remix.py new embed-page --kind widget --python <env>/bin/python
+```
+
+The template is one page with one notebook, as `examples/notebook` of the
+JupyterLab repository: no application object, no plugins, no settings
+system. `src/index.js` constructs each part by hand: the service manager,
+the command registry and its key bindings, the editor and language
+registries, the rendermime registry, the document registry and manager, the
+notebook factories, the toolbar, the completer. `src/commands.js` has the
+commands and shortcuts.
+
+- It is not a Python package. `main.py` is a small Jupyter Server
+  application (`ExtensionApp`) that serves the page: `python main.py` in the
+  folder of the notebooks. It needs `jupyter_server` and `ipykernel`.
+- Use this kind to put a component in a page of your own, or to learn how
+  the parts connect. For an application, the kinds `lab` and `shell` are
+  less code, because plugins do the wiring.
+- Verify with the probe in page mode, `--no-app`: the checks on the page
+  (`--expect-selector`, `--expect-eval`, `--expect-title`), the actions
+  `--click`, `--press`, `--type`, and `--fail-on-console-error` work;
+  `--exec` and the plugin checks do not.
+
+  ```bash
+  python <verify>/jlab_server.py start --name embed --cmd "<env>/bin/python $PWD/main.py" --path embed-page --root-dir $PWD
+  ```
+
+  ```bash
+  node <verify>/jlab_probe.cjs --server embed --no-app --pause 3000 --expect-selector '.jp-Notebook .jp-Cell' --click '.jp-Notebook .jp-CodeCell .cm-content' --press Shift+Enter --pause 4000 --expect-eval "document.querySelector('.jp-OutputArea-output') !== null" --fail-on-console-error --screenshot page.png
+  ```
+
 ## Upgrade to another JupyterLab release
 
 ```bash
@@ -261,11 +329,15 @@ errors of the probe are the reference.
 | `window.jupyterapp is missing` in the probe | Start the server with `--app-class <Class>` and `--path <url path>` |
 | The probe reports a 404 for `/lab/api/settings` | An old copy of the probe: the current one reads the settings URL from the page config |
 | A prebuilt extension does not load in a `--federated` remix | It needs a core package that is not in the bundle |
+| Kind `shell`: `did not find a LabShell instance` or `must be activated in JupyterLab` | A core plugin that works only in the JupyterLab shell: remove its name from `pick()` |
+| Kind `shell`: text typed in a cell is lost when the cell runs | The plugin `codemirror-extension:binding` is not in the set |
 
 ## References
 
 - [references/server.md](references/server.md): the server class, page
   config, static files, URLs.
+- [references/shell.md](references/shell.md): the kind `shell`: what a shell
+  must implement, which core plugins work outside JupyterLab, known errors.
 - Upstream examples: https://github.com/jupyterlab/jupyterlab/tree/main/examples
   (`app`, `federated`, `notebook`, `filebrowser`, `console`, `terminal`).
 - A full application with its own shell: https://github.com/jupyter/notebook

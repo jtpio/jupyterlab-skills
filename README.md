@@ -58,7 +58,7 @@ skills/
 ├── jupyterlab-remix/          a new application from JupyterLab packages, with its own bundle
 │   ├── scripts/jlab_remix.py
 │   ├── assets/                project templates
-│   └── references/            the server class
+│   └── references/            the server class, the custom shell
 └── jupyterlab-verify/         headless browser proof and screenshots
     └── scripts/jlab_server.py, jlab_probe.cjs
 ```

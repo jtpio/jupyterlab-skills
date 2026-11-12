@@ -1,7 +1,7 @@
 {
   "name": "jupyterlab-skills",
   "version": "0.1.0",
-  "description": "Agent skills to customize JupyterLab: inspect an installation, change configuration, create extensions and themes without a build step, package the result as an installable distribution, and verify it in a browser.",
+  "description": "Agent skills to customize JupyterLab: inspect an installation, change configuration, create extensions and themes without a build step, package the result as an installable distribution, build a new application from JupyterLab packages, and verify it in a browser.",
   "author": {
     "name": "Jeremy Tuloup"
   },

@@ -142,13 +142,19 @@ def new(args: argparse.Namespace) -> int:
         version = pin_versions(package_file, args.python)
 
     print(f"Created {project}  (kind: {args.kind}{', with prebuilt extensions' if args.federated else ''})")
-    print(f"  Python module:  {values['my_app']}   class: {values['MyApp']}   URL: /{name}")
+    if args.kind == "widget":
+        print(f"  Server file: main.py   class: {values['MyApp']}   URL: /{name}")
+    else:
+        print(f"  Python module: {values['my_app']}   class: {values['MyApp']}   URL: /{name}")
     print(f"  JupyterLab packages: {version}")
     print("Next:")
     print(f"  cd {project}")
     print("  npm install")
     print("  npm run build:prod")
-    print("  uv build --wheel")
+    if args.kind == "widget":
+        print("  python main.py     (needs jupyter_server and ipykernel; no wheel for this kind)")
+    else:
+        print("  uv build --wheel")
     return 0
 
 
@@ -320,21 +326,26 @@ def check(args: argparse.Namespace) -> int:
     if declared and entry.is_file():
         imported = set(re.findall(r"""from\s+['"](@jupyterlab/[\w-]+-extension)['"]""", entry.read_text()))
         imported |= set(re.findall(r"""import\(\s*['"](@jupyterlab/[\w-]+-extension)['"]""", entry.read_text()))
+        # Not always an error: a plugin without settings and CSS needs no copy.
         for name in sorted(imported - declared):
-            problems.append(
-                f"{name} is imported in src/index.js but not in 'jupyterlab.extensions': "
-                "its schemas, themes and styles are not copied"
+            notes.append(
+                f"{name} is imported in src/index.js but is not in 'jupyterlab.extensions': "
+                "the build does not copy its schemas, themes and styles"
             )
         for name in sorted(declared - imported):
-            problems.append(f"{name} is in 'jupyterlab.extensions' but src/index.js does not import it")
+            notes.append(f"{name} is in 'jupyterlab.extensions' but src/index.js does not import it")
         for name in sorted((declared | imported) - dependencies):
             problems.append(f"{name} is not in 'dependencies' of package.json")
 
     module = next(
         (p.parent for p in project.glob("*/app.py") if (p.parent / "__init__.py").is_file()), None
     )
-    if module is None:
-        problems.append("no Python package with app.py")
+    if module is None and (project / "main.py").is_file():
+        # The kind 'widget': a page that runs from its folder.
+        if not (project / "build" / "bundle.js").is_file():
+            notes.append("build/bundle.js is absent: run 'npm install' and 'npm run build:prod'")
+    elif module is None:
+        problems.append("no Python package with app.py, and no main.py")
     else:
         for folder in ("static", "schemas", "themes"):
             if folder == "static" or declared:

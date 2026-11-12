@@ -97,6 +97,11 @@ again.
 node scripts/jlab_probe.cjs [--server NAME | --url URL] [actions] [checks] [output]
 ```
 
+`--no-app` is for a page with no application object (JupyterLab components
+in a page of your own, kind `widget` of the skill `jupyterlab-remix`): the
+page checks and the actions `--click`, `--press`, `--type`, `--eval` work;
+`--exec`, `--activate` and the plugin and command checks do not.
+
 Each run starts from a clean workspace: no tab of an earlier run is open.
 `--keep-workspace` keeps the tabs. Files that a run creates in the root
 folder (`Untitled.ipynb`) stay on disk.
