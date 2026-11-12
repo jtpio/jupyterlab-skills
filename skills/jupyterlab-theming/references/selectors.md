@@ -24,7 +24,9 @@ in a running application. Class names with the prefix `lm-` come from Lumino
 | One tab; the active tab | `.lm-TabBar-tab`, `.lm-TabBar-tab.lm-mod-current` |
 | "+" button of a tab bar | `.lm-TabBar-addButton` |
 | A document or panel in the main area | `.jp-MainAreaWidget` |
-| Any toolbar; a toolbar button | `.jp-Toolbar`, `.jp-ToolbarButtonComponent` |
+| Any toolbar; a toolbar item; a toolbar button | `.jp-Toolbar`, `.jp-Toolbar-item`, `.jp-ToolbarButtonComponent` |
+| Divider between two panels | `.lm-SplitPanel-handle`, `.lm-DockPanel-handle` |
+| A hidden Lumino widget | `.lm-mod-hidden` |
 | Bottom panel (log console, terminals moved down) | `#jp-down-stack` |
 | Status bar | `#jp-main-statusbar` |
 | Notebook panel; its toolbar | `.jp-NotebookPanel`, `.jp-NotebookPanel-toolbar` |
@@ -46,6 +48,12 @@ in a running application. Class names with the prefix `lm-` come from Lumino
 | Text editor | `.jp-FileEditor` |
 | Terminal | `.jp-Terminal` |
 | Settings editor | `.jp-SettingsPanel` |
+
+A toolbar button is a `jp-button` web component: its inner parts are in a
+shadow DOM. Size, margin and color on the element work; layout rules for its
+content (`gap`) do not reach inside. In the probe, click it with
+`--click '<toolbar item selector> jp-button'`. Each toolbar also has one
+hidden item, `toolbar-popup-opener`: count the visible items only.
 
 Find more with the browser developer tools, or with the probe:
 `--eval "document.querySelector('<selector>').outerHTML.slice(0, 500)"`.

@@ -1,0 +1,8 @@
+node_modules/
+build/
+dist/
+lectern/static/
+lectern/schemas/
+lectern/themes/
+__pycache__/
+*.egg-info/

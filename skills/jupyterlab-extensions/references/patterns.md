@@ -21,6 +21,7 @@ TypeScript extension, the same names are imports.
 - [Startup actions](#startup-actions)
 - [Server requests and files](#server-requests-and-files)
 - [Run code in a kernel](#run-code-in-a-kernel)
+- [Render Markdown](#render-markdown)
 - [Dialogs and notifications](#dialogs-and-notifications)
 - [Menus from code](#menus-from-code)
 - [File types](#file-types)
@@ -498,6 +499,32 @@ async function runCode(app, code) {
 
 For the kernel of an open notebook, use
 `panel.sessionContext.session.kernel.requestExecute(...)`.
+
+## Render Markdown
+
+Render a Markdown string as JupyterLab does in a Markdown cell (headings,
+code, LaTeX, links). The plugin requires `IRenderMimeRegistry`.
+
+`SHARED`: `@jupyterlab/rendermime`
+
+```js
+const { IRenderMimeRegistry, MimeModel, RenderMimeRegistry } = lab['@jupyterlab/rendermime'];
+
+async function renderMarkdown(rendermime, contents, path, source) {
+  // The resolver makes relative links and images point to the folder of `path`.
+  const registry = rendermime.clone({
+    resolver: new RenderMimeRegistry.UrlResolver({ path, contents })
+  });
+  const widget = registry.createRenderer('text/markdown');
+  await widget.renderModel(new MimeModel({ data: { 'text/markdown': source } }));
+  return widget;
+}
+```
+
+`rendermime` is the service of `IRenderMimeRegistry`, `contents` is
+`app.serviceManager.contents`. The result is a Lumino widget: add it to a
+panel or to the shell. Read the source of a file with
+`(await contents.get(path, { content: true })).content`.
 
 ## Dialogs and notifications
 

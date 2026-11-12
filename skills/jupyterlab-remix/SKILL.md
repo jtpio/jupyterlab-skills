@@ -146,7 +146,10 @@ Put the result in three places. They must agree; `check` compares them.
 
 1. `dependencies` in `package.json`, with the version of the JupyterLab
    release. `jlab_remix.py pin <project> --python <env>/bin/python` sets
-   the versions.
+   the versions. It also writes `overrides` for all `@jupyterlab/*` and
+   `@lumino/*` packages: the published packages depend on each other with
+   `^` ranges, and without the overrides npm can install a newer minor
+   release for an indirect dependency. Keep the `overrides` block.
 2. `jupyterlab.extensions` in `package.json`. The build reads this list to
    copy the settings schemas, the themes and the CSS of each package.
 3. The imports and the `extensions` array in `src/index.js`. The plugins to
@@ -209,9 +212,31 @@ the plugin that owns the list (skill `jupyterlab-settings`).
   format as the default overrides of JupyterLab
   (`{"<plugin id>": {"<key>": <value>}}`). Menus, toolbars, shortcuts and the
   layout go here. The cookbook of the skill `jupyterlab-settings` applies to
-  the plugins that are in the bundle.
-- **CSS**: `style/app.css`. It loads after the CSS of the core packages.
-  Use the theme variables.
+  the plugins that are in the bundle. Its script writes the file and checks
+  each key against the schemas of your build (run it after a build):
+
+  ```bash
+  python <settings>/jlab_config.py --remix <project> set @jupyterlab/notebook-extension:panel toolbar '[{"name": "cut", "disabled": true}]'
+  ```
+
+- **CSS**: `style/app.css`. It loads after the CSS of the core packages, but
+  the CSS of the theme loads later and wins on `:root`. Set theme variables
+  on `body` (`body { --jp-layout-color1: #fbf7ee; }`), and use the variables
+  in your rules.
+- **Fonts**: add a font package and import its CSS in `src/index.js`; the
+  bundler copies the font files. No CDN.
+
+  ```bash
+  npm install @fontsource/ibm-plex-sans
+  ```
+
+  ```js
+  import '@fontsource/ibm-plex-sans/400.css';
+  import '@fontsource/ibm-plex-sans/600.css';
+  ```
+
+  Then `body { --jp-ui-font-family: 'IBM Plex Sans', system-ui, sans-serif; }`.
+  Import only the weights in use: each one adds files to the wheel.
 - **Themes**: a theme package in the bundle (`theme-light-extension`,
   `theme-dark-extension`) is available by name. For a look of your own, the
   simplest way is CSS in `style/app.css` on top of a built-in theme. A
@@ -270,7 +295,9 @@ Verify a notebook URL with `--url`:
 node <verify>/jlab_probe.cjs --url "http://127.0.0.1:<port>/solo-notebook/notebooks/demo.ipynb?token=<token>" --pause 3000 --exec notebook:run-all-cells --pause 4000 --expect-eval "document.querySelector('.jp-OutputArea-output') !== null" --fail-on-console-error
 ```
 
-`jlab_server.py url --name <name>` prints the base URL with the token.
+`jlab_server.py url --name <name>` prints the base URL with the token. The
+probe summary lists the areas of JupyterLab only: name yours with
+`--areas home,text`.
 
 ## Kind `widget`: components in a page
 
@@ -326,6 +353,8 @@ errors of the probe are the reference.
 | Settings of a plugin are missing, `404` for a schema | The package is imported but is not in `jupyterlab.extensions` |
 | An old bundle shows after a rebuild | The server keeps the hash of `bundle.js`: restart it |
 | Two warnings about Yjs when a notebook opens | `yjs` is newer than the JupyterLab release expects: keep the `overrides` entry of `package.json` |
+| `No provider for: <token>` for a plugin whose package is in the bundle, or `npm ls @jupyterlab/apputils` shows two versions | Two copies of a core package: run `jlab_remix.py pin`, remove `node_modules` and the lock file, install again |
+| `npm error Override for … conflicts with direct dependency` | A direct dependency has a different version than its override: run `jlab_remix.py pin`, or give both the same value |
 | `window.jupyterapp is missing` in the probe | Start the server with `--app-class <Class>` and `--path <url path>` |
 | The probe reports a 404 for `/lab/api/settings` | An old copy of the probe: the current one reads the settings URL from the page config |
 | A prebuilt extension does not load in a `--federated` remix | It needs a core package that is not in the bundle |
@@ -338,6 +367,9 @@ errors of the probe are the reference.
   config, static files, URLs.
 - [references/shell.md](references/shell.md): the kind `shell`: what a shell
   must implement, which core plugins work outside JupyterLab, known errors.
+- An application made with this skill, kind `shell` with two more areas and a
+  split: `examples/lectern` of the repository
+  https://github.com/jtpio/jupyterlab-skills
 - Upstream examples: https://github.com/jupyterlab/jupyterlab/tree/main/examples
   (`app`, `federated`, `notebook`, `filebrowser`, `console`, `terminal`).
 - A full application with its own shell: https://github.com/jupyter/notebook

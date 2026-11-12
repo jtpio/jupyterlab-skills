@@ -24,20 +24,25 @@ Target
 Output
   --screenshot <file.png>      save a screenshot (after --exec and --wait)
   --dump <file.json>           save plugins, commands, shell widgets, menus, settings
+  --areas <a,b>                more shell areas to list, for an application with its own shell
   --full                       print the full dump on stdout, not the summary
   --dependents <plugin id>     print the plugins that need this plugin (or package), then exit
 
-Actions (in the given order, before the checks and the screenshot)
+Actions and checks run in the given order. The screenshot is taken last.
+
+Actions
   --exec <command[:json]>      run an application command, with optional JSON args
   --click <css selector>       click the first visible element that matches
   --press <keys>               press a key or a chord, for example Control+Shift+P or Escape
   --type <text>                type text into the focused element
   --activate <widget id>       show a widget: open its sidebar or select its tab
-  --pause <ms>                 wait between two actions
+  --pause <ms>                 wait between two steps
+  --drag <css>:<dx>,<dy>       drag an element with the mouse, by dx and dy pixels
   --eval <javascript>          evaluate an expression in the page (app = window.jupyterapp)
   --wait <ms>                  wait after the actions (default 500)
 
-Checks (each can repeat; exit code 1 when one fails)
+Checks (each can repeat; a check sees the page as it is at its place in the
+sequence; exit code 1 when one fails)
   --expect-plugin <id>         the plugin is registered
   --expect-no-plugin <id>      the plugin is not registered (it is disabled)
   --expect-command <id>        the command exists
@@ -59,6 +64,8 @@ Browser
   --timeout <ms>               time limit for the application to start (default 60000)
 `;
 
+const ACTIONS = ['exec', 'click', 'eval', 'press', 'type', 'activate', 'pause', 'drag'];
+
 function parseArgs(argv) {
   const single = new Set([
     'url',
@@ -70,10 +77,11 @@ function parseArgs(argv) {
     'color-scheme',
     'timeout',
     'dependents',
-    'server'
+    'server',
+    'areas'
   ]);
   const flags = new Set(['full', 'fail-on-console-error', 'help', 'keep-workspace', 'no-app']);
-  const options = { actions: [], checks: [] };
+  const options = { steps: [] };
   for (let i = 0; i < argv.length; i++) {
     const arg = argv[i];
     if (!arg.startsWith('--')) {
@@ -90,10 +98,10 @@ function parseArgs(argv) {
     }
     if (single.has(key)) {
       options[key] = value;
-    } else if (['exec', 'click', 'eval', 'press', 'type', 'activate', 'pause'].includes(key)) {
-      options.actions.push({ type: key, value });
+    } else if (ACTIONS.includes(key)) {
+      options.steps.push({ kind: 'action', type: key, value });
     } else if (key.startsWith('expect-')) {
-      options.checks.push({ type: key.slice('expect-'.length), value });
+      options.steps.push({ kind: 'check', type: key.slice('expect-'.length), value });
     } else {
       throw new Error(`Unknown option: ${arg}`);
     }
@@ -154,7 +162,7 @@ function loadPlaywright() {
 /*
  * Runs in the page. Collects the state of the application.
  */
-async function collect() {
+async function collect(extraAreas) {
   const app = window.jupyterapp;
   const config = JSON.parse(
     document.getElementById('jupyter-config-data').textContent
@@ -185,7 +193,8 @@ async function collect() {
     return { id, label, caption };
   });
   const shell = {};
-  for (const area of ['top', 'menu', 'left', 'right', 'main', 'down', 'bottom', 'header']) {
+  const areas = ['top', 'menu', 'left', 'right', 'main', 'down', 'bottom', 'header'];
+  for (const area of areas.concat(extraAreas || [])) {
     try {
       shell[area] = Array.from(app.shell.widgets(area)).map(widget => ({
         id: widget.id,
@@ -492,7 +501,25 @@ async function main() {
     }
     await page.waitForTimeout(500);
 
-    for (const action of options.actions) {
+    const failures = [];
+    const extraAreas = (options.areas || '').split(',').filter(Boolean);
+    const collectState = () =>
+      noApp ? page.evaluate(collectPage) : page.evaluate(collect, extraAreas);
+    // The lists of plugins and commands do not change after startup.
+    let lists = null;
+    for (const action of options.steps) {
+      if (action.kind === 'check') {
+        if (lists === null && /plugin|command/.test(action.type)) {
+          lists = await collectState();
+        }
+        const live = await page.evaluate(() => ({
+          title: document.title,
+          theme: document.body.dataset.jpThemeName || ''
+        }));
+        const state = { plugins: [], commands: [], ...(lists || {}), ...live };
+        failures.push(...(await runChecks(page, state, [action])));
+        continue;
+      }
       if (noApp && ['exec', 'activate'].includes(action.type)) {
         throw new Error(`--${action.type} needs the application object: it does not work with --no-app`);
       }
@@ -524,6 +551,20 @@ async function main() {
         await page.keyboard.type(action.value);
       } else if (action.type === 'pause') {
         await page.waitForTimeout(Number(action.value));
+      } else if (action.type === 'drag') {
+        const split = action.value.lastIndexOf(':');
+        const [dx, dy] = action.value.slice(split + 1).split(',').map(Number);
+        const box = await page
+          .locator(action.value.slice(0, split))
+          .locator('visible=true')
+          .first()
+          .boundingBox();
+        const x = box.x + box.width / 2;
+        const y = box.y + box.height / 2;
+        await page.mouse.move(x, y);
+        await page.mouse.down();
+        await page.mouse.move(x + dx, y + dy, { steps: 12 });
+        await page.mouse.up();
       } else if (action.type === 'activate') {
         await page.evaluate(id => window.jupyterapp.shell.activateById(id), action.value);
       } else if (action.type === 'eval') {
@@ -546,7 +587,7 @@ async function main() {
     }
     await page.waitForTimeout(Number(options.wait || 500));
 
-    const state = noApp ? await page.evaluate(collectPage) : await page.evaluate(collect);
+    const state = await collectState();
     state.consoleErrors = consoleErrors;
     state.consoleWarnings = consoleWarnings;
 
@@ -556,7 +597,6 @@ async function main() {
       process.exit(0);
     }
 
-    const failures = await runChecks(page, state, options.checks);
     if (options['fail-on-console-error'] && consoleErrors.length) {
       failures.push(`${consoleErrors.length} console error(s)`);
     }

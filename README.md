@@ -91,15 +91,19 @@ Design choices:
   executed against JupyterLab 4.6.6. `tools/` holds the scripts that
   regenerate and check them for a new version.
 
-## Example
+## Examples
 
-[`examples/inkwell`](examples/inkwell) is a JupyterLab distribution that a
-coding agent built with these skills and a product brief: a writing studio
-with a home page in place of the launcher, its own themes and fonts, new
-commands, a shorter menu bar and toolbar, and a launch command. It has no
-build step.
+Two applications that a coding agent built with these skills and a product
+brief, with no other source of JupyterLab knowledge.
+
+| Example | Kind | What it shows |
+| --- | --- | --- |
+| [`examples/inkwell`](examples/inkwell) | Distribution: JupyterLab with configuration, a theme and no-build extensions | A writing studio: a home page in place of the launcher, its own themes and fonts, new commands, a shorter menu bar and toolbar. No build step |
+| [`examples/lectern`](examples/lectern) | Remix: a new application from JupyterLab packages, with its own shell | A two-pane lesson reader: the text of a lesson on the left, its notebook on the right. Its own bundle and server class |
 
 ![The Inkwell home page](examples/inkwell/screenshots/home.webp)
+
+![A lesson in Lectern](examples/lectern/screenshots/lesson.webp)
 
 ## Install
 

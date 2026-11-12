@@ -67,7 +67,7 @@ an argument of `activate`.
 | `IMarkdownViewerTracker` | `@jupyterlab/markdownviewer` | Open Markdown previews |
 | `IImageTracker` | `@jupyterlab/imageviewer` | Open images |
 | `IHTMLViewerTracker` | `@jupyterlab/htmlviewer` | Open HTML viewers |
-| `IRenderMimeRegistry` | `@jupyterlab/rendermime` | Renderers for output MIME types |
+| `IRenderMimeRegistry` | `@jupyterlab/rendermime` | Renderers for MIME types: outputs, Markdown, LaTeX. Also renders a Markdown string (see `patterns.md`) |
 | `IEditorServices` | `@jupyterlab/codeeditor` | Editor factories |
 | `IEditorExtensionRegistry` | `@jupyterlab/codemirror` | CodeMirror extensions |
 | `IEditorLanguageRegistry` | `@jupyterlab/codemirror` | Editor languages |

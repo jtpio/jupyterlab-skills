@@ -38,6 +38,45 @@ the constructor, a `case` in `add()`, and an entry in `widgets()` and
 `activateById()`. For a split between two areas, use a `SplitPanel` in place
 of one of the panels.
 
+A child of a `SplitPanel` that hides and shows again gets a default size.
+Keep the sizes of the user:
+
+```js
+setTextVisible(visible) {
+  if (!visible) {
+    this._sizes = this._split.relativeSizes();
+  }
+  this._text.setHidden(!visible);
+  if (visible && this._sizes) {
+    this._split.setRelativeSizes(this._sizes);
+  }
+}
+```
+
+The divider of a `SplitPanel` is `.lm-SplitPanel-handle`; a hidden widget
+has the class `lm-mod-hidden`.
+
+To replace the document in `main` (the next page of a guide, another
+notebook), open the new one first, then save and close the old one:
+
+```js
+async function closeDocument(docManager, widget) {
+  if (!widget || widget.isDisposed) {
+    return;
+  }
+  const context = docManager.contextForWidget(widget);
+  if (context?.model.dirty && context.contentsModel?.writable !== false) {
+    await context.save();
+  }
+  widget.close();
+}
+```
+
+`docManager` is the service of the token `IDocumentManager`
+(`@jupyterlab/docmanager`). With the setting `kernelShutdown: true` of
+`@jupyterlab/notebook-extension:tracker` in `settings/overrides.json`, the
+kernel of a closed notebook stops.
+
 Layout CSS that the shell needs:
 
 ```css

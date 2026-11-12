@@ -47,7 +47,10 @@ schema, and it only touches its own files (default name `50-custom.json`).
 Scope: `--scope env` writes to `<sys.prefix>/etc/jupyter`, `--scope user` to
 the user config folder. Without the option, the script uses `env` inside a
 virtual environment. `--config-dir` gives an explicit folder: use it with the
-`jupyter-config` folder of a distribution project.
+`jupyter-config` folder of a distribution project. `--remix <project>` is for
+a remix (skill `jupyterlab-remix`): `set`, `unset` and `apply` then write the
+file `settings/overrides.json` of the project, and the checks use the schemas
+of its build. A remix has no page config.
 
 Examples:
 

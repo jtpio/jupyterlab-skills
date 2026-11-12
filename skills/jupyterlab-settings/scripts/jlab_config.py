@@ -24,13 +24,14 @@ from pathlib import Path
 try:
     from jupyter_core.paths import jupyter_config_dir, jupyter_config_path, jupyter_path
     from jupyterlab.commands import get_app_dir, get_user_settings_dir
+
+    IMPORT_ERROR = None
 except ImportError as error:
-    print(
-        f"error: {error}.\nRun this script with the Python of the environment "
-        "that has JupyterLab, for example .venv/bin/python jlab_config.py show",
-        file=sys.stderr,
-    )
-    sys.exit(2)
+    # A remix project (--remix) has its own schemas: JupyterLab is not necessary.
+    IMPORT_ERROR = error
+
+# Folder of the settings schemas of a remix project, when --remix is given.
+REMIX_SCHEMAS: Path | None = None
 
 PLUGIN_ID = re.compile(r"""\bid:\s*["'`]((?:@[\w.-]+/)?[\w.-]+:[\w:./-]+)["'`]""")
 # Some core plugins keep their ID in a constant: match the literal too.
@@ -77,10 +78,27 @@ def config_root(args: argparse.Namespace) -> Path:
     return env_dir if scope == "env" else Path(jupyter_config_dir())
 
 
+def remix_module(project: Path) -> Path:
+    """
+    Python package folder of a remix project: the one with app.py.
+    """
+    for path in sorted(project.glob("*/app.py")):
+        if (path.parent / "__init__.py").is_file():
+            return path.parent
+    fail(f"{project} has no Python package with app.py: not a remix project")
+
+
 def snippet(args: argparse.Namespace, kind: str) -> Path:
     """
     Path of the snippet file of this script for one kind of config.
     """
+    if args.remix:
+        if kind != "default_setting_overrides":
+            fail(
+                "a remix has no page config: leave a plugin out of the bundle "
+                "(the DISABLED list or pick() in src/index.js)"
+            )
+        return remix_module(Path(args.remix).resolve()) / "settings" / "overrides.json"
     return config_root(args) / "labconfig" / f"{kind}.d" / f"{args.name}.json"
 
 
@@ -115,6 +133,10 @@ def schema_files() -> dict[str, Path]:
     Map each plugin ID that has a settings schema to its file.
     """
     found: dict[str, Path] = {}
+    if REMIX_SCHEMAS is not None:
+        for path in REMIX_SCHEMAS.rglob("*.json"):
+            found[f"{path.parent.relative_to(REMIX_SCHEMAS).as_posix()}:{path.stem}"] = path
+        return found
     core = Path(get_app_dir()) / "schemas"
     for path in core.rglob("*.json"):
         found[f"{path.parent.relative_to(core).as_posix()}:{path.stem}"] = path
@@ -452,6 +474,20 @@ def cmd_apply(args: argparse.Namespace) -> None:
     unknown = set(spec) - {"disable", "lock", "page", "overrides"}
     if unknown:
         fail(f"unknown keys in {args.file}: {', '.join(sorted(unknown))}")
+    if args.remix:
+        if set(spec) - {"overrides"}:
+            fail("for a remix, the file can only have the key \"overrides\"")
+        overrides_path = snippet(args, "default_setting_overrides")
+        overrides = read(overrides_path)
+        for plugin, values in spec.get("overrides", {}).items():
+            for key, value in values.items():
+                if not args.no_validate:
+                    check_setting(plugin, key, value)
+                overrides.setdefault(plugin, {})[key] = value
+                if key == "shortcuts" and not args.no_validate:
+                    check_shortcuts(value)
+        write(overrides_path, overrides)
+        return
     page_path = snippet(args, "page_config")
     page = read(page_path)
     plugins = known_plugins() if not args.no_validate else set()
@@ -482,7 +518,7 @@ def cmd_show(args: argparse.Namespace) -> None:
     """
     Print the snippets of this script.
     """
-    for kind in ("page_config", "default_setting_overrides"):
+    for kind in ("default_setting_overrides",) if args.remix else ("page_config", "default_setting_overrides"):
         path = snippet(args, kind)
         print(f"# {path}")
         print(json.dumps(read(path), indent=2) if path.is_file() else "(not present)")
@@ -506,6 +542,12 @@ def main() -> int:
         "--config-dir",
         help="explicit Jupyter config folder, for example the jupyter-config "
         "folder of a distribution project",
+    )
+    parser.add_argument(
+        "--remix",
+        metavar="PROJECT",
+        help="a remix project (skill jupyterlab-remix): write the default settings to "
+        "<module>/settings/overrides.json and check them against the schemas of its build",
     )
     parser.add_argument("--name", default="50-custom", help="base name of the snippet files")
     parser.add_argument(
@@ -563,6 +605,26 @@ def main() -> int:
     sub.add_parser("show", help="print the snippets").set_defaults(func=cmd_show)
 
     args = parser.parse_args()
+    if args.remix:
+        global REMIX_SCHEMAS
+        if args.func in (cmd_disable, cmd_enable, cmd_page, cmd_user_set):
+            fail(
+                f"'{args.action}' does not apply to a remix: only set, unset, apply "
+                "(with \"overrides\") and show"
+            )
+        schemas = remix_module(Path(args.remix).resolve()) / "schemas"
+        if schemas.is_dir():
+            REMIX_SCHEMAS = schemas
+        else:
+            warn(f"{schemas} is absent (no build yet): the values are not checked")
+            args.no_validate = True
+    elif IMPORT_ERROR is not None:
+        print(
+            f"error: {IMPORT_ERROR}.\nRun this script with the Python of the environment "
+            "that has JupyterLab, for example .venv/bin/python jlab_config.py show",
+            file=sys.stderr,
+        )
+        sys.exit(2)
     args.func(args)
     return 0
 

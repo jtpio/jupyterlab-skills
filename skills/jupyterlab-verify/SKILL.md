@@ -106,6 +106,10 @@ Each run starts from a clean workspace: no tab of an earlier run is open.
 `--keep-workspace` keeps the tabs. Files that a run creates in the root
 folder (`Untitled.ipynb`) stay on disk.
 
+Actions and checks run in the order of the command line: a check sees the
+page as it is at that point. Put a check after the action that it tests, and
+check an intermediate state before the next action changes it.
+
 Checks, each can repeat:
 
 | Option | Passes when |
@@ -120,7 +124,7 @@ Checks, each can repeat:
 | `--expect-setting '<plugin>:<key>=<json>'` | The value in effect of a setting matches the JSON. `<key>` can be a path (`codeCellConfig.lineNumbers=true`). An object matches when the setting has at least its keys and values |
 | `--fail-on-console-error` | The browser console has no error |
 
-Actions, run in the given order before the checks and the screenshot:
+Actions:
 
 | Option | Does |
 | --- | --- |
@@ -129,8 +133,9 @@ Actions, run in the given order before the checks and the screenshot:
 | `--click '<css>'` | Click the first visible element that matches |
 | `--press <keys>` | Press a key or a chord: `Control+Shift+P`, `Meta+K`, `Escape`. Proves that a shortcut works |
 | `--type '<text>'` | Type into the element that has the focus |
-| `--pause <ms>` | Wait between two actions, for example after a notebook opens |
-| `--eval '<js>'` | Evaluate JavaScript in the page; `app` is the application. The result prints on stderr as `eval: …` |
+| `--pause <ms>` | Wait between two steps, for example after a notebook opens |
+| `--drag '<css>:<dx>,<dy>'` | Drag an element with the mouse by dx and dy pixels: a divider, a tab |
+| `--eval '<js>'` | Evaluate JavaScript in the page; `app` is the application. The result prints on stderr as `eval: …`. A promise is awaited: `(async () => { … })()` works |
 | `--wait <ms>` | Wait after all the actions (default 500) |
 
 Output:
@@ -142,6 +147,7 @@ Output:
 | `--viewport 1440x900` | Size of the window |
 | `--color-scheme dark` | Browser preference, for adaptive themes |
 | `--dump <file.json>` | Save everything: plugins with their tokens, commands with labels, shortcuts, widgets, menus, settings schemas, page config |
+| `--areas home,text` | More shell areas to list in the summary. The probe knows the areas of JupyterLab only; an application with its own shell names its areas here |
 | `--full` | Print the full data instead of the summary |
 | `--dependents <id>` | Print the plugins that need this plugin or package, then exit |
 

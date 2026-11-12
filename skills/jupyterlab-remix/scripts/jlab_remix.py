@@ -59,29 +59,42 @@ def staging_dir(python: str) -> Path:
     return Path(result.stdout.strip())
 
 
-def pin_versions(package_file: Path, python: str) -> str:
+def pin_versions(package_file: Path, python: str) -> tuple[str, bool]:
     """
     Set the JupyterLab dependencies to the versions of an installed JupyterLab.
 
-    Returns the JupyterLab version. A remix must use one consistent set of
-    packages: the set of the release that it targets.
+    Returns the JupyterLab version and whether a version changed. A remix
+    must use one consistent set of packages: the set of its target release.
     """
     staging = staging_dir(python)
     core = json.loads((staging / "package.json").read_text())
     resolutions = core["resolutions"]
-    package = json.loads(package_file.read_text())
+    before = package_file.read_text()
+    package = json.loads(before)
+    # npm refuses an override that differs from a direct dependency: give
+    # the direct dependencies the same versions.
     for section in ("dependencies", "devDependencies"):
         for name in package.get(section, {}):
-            if name.startswith("@jupyterlab/") and name in resolutions:
+            if name.startswith(("@jupyterlab/", "@lumino/")) and name in resolutions:
                 package[section][name] = resolutions[name]
+    # The published packages depend on each other with "^" ranges. Without
+    # overrides, npm takes a newer minor release for the indirect ones, and
+    # the bundle then has two copies of a core package.
+    overrides = {
+        name: version
+        for name, version in sorted(resolutions.items())
+        if name.startswith(("@jupyterlab/", "@lumino/"))
+    }
     lock = staging / "yarn.lock"
     if lock.is_file():
         match = re.search(r'\n"yjs@[^"]*":\n\s+version: ([^\n]+)', lock.read_text())
         if match:
             # A newer yjs than the one of the release logs warnings.
-            package.setdefault("overrides", {})["yjs"] = match.group(1).strip()
-    package_file.write_text(json.dumps(package, indent=2) + "\n")
-    return core["version"]
+            overrides["yjs"] = match.group(1).strip()
+    package["overrides"] = overrides
+    after = json.dumps(package, indent=2) + "\n"
+    package_file.write_text(after)
+    return core["version"], json.loads(before) != package
 
 
 def class_name(name: str) -> str:
@@ -139,7 +152,7 @@ def new(args: argparse.Namespace) -> int:
     version = "the release that the template was made for"
     package_file = project / "package.json"
     if args.python and package_file.is_file():
-        version = pin_versions(package_file, args.python)
+        version, changed = pin_versions(package_file, args.python)
 
     print(f"Created {project}  (kind: {args.kind}{', with prebuilt extensions' if args.federated else ''})")
     if args.kind == "widget":
@@ -165,7 +178,10 @@ def pin(args: argparse.Namespace) -> int:
     package_file = Path(args.project).resolve() / "package.json"
     if not package_file.is_file():
         fail(f"{package_file} does not exist")
-    version = pin_versions(package_file, args.python)
+    version, changed = pin_versions(package_file, args.python)
+    if not changed:
+        print(f"{package_file} already has the versions of JupyterLab {version}. No change.")
+        return 0
     print(f"Pinned the JupyterLab packages of {package_file} to JupyterLab {version}.")
     print("Remove node_modules and package-lock.json, then: npm install && npm run build:prod")
     return 0
@@ -326,8 +342,10 @@ def check(args: argparse.Namespace) -> int:
     if declared and entry.is_file():
         imported = set(re.findall(r"""from\s+['"](@jupyterlab/[\w-]+-extension)['"]""", entry.read_text()))
         imported |= set(re.findall(r"""import\(\s*['"](@jupyterlab/[\w-]+-extension)['"]""", entry.read_text()))
-        # Not always an error: a plugin without settings and CSS needs no copy.
-        for name in sorted(imported - declared):
+        # With pick(), the project selects plugins by name: a package that
+        # gives only plugins without settings needs no copy of its schemas.
+        by_name = "pick(" in entry.read_text()
+        for name in sorted(set() if by_name else imported - declared):
             notes.append(
                 f"{name} is imported in src/index.js but is not in 'jupyterlab.extensions': "
                 "the build does not copy its schemas, themes and styles"
