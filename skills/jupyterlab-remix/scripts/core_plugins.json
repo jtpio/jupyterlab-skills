@@ -1,0 +1,1433 @@
+{
+ "jupyterlab": "4.6.6",
+ "plugins": {
+  "@jupyterlab/application-extension:commands": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/translation:ITranslator",
+    "@jupyterlab/coreutils:ISettingRegistry"
+   ]
+  },
+  "@jupyterlab/application-extension:context-menu": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/coreutils:ISettingRegistry",
+    "@jupyterlab/translation:ITranslator"
+   ]
+  },
+  "@jupyterlab/application-extension:dirty": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/translation:ITranslator"
+   ]
+  },
+  "@jupyterlab/application-extension:faviconbusy": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/application:ILabStatus"
+   ]
+  },
+  "@jupyterlab/application-extension:info": {
+   "provides": "@jupyterlab/application:IInfo",
+   "requires": []
+  },
+  "@jupyterlab/application-extension:layout": {
+   "provides": "@jupyterlab/application:ILayoutRestorer",
+   "requires": [
+    "@jupyterlab/coreutils:IStateDB",
+    "@jupyterlab/application:ILabShell",
+    "@jupyterlab/coreutils:ISettingRegistry"
+   ]
+  },
+  "@jupyterlab/application-extension:logo": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/application:ILabShell"
+   ]
+  },
+  "@jupyterlab/application-extension:main": {
+   "provides": "@jupyterlab/application:ITreePathUpdater",
+   "requires": [
+    "@jupyterlab/application:IRouter",
+    "@jupyterlab/apputils:IWindowResolver",
+    "@jupyterlab/translation:ITranslator",
+    "@jupyterlab/application:ITreeResolver"
+   ]
+  },
+  "@jupyterlab/application-extension:mimedocument": {
+   "provides": "@jupyterlab/application:IMimeDocumentTracker",
+   "requires": []
+  },
+  "@jupyterlab/application-extension:move-widget": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/application:ILabShell"
+   ]
+  },
+  "@jupyterlab/application-extension:notfound": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/application:IPaths",
+    "@jupyterlab/application:IRouter",
+    "@jupyterlab/translation:ITranslator"
+   ]
+  },
+  "@jupyterlab/application-extension:paths": {
+   "provides": "@jupyterlab/application:IPaths",
+   "requires": []
+  },
+  "@jupyterlab/application-extension:property-inspector": {
+   "provides": "@jupyterlab/property-inspector:IPropertyInspectorProvider",
+   "requires": [
+    "@jupyterlab/application:ILabShell",
+    "@jupyterlab/translation:ITranslator"
+   ]
+  },
+  "@jupyterlab/application-extension:router": {
+   "provides": "@jupyterlab/application:IRouter",
+   "requires": [
+    "@jupyterlab/application:IPaths"
+   ]
+  },
+  "@jupyterlab/application-extension:shell": {
+   "provides": "@jupyterlab/application:ILabShell",
+   "requires": []
+  },
+  "@jupyterlab/application-extension:status": {
+   "provides": "@jupyterlab/application:ILabStatus",
+   "requires": []
+  },
+  "@jupyterlab/application-extension:top-bar": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/coreutils:ISettingRegistry",
+    "@jupyterlab/apputils:IToolbarWidgetRegistry"
+   ]
+  },
+  "@jupyterlab/application-extension:tree-resolver": {
+   "provides": "@jupyterlab/application:ITreeResolver",
+   "requires": [
+    "@jupyterlab/application:IRouter"
+   ]
+  },
+  "@jupyterlab/apputils-extension:announcements": {
+   "provides": null,
+   "requires": []
+  },
+  "@jupyterlab/apputils-extension:kernel-status": {
+   "provides": "@jupyterlab/apputils:IKernelStatusModel",
+   "requires": [
+    "@jupyterlab/statusbar:IStatusBar"
+   ]
+  },
+  "@jupyterlab/apputils-extension:kernels-settings": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/coreutils:ISettingRegistry"
+   ]
+  },
+  "@jupyterlab/apputils-extension:licenses-client": {
+   "provides": "@jupyterlab/apputils:ILicensesClient",
+   "requires": []
+  },
+  "@jupyterlab/apputils-extension:licenses-plugin": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/apputils:ILicensesClient",
+    "@jupyterlab/translation:ITranslator"
+   ]
+  },
+  "@jupyterlab/apputils-extension:movable-section-registry": {
+   "provides": "@jupyterlab/apputils:IMovableSectionRegistry",
+   "requires": []
+  },
+  "@jupyterlab/apputils-extension:move-sections": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/translation:ITranslator"
+   ]
+  },
+  "@jupyterlab/apputils-extension:notification": {
+   "provides": null,
+   "requires": []
+  },
+  "@jupyterlab/apputils-extension:palette": {
+   "provides": "@jupyterlab/apputils:ICommandPalette",
+   "requires": [
+    "@jupyterlab/translation:ITranslator"
+   ]
+  },
+  "@jupyterlab/apputils-extension:palette-restorer": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/application:ILayoutRestorer"
+   ]
+  },
+  "@jupyterlab/apputils-extension:print": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/translation:ITranslator"
+   ]
+  },
+  "@jupyterlab/apputils-extension:resolver": {
+   "provides": "@jupyterlab/apputils:IWindowResolver",
+   "requires": [
+    "@jupyterlab/application:IPaths",
+    "@jupyterlab/application:IRouter"
+   ]
+  },
+  "@jupyterlab/apputils-extension:running-sessions-status": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/statusbar:IStatusBar",
+    "@jupyterlab/translation:ITranslator"
+   ]
+  },
+  "@jupyterlab/apputils-extension:sanitizer": {
+   "provides": "@jupyterlab/apputils:ISanitizer",
+   "requires": [
+    "@jupyterlab/coreutils:ISettingRegistry"
+   ]
+  },
+  "@jupyterlab/apputils-extension:sessionDialogs": {
+   "provides": "@jupyterlab/apputils:ISessionContextDialogs",
+   "requires": []
+  },
+  "@jupyterlab/apputils-extension:settings": {
+   "provides": "@jupyterlab/coreutils:ISettingRegistry",
+   "requires": []
+  },
+  "@jupyterlab/apputils-extension:settings-connector": {
+   "provides": "@jupyterlab/coreutils:ISettingConnector",
+   "requires": []
+  },
+  "@jupyterlab/apputils-extension:splash": {
+   "provides": "@jupyterlab/apputils:ISplashScreen",
+   "requires": [
+    "@jupyterlab/translation:ITranslator"
+   ]
+  },
+  "@jupyterlab/apputils-extension:state": {
+   "provides": "@jupyterlab/coreutils:IStateDB",
+   "requires": [
+    "@jupyterlab/application:IPaths",
+    "@jupyterlab/application:IRouter",
+    "@jupyterlab/translation:ITranslator"
+   ]
+  },
+  "@jupyterlab/apputils-extension:subshell-settings": {
+   "provides": null,
+   "requires": []
+  },
+  "@jupyterlab/apputils-extension:themes": {
+   "provides": "@jupyterlab/apputils:IThemeManager",
+   "requires": [
+    "@jupyterlab/coreutils:ISettingRegistry",
+    "@jupyterlab/application:IPaths",
+    "@jupyterlab/translation:ITranslator"
+   ]
+  },
+  "@jupyterlab/apputils-extension:themes-palette-menu": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/apputils:IThemeManager",
+    "@jupyterlab/translation:ITranslator"
+   ]
+  },
+  "@jupyterlab/apputils-extension:toggle-header": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/translation:ITranslator"
+   ]
+  },
+  "@jupyterlab/apputils-extension:toolbar-registry": {
+   "provides": "@jupyterlab/apputils:IToolbarWidgetRegistry",
+   "requires": []
+  },
+  "@jupyterlab/apputils-extension:utilityCommands": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/translation:ITranslator"
+   ]
+  },
+  "@jupyterlab/apputils-extension:workspaces": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/coreutils:IStateDB",
+    "@jupyterlab/translation:ITranslator",
+    "@jupyterlab/application:IPaths"
+   ]
+  },
+  "@jupyterlab/audio-extension:plugin": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/translation:ITranslator",
+    "@jupyterlab/services:IDefaultDrive"
+   ]
+  },
+  "@jupyterlab/cell-toolbar-extension:plugin": {
+   "provides": null,
+   "requires": []
+  },
+  "@jupyterlab/celltags-extension:plugin": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/notebook:INotebookTracker"
+   ]
+  },
+  "@jupyterlab/codemirror-extension:binding": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/codemirror:IEditorExtensionRegistry"
+   ]
+  },
+  "@jupyterlab/codemirror-extension:commands": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/notebook:INotebookTracker"
+   ]
+  },
+  "@jupyterlab/codemirror-extension:extensions": {
+   "provides": "@jupyterlab/codemirror:IEditorExtensionRegistry",
+   "requires": [
+    "@jupyterlab/codemirror:IEditorThemeRegistry"
+   ]
+  },
+  "@jupyterlab/codemirror-extension:languages": {
+   "provides": "@jupyterlab/codemirror:IEditorLanguageRegistry",
+   "requires": []
+  },
+  "@jupyterlab/codemirror-extension:line-col-status": {
+   "provides": "@jupyterlab/codeeditor:IPositionModel",
+   "requires": [
+    "@jupyterlab/translation:ITranslator"
+   ]
+  },
+  "@jupyterlab/codemirror-extension:services": {
+   "provides": "@jupyterlab/codeeditor:IEditorServices",
+   "requires": [
+    "@jupyterlab/codemirror:IEditorLanguageRegistry",
+    "@jupyterlab/codemirror:IEditorExtensionRegistry"
+   ]
+  },
+  "@jupyterlab/codemirror-extension:themes": {
+   "provides": "@jupyterlab/codemirror:IEditorThemeRegistry",
+   "requires": []
+  },
+  "@jupyterlab/completer-extension:base-service": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/completer:ICompletionProviderManager"
+   ]
+  },
+  "@jupyterlab/completer-extension:inline-completer": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/completer:ICompletionProviderManager",
+    "@jupyterlab/completer:IInlineCompleterFactory",
+    "@jupyterlab/coreutils:ISettingRegistry"
+   ]
+  },
+  "@jupyterlab/completer-extension:inline-completer-factory": {
+   "provides": "@jupyterlab/completer:IInlineCompleterFactory",
+   "requires": []
+  },
+  "@jupyterlab/completer-extension:inline-history": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/completer:ICompletionProviderManager"
+   ]
+  },
+  "@jupyterlab/completer-extension:manager": {
+   "provides": "@jupyterlab/completer:ICompletionProviderManager",
+   "requires": [
+    "@jupyterlab/coreutils:ISettingRegistry"
+   ]
+  },
+  "@jupyterlab/console-extension:cell-executor": {
+   "provides": "@jupyterlab/console:IConsoleCellExecutor",
+   "requires": []
+  },
+  "@jupyterlab/console-extension:completer": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/console:IConsoleTracker"
+   ]
+  },
+  "@jupyterlab/console-extension:cursor-position": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/console:IConsoleTracker",
+    "@jupyterlab/codeeditor:IPositionModel"
+   ]
+  },
+  "@jupyterlab/console-extension:factory": {
+   "provides": "@jupyterlab/console:IContentFactory",
+   "requires": [
+    "@jupyterlab/codeeditor:IEditorServices"
+   ]
+  },
+  "@jupyterlab/console-extension:foreign": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/console:IConsoleTracker",
+    "@jupyterlab/coreutils:ISettingRegistry",
+    "@jupyterlab/translation:ITranslator"
+   ]
+  },
+  "@jupyterlab/console-extension:kernel-status": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/console:IConsoleTracker",
+    "@jupyterlab/apputils:IKernelStatusModel"
+   ]
+  },
+  "@jupyterlab/console-extension:tracker": {
+   "provides": "@jupyterlab/console:IConsoleTracker",
+   "requires": [
+    "@jupyterlab/console:IContentFactory",
+    "@jupyterlab/codeeditor:IEditorServices",
+    "@jupyterlab/console:IConsoleCellExecutor",
+    "@jupyterlab/rendermime:IRenderMimeRegistry",
+    "@jupyterlab/coreutils:ISettingRegistry"
+   ]
+  },
+  "@jupyterlab/csvviewer-extension:csv": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/translation:ITranslator"
+   ]
+  },
+  "@jupyterlab/csvviewer-extension:tsv": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/translation:ITranslator"
+   ]
+  },
+  "@jupyterlab/debugger-extension:completions": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/debugger:IDebugger",
+    "@jupyterlab/completer:ICompletionProviderManager"
+   ]
+  },
+  "@jupyterlab/debugger-extension:config": {
+   "provides": "@jupyterlab/debugger:IDebuggerConfig",
+   "requires": []
+  },
+  "@jupyterlab/debugger-extension:consoles": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/debugger:IDebugger",
+    "@jupyterlab/console:IConsoleTracker"
+   ]
+  },
+  "@jupyterlab/debugger-extension:debug-console": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/debugger:IDebugger",
+    "@jupyterlab/console:IContentFactory",
+    "@jupyterlab/codeeditor:IEditorServices",
+    "@jupyterlab/completer:ICompletionProviderManager",
+    "@jupyterlab/apputils:ISanitizer",
+    "@jupyterlab/translation:ITranslator"
+   ]
+  },
+  "@jupyterlab/debugger-extension:display-registry": {
+   "provides": "@jupyterlab/debugger:IDebuggerDisplayRegistry",
+   "requires": []
+  },
+  "@jupyterlab/debugger-extension:files": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/debugger:IDebugger",
+    "@jupyterlab/fileeditor:IEditorTracker"
+   ]
+  },
+  "@jupyterlab/debugger-extension:main": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/debugger:IDebugger",
+    "@jupyterlab/debugger:IDebuggerSidebar",
+    "@jupyterlab/codeeditor:IEditorServices",
+    "@jupyterlab/translation:ITranslator",
+    "@jupyterlab/console:IContentFactory",
+    "@jupyterlab/console:IConsoleTracker"
+   ]
+  },
+  "@jupyterlab/debugger-extension:notebooks": {
+   "provides": "@jupyterlab/debugger:IDebuggerHandler",
+   "requires": [
+    "@jupyterlab/debugger:IDebugger",
+    "@jupyterlab/notebook:INotebookTracker"
+   ]
+  },
+  "@jupyterlab/debugger-extension:service": {
+   "provides": "@jupyterlab/debugger:IDebugger",
+   "requires": [
+    "@jupyterlab/debugger:IDebuggerConfig"
+   ]
+  },
+  "@jupyterlab/debugger-extension:sidebar": {
+   "provides": "@jupyterlab/debugger:IDebuggerSidebar",
+   "requires": [
+    "@jupyterlab/debugger:IDebugger",
+    "@jupyterlab/codeeditor:IEditorServices",
+    "@jupyterlab/translation:ITranslator"
+   ]
+  },
+  "@jupyterlab/debugger-extension:source-viewer": {
+   "provides": "@jupyterlab/debugger:IDebuggerSourceViewer",
+   "requires": [
+    "@jupyterlab/debugger:IDebugger",
+    "@jupyterlab/codeeditor:IEditorServices",
+    "@jupyterlab/debugger:IDebuggerSources",
+    "@jupyterlab/translation:ITranslator"
+   ]
+  },
+  "@jupyterlab/debugger-extension:sources": {
+   "provides": "@jupyterlab/debugger:IDebuggerSources",
+   "requires": [
+    "@jupyterlab/debugger:IDebuggerConfig",
+    "@jupyterlab/codeeditor:IEditorServices"
+   ]
+  },
+  "@jupyterlab/debugger-extension:variables": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/debugger:IDebugger",
+    "@jupyterlab/debugger:IDebuggerHandler",
+    "@jupyterlab/translation:ITranslator"
+   ]
+  },
+  "@jupyterlab/docmanager-extension:contexts": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/docmanager:IDocumentManager",
+    "@jupyterlab/docmanager:IDocumentWidgetOpener"
+   ]
+  },
+  "@jupyterlab/docmanager-extension:dialogs": {
+   "provides": "@jupyterlab/docmanager:IDocumentManagerDialogs",
+   "requires": [
+    "@jupyterlab/translation:ITranslator"
+   ]
+  },
+  "@jupyterlab/docmanager-extension:download": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/docmanager:IDocumentManager"
+   ]
+  },
+  "@jupyterlab/docmanager-extension:manager": {
+   "provides": "@jupyterlab/docmanager:IDocumentManager",
+   "requires": [
+    "@jupyterlab/docmanager:IDocumentWidgetOpener"
+   ]
+  },
+  "@jupyterlab/docmanager-extension:open-browser-tab": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/docmanager:IDocumentManager"
+   ]
+  },
+  "@jupyterlab/docmanager-extension:opener": {
+   "provides": "@jupyterlab/docmanager:IDocumentWidgetOpener",
+   "requires": []
+  },
+  "@jupyterlab/docmanager-extension:path-status": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/docmanager:IDocumentManager",
+    "@jupyterlab/application:ILabShell"
+   ]
+  },
+  "@jupyterlab/docmanager-extension:plugin": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/docmanager:IDocumentManager",
+    "@jupyterlab/docmanager:IDocumentWidgetOpener",
+    "@jupyterlab/coreutils:ISettingRegistry"
+   ]
+  },
+  "@jupyterlab/docmanager-extension:recents": {
+   "provides": "@jupyterlab/docmanager:IRecentsManager",
+   "requires": [
+    "@jupyterlab/coreutils:IStateDB"
+   ]
+  },
+  "@jupyterlab/docmanager-extension:saving-status": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/docmanager:IDocumentManager",
+    "@jupyterlab/application:ILabShell"
+   ]
+  },
+  "@jupyterlab/documentsearch-extension:labShellWidgetListener": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/application:ILabShell",
+    "@jupyterlab/documentsearch:ISearchProviderRegistry"
+   ]
+  },
+  "@jupyterlab/documentsearch-extension:plugin": {
+   "provides": "@jupyterlab/documentsearch:ISearchProviderRegistry",
+   "requires": [
+    "@jupyterlab/translation:ITranslator"
+   ]
+  },
+  "@jupyterlab/extensionmanager-extension:plugin": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/coreutils:ISettingRegistry"
+   ]
+  },
+  "@jupyterlab/filebrowser-extension:browser": {
+   "provides": "@jupyterlab/filebrowser:IFileBrowserCommands",
+   "requires": [
+    "@jupyterlab/filebrowser:IDefaultFileBrowser",
+    "@jupyterlab/filebrowser:IFileBrowserFactory",
+    "@jupyterlab/translation:ITranslator"
+   ]
+  },
+  "@jupyterlab/filebrowser-extension:create-new-language-file": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/translation:ITranslator"
+   ]
+  },
+  "@jupyterlab/filebrowser-extension:default-file-browser": {
+   "provides": "@jupyterlab/filebrowser:IDefaultFileBrowser",
+   "requires": [
+    "@jupyterlab/filebrowser:IFileBrowserFactory"
+   ]
+  },
+  "@jupyterlab/filebrowser-extension:download": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/filebrowser:IFileBrowserFactory",
+    "@jupyterlab/translation:ITranslator"
+   ]
+  },
+  "@jupyterlab/filebrowser-extension:factory": {
+   "provides": "@jupyterlab/filebrowser:IFileBrowserFactory",
+   "requires": [
+    "@jupyterlab/docmanager:IDocumentManager",
+    "@jupyterlab/translation:ITranslator"
+   ]
+  },
+  "@jupyterlab/filebrowser-extension:file-upload-status": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/filebrowser:IFileBrowserFactory",
+    "@jupyterlab/translation:ITranslator"
+   ]
+  },
+  "@jupyterlab/filebrowser-extension:notify-upload": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/filebrowser:IDefaultFileBrowser",
+    "@jupyterlab/coreutils:ISettingRegistry",
+    "@jupyterlab/translation:ITranslator"
+   ]
+  },
+  "@jupyterlab/filebrowser-extension:open-browser-tab": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/filebrowser:IFileBrowserFactory",
+    "@jupyterlab/translation:ITranslator"
+   ]
+  },
+  "@jupyterlab/filebrowser-extension:open-url": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/filebrowser:IDefaultFileBrowser",
+    "@jupyterlab/translation:ITranslator"
+   ]
+  },
+  "@jupyterlab/filebrowser-extension:open-with": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/filebrowser:IFileBrowserFactory"
+   ]
+  },
+  "@jupyterlab/filebrowser-extension:settings": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/filebrowser:IDefaultFileBrowser"
+   ]
+  },
+  "@jupyterlab/filebrowser-extension:share-file": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/filebrowser:IFileBrowserFactory",
+    "@jupyterlab/translation:ITranslator"
+   ]
+  },
+  "@jupyterlab/filebrowser-extension:widget": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/docmanager:IDocumentManager",
+    "@jupyterlab/filebrowser:IDefaultFileBrowser",
+    "@jupyterlab/filebrowser:IFileBrowserFactory",
+    "@jupyterlab/coreutils:ISettingRegistry",
+    "@jupyterlab/apputils:IToolbarWidgetRegistry",
+    "@jupyterlab/translation:ITranslator",
+    "@jupyterlab/application:ILabShell",
+    "@jupyterlab/filebrowser:IFileBrowserCommands"
+   ]
+  },
+  "@jupyterlab/fileeditor-extension:completer": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/fileeditor:IEditorTracker"
+   ]
+  },
+  "@jupyterlab/fileeditor-extension:cursor-position": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/fileeditor:IEditorTracker",
+    "@jupyterlab/codeeditor:IPositionModel"
+   ]
+  },
+  "@jupyterlab/fileeditor-extension:editor-syntax-status": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/fileeditor:IEditorTracker",
+    "@jupyterlab/codemirror:IEditorLanguageRegistry",
+    "@jupyterlab/application:ILabShell",
+    "@jupyterlab/translation:ITranslator"
+   ]
+  },
+  "@jupyterlab/fileeditor-extension:language-server": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/fileeditor:IEditorTracker",
+    "@jupyterlab/lsp:ILSPDocumentConnectionManager",
+    "@jupyterlab/lsp:ILSPFeatureManager",
+    "@jupyterlab/lsp:ILSPCodeExtractorsManager",
+    "@jupyterlab/lsp:IWidgetLSPAdapterTracker"
+   ]
+  },
+  "@jupyterlab/fileeditor-extension:plugin": {
+   "provides": "@jupyterlab/fileeditor:IEditorTracker",
+   "requires": [
+    "@jupyterlab/fileeditor:IEditorWidgetFactory",
+    "@jupyterlab/codeeditor:IEditorServices",
+    "@jupyterlab/codemirror:IEditorExtensionRegistry",
+    "@jupyterlab/codemirror:IEditorLanguageRegistry",
+    "@jupyterlab/codemirror:IEditorThemeRegistry",
+    "@jupyterlab/coreutils:ISettingRegistry"
+   ]
+  },
+  "@jupyterlab/fileeditor-extension:search": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/documentsearch:ISearchProviderRegistry"
+   ]
+  },
+  "@jupyterlab/fileeditor-extension:tab-space-status": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/fileeditor:IEditorTracker",
+    "@jupyterlab/codemirror:IEditorExtensionRegistry",
+    "@jupyterlab/coreutils:ISettingRegistry",
+    "@jupyterlab/translation:ITranslator"
+   ]
+  },
+  "@jupyterlab/fileeditor-extension:widget-factory": {
+   "provides": "@jupyterlab/fileeditor:IEditorWidgetFactory",
+   "requires": [
+    "@jupyterlab/codeeditor:IEditorServices",
+    "@jupyterlab/coreutils:ISettingRegistry"
+   ]
+  },
+  "@jupyterlab/help-extension:about": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/translation:ITranslator"
+   ]
+  },
+  "@jupyterlab/help-extension:jupyter-forum": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/translation:ITranslator"
+   ]
+  },
+  "@jupyterlab/help-extension:licenses-commands": {
+   "provides": null,
+   "requires": []
+  },
+  "@jupyterlab/help-extension:open": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/translation:ITranslator"
+   ]
+  },
+  "@jupyterlab/help-extension:resources": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/mainmenu:IMainMenu",
+    "@jupyterlab/translation:ITranslator"
+   ]
+  },
+  "@jupyterlab/htmlviewer-extension:plugin": {
+   "provides": "@jupyterlab/htmlviewer:IHTMLViewerTracker",
+   "requires": [
+    "@jupyterlab/translation:ITranslator"
+   ]
+  },
+  "@jupyterlab/hub-extension:connectionlost": {
+   "provides": "@jupyterlab/application:IConnectionLost",
+   "requires": [
+    "@jupyterlab/application:IPaths",
+    "@jupyterlab/translation:ITranslator"
+   ]
+  },
+  "@jupyterlab/hub-extension:menu": {
+   "provides": null,
+   "requires": []
+  },
+  "@jupyterlab/hub-extension:plugin": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/application:IPaths",
+    "@jupyterlab/translation:ITranslator"
+   ]
+  },
+  "@jupyterlab/imageviewer-extension:plugin": {
+   "provides": "@jupyterlab/imageviewer:IImageTracker",
+   "requires": [
+    "@jupyterlab/translation:ITranslator"
+   ]
+  },
+  "@jupyterlab/inspector-extension:consoles": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/inspector:IInspector",
+    "@jupyterlab/console:IConsoleTracker"
+   ]
+  },
+  "@jupyterlab/inspector-extension:inspector": {
+   "provides": "@jupyterlab/inspector:IInspector",
+   "requires": [
+    "@jupyterlab/translation:ITranslator"
+   ]
+  },
+  "@jupyterlab/inspector-extension:notebooks": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/inspector:IInspector",
+    "@jupyterlab/notebook:INotebookTracker"
+   ]
+  },
+  "@jupyterlab/javascript-extension:factory": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/rendermime:IRenderMimeRegistry",
+    "@jupyterlab/translation:ITranslator"
+   ]
+  },
+  "@jupyterlab/json-extension:factory": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/rendermime:IRenderMimeRegistry",
+    "@jupyterlab/translation:ITranslator"
+   ]
+  },
+  "@jupyterlab/json-lines-extension:factory": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/rendermime:IRenderMimeRegistry",
+    "@jupyterlab/translation:ITranslator"
+   ]
+  },
+  "@jupyterlab/launcher-extension:plugin": {
+   "provides": "@jupyterlab/launcher:ILauncher",
+   "requires": [
+    "@jupyterlab/translation:ITranslator"
+   ]
+  },
+  "@jupyterlab/logconsole-extension:plugin": {
+   "provides": "@jupyterlab/logconsole:ILoggerRegistry",
+   "requires": [
+    "@jupyterlab/rendermime:IRenderMimeRegistry",
+    "@jupyterlab/translation:ITranslator"
+   ]
+  },
+  "@jupyterlab/lsp-extension:code-extractor-manager": {
+   "provides": "@jupyterlab/lsp:ILSPCodeExtractorsManager",
+   "requires": []
+  },
+  "@jupyterlab/lsp-extension:feature": {
+   "provides": "@jupyterlab/lsp:ILSPFeatureManager",
+   "requires": []
+  },
+  "@jupyterlab/lsp-extension:plugin": {
+   "provides": "@jupyterlab/lsp:ILSPDocumentConnectionManager",
+   "requires": [
+    "@jupyterlab/translation:ITranslator",
+    "@jupyterlab/lsp:IWidgetLSPAdapterTracker"
+   ]
+  },
+  "@jupyterlab/lsp-extension:settings": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/lsp:ILSPDocumentConnectionManager",
+    "@jupyterlab/coreutils:ISettingRegistry",
+    "@jupyterlab/translation:ITranslator"
+   ]
+  },
+  "@jupyterlab/lsp-extension:tracker": {
+   "provides": "@jupyterlab/lsp:IWidgetLSPAdapterTracker",
+   "requires": []
+  },
+  "@jupyterlab/mainmenu-extension:plugin": {
+   "provides": "@jupyterlab/mainmenu:IMainMenu",
+   "requires": [
+    "@jupyterlab/application:IRouter",
+    "@jupyterlab/translation:ITranslator"
+   ]
+  },
+  "@jupyterlab/mainmenu-extension:recents": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/docmanager:IRecentsManager",
+    "@jupyterlab/mainmenu:IMainMenu"
+   ]
+  },
+  "@jupyterlab/markdownviewer-extension:plugin": {
+   "provides": "@jupyterlab/markdownviewer:IMarkdownViewerTracker",
+   "requires": [
+    "@jupyterlab/rendermime:IRenderMimeRegistry",
+    "@jupyterlab/translation:ITranslator"
+   ]
+  },
+  "@jupyterlab/markedparser-extension:plugin": {
+   "provides": "@jupyterlab/rendermime:IMarkdownParser",
+   "requires": [
+    "@jupyterlab/codemirror:IEditorLanguageRegistry"
+   ]
+  },
+  "@jupyterlab/mathjax-extension:plugin": {
+   "provides": "@jupyterlab/rendermime:ILatexTypesetter",
+   "requires": []
+  },
+  "@jupyterlab/mermaid-extension:context-commands": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/mermaid:IMermaidManager"
+   ]
+  },
+  "@jupyterlab/mermaid-extension:core": {
+   "provides": "@jupyterlab/mermaid:IMermaidManager",
+   "requires": []
+  },
+  "@jupyterlab/mermaid-extension:factory": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/rendermime:IRenderMimeRegistry",
+    "@jupyterlab/translation:ITranslator"
+   ]
+  },
+  "@jupyterlab/mermaid-extension:markdown": {
+   "provides": "@jupyterlab/mermaid:IMermaidMarkdown",
+   "requires": [
+    "@jupyterlab/mermaid:IMermaidManager"
+   ]
+  },
+  "@jupyterlab/metadataform-extension:metadataforms": {
+   "provides": "@jupyterlab/metadataform:IMetadataFormProvider",
+   "requires": [
+    "@jupyterlab/notebook:INotebookTools",
+    "@jupyterlab/translation:ITranslator",
+    "@jupyterlab/ui-components:IFormRendererRegistry",
+    "@jupyterlab/coreutils:ISettingRegistry"
+   ]
+  },
+  "@jupyterlab/notebook-extension:active-cell-tool": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/notebook:INotebookTracker",
+    "@jupyterlab/ui-components:IFormRendererRegistry",
+    "@jupyterlab/codemirror:IEditorLanguageRegistry"
+   ]
+  },
+  "@jupyterlab/notebook-extension:cell-counter-status": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/notebook:INotebookTracker",
+    "@jupyterlab/translation:ITranslator"
+   ]
+  },
+  "@jupyterlab/notebook-extension:cell-executor": {
+   "provides": "@jupyterlab/notebook:INotebookCellExecutor",
+   "requires": []
+  },
+  "@jupyterlab/notebook-extension:cloned-outputs": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/docmanager:IDocumentManager",
+    "@jupyterlab/notebook:INotebookTracker",
+    "@jupyterlab/translation:ITranslator"
+   ]
+  },
+  "@jupyterlab/notebook-extension:code-console": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/notebook:INotebookTracker",
+    "@jupyterlab/translation:ITranslator"
+   ]
+  },
+  "@jupyterlab/notebook-extension:completer": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/notebook:INotebookTracker"
+   ]
+  },
+  "@jupyterlab/notebook-extension:copy-output": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/translation:ITranslator",
+    "@jupyterlab/notebook:INotebookTracker"
+   ]
+  },
+  "@jupyterlab/notebook-extension:cursor-position": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/notebook:INotebookTracker",
+    "@jupyterlab/codeeditor:IPositionModel"
+   ]
+  },
+  "@jupyterlab/notebook-extension:execution-indicator": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/notebook:INotebookTracker",
+    "@jupyterlab/application:ILabShell",
+    "@jupyterlab/translation:ITranslator"
+   ]
+  },
+  "@jupyterlab/notebook-extension:export": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/translation:ITranslator",
+    "@jupyterlab/notebook:INotebookTracker"
+   ]
+  },
+  "@jupyterlab/notebook-extension:factory": {
+   "provides": "@jupyterlab/notebook:IContentFactory",
+   "requires": [
+    "@jupyterlab/codeeditor:IEditorServices"
+   ]
+  },
+  "@jupyterlab/notebook-extension:kernel-status": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/notebook:INotebookTracker",
+    "@jupyterlab/apputils:IKernelStatusModel"
+   ]
+  },
+  "@jupyterlab/notebook-extension:language-server": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/notebook:INotebookTracker",
+    "@jupyterlab/lsp:ILSPDocumentConnectionManager",
+    "@jupyterlab/lsp:ILSPFeatureManager",
+    "@jupyterlab/lsp:ILSPCodeExtractorsManager",
+    "@jupyterlab/lsp:IWidgetLSPAdapterTracker"
+   ]
+  },
+  "@jupyterlab/notebook-extension:log-output": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/notebook:INotebookTracker"
+   ]
+  },
+  "@jupyterlab/notebook-extension:metadata-editor": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/notebook:INotebookTracker",
+    "@jupyterlab/codeeditor:IEditorServices",
+    "@jupyterlab/ui-components:IFormRendererRegistry"
+   ]
+  },
+  "@jupyterlab/notebook-extension:mode-status": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/notebook:INotebookTracker",
+    "@jupyterlab/translation:ITranslator"
+   ]
+  },
+  "@jupyterlab/notebook-extension:open-with-no-kernel": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/filebrowser:IFileBrowserFactory"
+   ]
+  },
+  "@jupyterlab/notebook-extension:search": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/documentsearch:ISearchProviderRegistry"
+   ]
+  },
+  "@jupyterlab/notebook-extension:toc": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/notebook:INotebookTracker",
+    "@jupyterlab/toc:ITableOfContentsRegistry",
+    "@jupyterlab/apputils:ISanitizer"
+   ]
+  },
+  "@jupyterlab/notebook-extension:tools": {
+   "provides": "@jupyterlab/notebook:INotebookTools",
+   "requires": [
+    "@jupyterlab/notebook:INotebookTracker",
+    "@jupyterlab/codeeditor:IEditorServices",
+    "@jupyterlab/codemirror:IEditorLanguageRegistry",
+    "@jupyterlab/coreutils:IStateDB",
+    "@jupyterlab/translation:ITranslator"
+   ]
+  },
+  "@jupyterlab/notebook-extension:tracker": {
+   "provides": "@jupyterlab/notebook:INotebookTracker",
+   "requires": [
+    "@jupyterlab/notebook:INotebookWidgetFactory",
+    "@jupyterlab/codemirror:IEditorExtensionRegistry",
+    "@jupyterlab/notebook:INotebookCellExecutor"
+   ]
+  },
+  "@jupyterlab/notebook-extension:trust-status": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/notebook:INotebookTracker",
+    "@jupyterlab/translation:ITranslator"
+   ]
+  },
+  "@jupyterlab/notebook-extension:update-raw-mimetype": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/notebook:INotebookTracker",
+    "@jupyterlab/metadataform:IMetadataFormProvider",
+    "@jupyterlab/translation:ITranslator"
+   ]
+  },
+  "@jupyterlab/notebook-extension:widget-factory": {
+   "provides": "@jupyterlab/notebook:INotebookWidgetFactory",
+   "requires": [
+    "@jupyterlab/notebook:IContentFactory",
+    "@jupyterlab/codeeditor:IEditorServices",
+    "@jupyterlab/rendermime:IRenderMimeRegistry",
+    "@jupyterlab/apputils:IToolbarWidgetRegistry"
+   ]
+  },
+  "@jupyterlab/pdf-extension:factory": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/rendermime:IRenderMimeRegistry",
+    "@jupyterlab/translation:ITranslator"
+   ]
+  },
+  "@jupyterlab/pluginmanager-extension:plugin": {
+   "provides": "@jupyterlab/pluginmanager:IPluginManager",
+   "requires": [
+    "@jupyterlab/application:IInfo"
+   ]
+  },
+  "@jupyterlab/rendermime-extension:plugin": {
+   "provides": "@jupyterlab/rendermime:IRenderMimeRegistry",
+   "requires": []
+  },
+  "@jupyterlab/running-extension:plugin": {
+   "provides": "@jupyterlab/running:IRunningSessionManagers",
+   "requires": [
+    "@jupyterlab/translation:ITranslator"
+   ]
+  },
+  "@jupyterlab/running-extension:recently-closed": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/running:IRunningSessionManagers",
+    "@jupyterlab/docmanager:IRecentsManager",
+    "@jupyterlab/translation:ITranslator"
+   ]
+  },
+  "@jupyterlab/running-extension:search-tabs": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/running:IRunningSessionManagers",
+    "@jupyterlab/translation:ITranslator"
+   ]
+  },
+  "@jupyterlab/running-extension:sidebar": {
+   "provides": "@jupyterlab/running:IRunningSessionsSidebar",
+   "requires": [
+    "@jupyterlab/running:IRunningSessionManagers",
+    "@jupyterlab/translation:ITranslator"
+   ]
+  },
+  "@jupyterlab/services-extension:config-section-manager": {
+   "provides": "@jupyterlab/services:IConfigSectionManager",
+   "requires": []
+  },
+  "@jupyterlab/services-extension:connection-status": {
+   "provides": "@jupyterlab/application:IConnectionStatus",
+   "requires": []
+  },
+  "@jupyterlab/services-extension:content-provider-warning": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/services:IDefaultContentProvider"
+   ]
+  },
+  "@jupyterlab/services-extension:contents-manager": {
+   "provides": "@jupyterlab/services:IContentsManager",
+   "requires": [
+    "@jupyterlab/services:IDefaultDrive",
+    "@jupyterlab/services:IServerSettings"
+   ]
+  },
+  "@jupyterlab/services-extension:default-content-provider": {
+   "provides": "@jupyterlab/services:IDefaultContentProvider",
+   "requires": []
+  },
+  "@jupyterlab/services-extension:default-drive": {
+   "provides": "@jupyterlab/services:IDefaultDrive",
+   "requires": []
+  },
+  "@jupyterlab/services-extension:event-manager": {
+   "provides": "@jupyterlab/services:IEventManager",
+   "requires": []
+  },
+  "@jupyterlab/services-extension:kernel-manager": {
+   "provides": "@jupyterlab/services:IKernelManager",
+   "requires": []
+  },
+  "@jupyterlab/services-extension:kernel-spec-manager": {
+   "provides": "@jupyterlab/services:IKernelSpecManager",
+   "requires": []
+  },
+  "@jupyterlab/services-extension:nbconvert-manager": {
+   "provides": "@jupyterlab/services:INbConvertManager",
+   "requires": []
+  },
+  "@jupyterlab/services-extension:server-settings": {
+   "provides": "@jupyterlab/services:IServerSettings",
+   "requires": []
+  },
+  "@jupyterlab/services-extension:service-manager": {
+   "provides": "@jupyterlab/services:IServiceManager",
+   "requires": []
+  },
+  "@jupyterlab/services-extension:session-manager": {
+   "provides": "@jupyterlab/services:ISessionManager",
+   "requires": [
+    "@jupyterlab/services:IKernelManager"
+   ]
+  },
+  "@jupyterlab/services-extension:setting-manager": {
+   "provides": "@jupyterlab/services:ISettingManager",
+   "requires": []
+  },
+  "@jupyterlab/services-extension:terminal-manager": {
+   "provides": "@jupyterlab/services:ITerminalManager",
+   "requires": []
+  },
+  "@jupyterlab/services-extension:user-manager": {
+   "provides": "@jupyterlab/services:IUserManager",
+   "requires": []
+  },
+  "@jupyterlab/services-extension:workspace-manager": {
+   "provides": "@jupyterlab/services:IWorkspaceManager",
+   "requires": []
+  },
+  "@jupyterlab/settingeditor-extension:form-ui": {
+   "provides": "@jupyterlab/settingeditor:ISettingEditorTracker",
+   "requires": [
+    "@jupyterlab/coreutils:ISettingRegistry",
+    "@jupyterlab/coreutils:IStateDB",
+    "@jupyterlab/translation:ITranslator",
+    "@jupyterlab/ui-components:IFormRendererRegistry",
+    "@jupyterlab/application:ILabStatus"
+   ]
+  },
+  "@jupyterlab/settingeditor-extension:plugin": {
+   "provides": "@jupyterlab/settingeditor:IJSONSettingEditorTracker",
+   "requires": [
+    "@jupyterlab/coreutils:ISettingRegistry",
+    "@jupyterlab/codeeditor:IEditorServices",
+    "@jupyterlab/coreutils:IStateDB",
+    "@jupyterlab/rendermime:IRenderMimeRegistry",
+    "@jupyterlab/application:ILabStatus",
+    "@jupyterlab/translation:ITranslator"
+   ]
+  },
+  "@jupyterlab/shortcuts-extension:shortcuts": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/coreutils:ISettingRegistry"
+   ]
+  },
+  "@jupyterlab/statusbar-extension:plugin": {
+   "provides": "@jupyterlab/statusbar:IStatusBar",
+   "requires": [
+    "@jupyterlab/translation:ITranslator"
+   ]
+  },
+  "@jupyterlab/terminal-extension:open-folder-in-terminal": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/filebrowser:IFileBrowserFactory",
+    "@jupyterlab/translation:ITranslator",
+    "@jupyterlab/terminal:ITerminalTracker"
+   ]
+  },
+  "@jupyterlab/terminal-extension:plugin": {
+   "provides": "@jupyterlab/terminal:ITerminalTracker",
+   "requires": [
+    "@jupyterlab/coreutils:ISettingRegistry",
+    "@jupyterlab/translation:ITranslator"
+   ]
+  },
+  "@jupyterlab/theme-dark-extension:plugin": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/apputils:IThemeManager",
+    "@jupyterlab/translation:ITranslator"
+   ]
+  },
+  "@jupyterlab/theme-dark-high-contrast-extension:plugin": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/apputils:IThemeManager",
+    "@jupyterlab/translation:ITranslator"
+   ]
+  },
+  "@jupyterlab/theme-light-extension:plugin": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/apputils:IThemeManager",
+    "@jupyterlab/translation:ITranslator"
+   ]
+  },
+  "@jupyterlab/toc-extension:registry": {
+   "provides": "@jupyterlab/toc:ITableOfContentsRegistry",
+   "requires": []
+  },
+  "@jupyterlab/toc-extension:tracker": {
+   "provides": "@jupyterlab/toc:ITableOfContentsTracker",
+   "requires": [
+    "@jupyterlab/toc:ITableOfContentsRegistry"
+   ]
+  },
+  "@jupyterlab/tooltip-extension:consoles": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/tooltip:ITooltipManager",
+    "@jupyterlab/console:IConsoleTracker"
+   ]
+  },
+  "@jupyterlab/tooltip-extension:files": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/tooltip:ITooltipManager",
+    "@jupyterlab/fileeditor:IEditorTracker",
+    "@jupyterlab/rendermime:IRenderMimeRegistry"
+   ]
+  },
+  "@jupyterlab/tooltip-extension:manager": {
+   "provides": "@jupyterlab/tooltip:ITooltipManager",
+   "requires": []
+  },
+  "@jupyterlab/tooltip-extension:notebooks": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/tooltip:ITooltipManager",
+    "@jupyterlab/notebook:INotebookTracker"
+   ]
+  },
+  "@jupyterlab/translation-extension:plugin": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/coreutils:ISettingRegistry",
+    "@jupyterlab/translation:ITranslator",
+    "@jupyterlab/translation:ITranslatorConnector"
+   ]
+  },
+  "@jupyterlab/translation-extension:translator": {
+   "provides": "@jupyterlab/translation:ITranslator",
+   "requires": [
+    "@jupyterlab/application:IPaths",
+    "@jupyterlab/coreutils:ISettingRegistry"
+   ]
+  },
+  "@jupyterlab/translation-extension:translator-connector": {
+   "provides": "@jupyterlab/translation:ITranslatorConnector",
+   "requires": [
+    "@jupyterlab/application:IPaths"
+   ]
+  },
+  "@jupyterlab/ui-components-extension:form-renderer-registry": {
+   "provides": "@jupyterlab/ui-components:IFormRendererRegistry",
+   "requires": []
+  },
+  "@jupyterlab/ui-components-extension:labicon-manager": {
+   "provides": "@jupyterlab/ui-components:ILabIconManager",
+   "requires": []
+  },
+  "@jupyterlab/vega5-extension:factory": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/rendermime:IRenderMimeRegistry",
+    "@jupyterlab/translation:ITranslator"
+   ]
+  },
+  "@jupyterlab/video-extension:plugin": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/translation:ITranslator",
+    "@jupyterlab/services:IDefaultDrive"
+   ]
+  },
+  "@jupyterlab/workspaces-extension:commands": {
+   "provides": "@jupyterlab/workspaces:IWorkspaceCommands",
+   "requires": [
+    "@jupyterlab/workspaces:IWorkspacesModel",
+    "@jupyterlab/filebrowser:IDefaultFileBrowser",
+    "@jupyterlab/apputils:IWindowResolver",
+    "@jupyterlab/coreutils:IStateDB",
+    "@jupyterlab/translation:ITranslator",
+    "@jupyterlab/application:IPaths"
+   ]
+  },
+  "@jupyterlab/workspaces-extension:indicator": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/workspaces:IWorkspacesModel",
+    "@jupyterlab/workspaces:IWorkspaceCommands",
+    "@jupyterlab/apputils:IWindowResolver",
+    "@jupyterlab/translation:ITranslator",
+    "@jupyterlab/coreutils:ISettingRegistry",
+    "@jupyterlab/apputils:IToolbarWidgetRegistry"
+   ]
+  },
+  "@jupyterlab/workspaces-extension:menu": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/workspaces:IWorkspaceCommands"
+   ]
+  },
+  "@jupyterlab/workspaces-extension:model": {
+   "provides": "@jupyterlab/workspaces:IWorkspacesModel",
+   "requires": []
+  },
+  "@jupyterlab/workspaces-extension:sidebar": {
+   "provides": null,
+   "requires": [
+    "@jupyterlab/workspaces:IWorkspaceCommands",
+    "@jupyterlab/workspaces:IWorkspacesModel",
+    "@jupyterlab/running:IRunningSessionManagers",
+    "@jupyterlab/apputils:IWindowResolver"
+   ]
+  }
+ }
+}

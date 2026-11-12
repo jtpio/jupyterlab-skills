@@ -17,6 +17,7 @@ clients that read `SKILL.md` files.
 | "Add a button that runs all cells and saves", "add a panel", "replace the launcher with a home page" | `jupyterlab-extensions` |
 | "Use these colors and this font", "make it compact" | `jupyterlab-theming` |
 | "Make this a package that I can install", "create my own JupyterLab app" | `jupyterlab-distribution` |
+| "Build a minimal notebook app from JupyterLab components", "my own shell", "embed a notebook in a page" | `jupyterlab-remix` |
 | "What is the ID of this plugin?", "why does my setting not apply?" | `jupyterlab-inspect` |
 | "Show me that it works" | `jupyterlab-verify` |
 | Any of the above, when the agent does not know where to start | `jupyterlab-customize` |
@@ -54,6 +55,10 @@ skills/
 │   └── references/            CSS variables, selectors and recipes
 ├── jupyterlab-distribution/   one pip-installable package for everything
 │   └── scripts/jlab_dist.py
+├── jupyterlab-remix/          a new application from JupyterLab packages, with its own bundle
+│   ├── scripts/jlab_remix.py
+│   ├── assets/                project templates
+│   └── references/            the server class
 └── jupyterlab-verify/         headless browser proof and screenshots
     └── scripts/jlab_server.py, jlab_probe.cjs
 ```
@@ -138,7 +143,7 @@ Claude Code also reads `~/.claude/skills/`, Codex CLI `~/.codex/skills/`.
 For one project only, copy the folders to `.agents/skills/` (or
 `.claude/skills/`) in the repository.
 
-Install the seven skills together. Each one has its own scripts, but they
+Install the eight skills together. Each one has its own scripts, but they
 refer to each other by name.
 
 ## Requirements

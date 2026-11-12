@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>{{ page_config['appName'] | e }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script id="jupyter-config-data" type="application/json">
+      {{ dict(page_config, baseUrl=base_url, wsUrl=ws_url) | tojson }}
+    </script>
+    {#
+      static_url adds a hash of the file to the URL: the server lets the
+      browser keep each file in static/ forever.
+    #}
+    <script src="{{ static_url('bundle.js') }}"></script>
+  </head>
+  <body class="jp-ThemedContainer">
+    <script>
+      // Remove the token from the URL, so that it does not stay in the history.
+      (function () {
+        const url = new URL(window.location.href);
+        if (url.searchParams.has('token')) {
+          url.searchParams.delete('token');
+          window.history.replaceState({}, '', url.href);
+        }
+      })();
+    </script>
+  </body>
+</html>

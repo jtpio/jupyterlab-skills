@@ -43,17 +43,18 @@ broken layout.
 ## The server script
 
 ```bash
-python scripts/jlab_server.py start [--name NAME] [--python PY | --cmd CMD] [--app-class CLASS] [--project DIR] [--root-dir DIR] [--port N] [--env KEY=VALUE] [-- extra server args]
+python scripts/jlab_server.py start [--name NAME] [--python PY | --cmd CMD] [--app-class CLASS] [--path URLPATH] [--project DIR] [--root-dir DIR] [--port N] [--env KEY=VALUE] [-- extra server args]
 ```
 
 - `--python`: Python of the environment under test. The server runs
   `python -m jupyterlab`.
 - `--cmd`: a command to run instead, for example the launch command of a
   distribution: `--cmd /tmp/test-env/bin/my-lab`.
-- `--app-class`: class name of a custom application that is built from
-  JupyterLab packages with its own server class, for example `MyApp`. The
-  script then sets the `expose_app_in_browser` option and the clean profile
-  on that class too. Use it together with `--cmd`.
+- `--app-class` and `--path`: for a remix (skill `jupyterlab-remix`), an
+  application with its own server class and URL. `--app-class MyApp` sets the
+  `expose_app_in_browser` option and the clean profile on that class.
+  `--path my-app` is the URL path of the application (default `lab`). Use
+  both together with `--cmd`.
 - `--project`: a distribution project (skill `jupyterlab-distribution`) to
   load without an install. The server reads `DIR/jupyter-config` and
   `DIR/labextensions` in front of the folders of the environment. Use it

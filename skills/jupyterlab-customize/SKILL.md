@@ -1,6 +1,6 @@
 ---
 name: jupyterlab-customize
-description: Start here for any request to change how JupyterLab looks or behaves. Covers disabling or hiding an extension or a part of the UI, changing a default (theme, layout, editor, notebook, file browser), editing menus, toolbars, context menus and keyboard shortcuts, adding a button, panel, command or home page, restyling or rebranding the application, and packaging the result as an installable JupyterLab distribution. Chooses the right mechanism (page config, setting overrides, user settings, server config, CSS or theme, new extension, Python package) and hands over to the companion skills jupyterlab-inspect, jupyterlab-settings, jupyterlab-extensions, jupyterlab-theming, jupyterlab-distribution and jupyterlab-verify. Use it also when the user does not say "JupyterLab" but works in a Jupyter notebook environment.
+description: Start here for any request to change how JupyterLab looks or behaves. Covers disabling or hiding an extension or a part of the UI, changing a default (theme, layout, editor, notebook, file browser), editing menus, toolbars, context menus and keyboard shortcuts, adding a button, panel, command or home page, restyling or rebranding the application, and packaging the result as an installable JupyterLab distribution. Chooses the right mechanism (page config, setting overrides, user settings, server config, CSS or theme, new extension, Python package) and hands over to the companion skills jupyterlab-inspect, jupyterlab-settings, jupyterlab-extensions, jupyterlab-theming, jupyterlab-distribution, jupyterlab-remix and jupyterlab-verify. Use it also when the user does not say "JupyterLab" but works in a Jupyter notebook environment.
 compatibility: JupyterLab 4.x (tested with 4.6). Needs Python and the environment that has JupyterLab. Node.js with Playwright is necessary only for the browser checks.
 ---
 
@@ -18,6 +18,11 @@ or more of these five things:
 | **Style** | Colors, fonts, spacing, hidden elements | theme extension or stylesheet | `jupyterlab-theming` |
 | **Add behavior** | New command, button, panel, home page, replacement of a core plugin | extension in `share/jupyter/labextensions/` | `jupyterlab-extensions` |
 | **Package** | One `pip install` that brings all of the above | Python project with a wheel | `jupyterlab-distribution` |
+
+A sixth way is not a customization: a **remix** is a new application built
+from the JupyterLab npm packages, with its own bundle and shell (skill
+`jupyterlab-remix`). Use it only when the five levers cannot give the result:
+a different layout, or only a part of the core in the bundle.
 
 Two more skills support the work: `jupyterlab-inspect` finds the IDs and the
 folders, `jupyterlab-verify` proves in a real browser that the change works.
@@ -66,6 +71,7 @@ distribution with `jlab_dist.py collect` (see `jupyterlab-distribution`).
 | "Rename the app", "own favicon" | Page config `appName` + small extension | |
 | "Install extension X by default" | Package dependency | Or `pip install` in the environment |
 | "Give me something to install" | Package | |
+| "A single-document notebook app", "my own shell", "embed a notebook in my page", "only these core plugins in the bundle" | Remix (`jupyterlab-remix`) | Needs Node.js and a build |
 
 Order of preference: **setting → disabled plugin → stylesheet → extension**.
 A setting stays visible in the Settings Editor and the user can change it
@@ -113,9 +119,9 @@ levers in this order. Each step has its skill.
 
 - Changes to kernels, to the Jupyter Server API, or to JupyterHub: these are
   server topics. Only the server options that affect the UI are covered.
-- A custom build of the JupyterLab core application (`jupyter lab build`,
-  a new webpack application). The skills use prebuilt extensions only, which
-  need no rebuild of JupyterLab.
+- A rebuild of the installed JupyterLab application (`jupyter lab build`
+  with source extensions). The skills use prebuilt extensions, which need no
+  rebuild, or a separate application (skill `jupyterlab-remix`).
 - Jupyter Notebook 7 and JupyterLite share most mechanisms, but paths and
   some plugin IDs differ. Check with the inspect tools before you rely on a
   recipe.

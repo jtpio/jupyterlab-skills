@@ -341,9 +341,10 @@ def main() -> int:
             if plugin["id"].startswith("@jupyterlab/")
         },
     }
-    outputs[ROOT / "jupyterlab-settings" / "scripts" / "core_plugins.json"] = (
-        json.dumps(graph, indent=1) + "\n"
-    )
+    # jlab_config.py adds the dependents of a disabled plugin; jlab_remix.py
+    # plans the plugins of a remix. Each skill keeps its own copy.
+    for skill in ("jupyterlab-settings", "jupyterlab-remix"):
+        outputs[ROOT / skill / "scripts" / "core_plugins.json"] = json.dumps(graph, indent=1) + "\n"
     for path, text in outputs.items():
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(text)

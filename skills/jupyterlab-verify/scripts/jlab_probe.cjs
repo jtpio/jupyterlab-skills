@@ -206,7 +206,8 @@ async function collect() {
   let settings = [];
   try {
     const token = config.token ? `?token=${config.token}` : '';
-    const response = await fetch(`${config.baseUrl}lab/api/settings${token}`);
+    // A remix serves the settings below its own URL.
+    const response = await fetch(`${config.fullSettingsUrl}${token}`);
     const data = await response.json();
     settings = data.settings.map(item => ({
       id: item.id,
@@ -348,7 +349,7 @@ async function runChecks(page, state, checks) {
             );
             const token = config.token ? `?token=${config.token}` : '';
             const response = await fetch(
-              `${config.baseUrl}lab/api/settings/${pluginId}${token}`
+              `${config.fullSettingsUrl}/${pluginId}${token}`
             );
             if (!response.ok) {
               return { error: `HTTP ${response.status}` };

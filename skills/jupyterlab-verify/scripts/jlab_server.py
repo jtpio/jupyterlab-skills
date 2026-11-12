@@ -175,7 +175,7 @@ def start(args: argparse.Namespace) -> int:
         "pid": process.pid,
         "port": port,
         "token": token,
-        "url": f"{base}lab?token={token}",
+        "url": f"{base}{args.path.strip('/')}?token={token}",
         "base_url": base,
         "root_dir": str(root_dir),
         "log": str(log),
@@ -186,6 +186,7 @@ def start(args: argparse.Namespace) -> int:
             "python": args.python,
             "cmd": args.cmd,
             "app_class": args.app_class,
+            "path": args.path,
             "project": args.project,
             "env": args.env,
             "extra": args.extra,
@@ -304,6 +305,12 @@ def main() -> int:
         "--app-class",
         help="class name of a custom application (a remix), for example MyApp: "
         "the script then also sets its expose_app_in_browser option",
+    )
+    p_start.add_argument(
+        "--path",
+        default="lab",
+        help="URL path of the application (default: lab). A remix has its own, "
+        "for example my-app",
     )
     p_start.add_argument(
         "--project",
