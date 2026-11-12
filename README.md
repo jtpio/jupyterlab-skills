@@ -40,19 +40,18 @@ distribution with one command.
 ```
 skills/
 ├── jupyterlab-customize/      start here: choose the mechanism, follow the loop
-├── jupyterlab-inspect/        folders, plugin IDs, settings, why a change does not apply
-│   ├── scripts/jlab_inspect.py
-│   └── references/            catalogs of the core plugins and commands
+├── jupyterlab-inspect/        folders, IDs of plugins, settings, menus, toolbars, shortcuts
+│   └── scripts/jlab_inspect.py
 ├── jupyterlab-settings/       page config, default overrides, user settings, server config
 │   ├── scripts/jlab_config.py
-│   └── references/            cookbook, file formats, menu / toolbar / widget IDs, shortcuts
+│   └── references/            cookbook, file formats
 ├── jupyterlab-extensions/     new behavior, with no build step
 │   ├── scripts/jlab_ext.py
 │   ├── assets/nobuild/        template of the extension file
 │   └── references/            patterns, replace core parts, tokens, TypeScript path
 ├── jupyterlab-theming/        themes, stylesheets, fonts
 │   ├── scripts/new_theme.py
-│   └── references/            CSS variables, selectors and recipes
+│   └── references/            selectors and recipes
 ├── jupyterlab-distribution/   one pip-installable package for everything
 │   └── scripts/jlab_dist.py
 ├── jupyterlab-remix/          a new application from JupyterLab packages, with its own bundle
@@ -87,9 +86,19 @@ Design choices:
 - **Themes start complete.** `new_theme.py` copies a built-in theme and adds
   a file for the overrides, because a theme that defines only some variables
   breaks the interface.
-- **Everything was run.** The recipes, code patterns and catalogs were
-  executed against JupyterLab 4.6.6. `tools/` holds the scripts that
-  regenerate and check them for a new version.
+- **No copies of version data.** The skills have no lists of plugins,
+  commands, shortcuts or CSS variables. `jlab_inspect.py` reads them from
+  the installation, and the probe reads them from the running application,
+  so they are correct for each version and include the installed extensions.
+- **No copy of the documentation.** The skills hold the procedure, the
+  traps, tested snippets and the scripts. For the meaning of a feature they
+  link to the JupyterLab documentation.
+  [docs/upstream-doc-gaps.md](docs/upstream-doc-gaps.md) lists the facts
+  that the skills must still hold because the documentation does not have
+  them.
+- **Everything was run.** The recipes and code patterns were executed
+  against JupyterLab 4.6.6. `tools/check_recipes.py` checks them for a new
+  version.
 
 ## Examples
 
@@ -152,7 +161,7 @@ refer to each other by name.
 
 ## Requirements
 
-- JupyterLab 4.x. The catalogs and recipes were made with 4.6.
+- JupyterLab 4.x. The recipes were made with 4.6.
 - Python 3.9 or newer. `jlab_inspect.py` and `jlab_config.py` must run with
   the Python of the environment that has JupyterLab.
 - For `jupyterlab-verify`: Node.js with [Playwright](https://playwright.dev)
@@ -197,10 +206,18 @@ python skills/jupyterlab-verify/scripts/jlab_server.py stop
 
 ## Maintain
 
-`tools/generate_references.py` writes the catalogs in `references/` again
-from a live stock JupyterLab, and the dependency data that `jlab_config.py`
-uses. `tools/check_recipes.py` validates each JSON block of a Markdown file
-against an installation. Run both after a new JupyterLab release:
+After a new JupyterLab release, check the recipes: `tools/check_recipes.py`
+validates each JSON block of a Markdown file against an installation.
+
+```bash
+<env>/bin/python tools/check_recipes.py skills/jupyterlab-settings/references/recipes.md skills/jupyterlab-settings/SKILL.md
+```
+
+One file of data is a copy: `core_plugins.json` (in the settings and remix
+skills) holds the service that each core plugin provides and requires. The
+files of an installation do not have this data. `jlab_config.py` gives a
+warning when the installed JupyterLab is a different minor version, and it
+accepts fresh data (`--graph`). To update the copy:
 
 ```bash
 python skills/jupyterlab-verify/scripts/jlab_server.py start --python <env>/bin/python --root-dir /tmp/stock
@@ -211,12 +228,11 @@ node skills/jupyterlab-verify/scripts/jlab_probe.cjs --dump /tmp/stock.json
 ```
 
 ```bash
-<env>/bin/python tools/generate_references.py /tmp/stock.json
+python tools/update_plugin_data.py /tmp/stock.json
 ```
 
-```bash
-<env>/bin/python tools/check_recipes.py skills/jupyterlab-settings/references/recipes.md skills/jupyterlab-settings/SKILL.md
-```
+When a fact of [docs/upstream-doc-gaps.md](docs/upstream-doc-gaps.md) lands
+in the JupyterLab documentation, replace the text in the skill with a link.
 
 The module federation container (the last part of `remoteEntry.js`) exists
 in three places: `skills/jupyterlab-extensions/assets/nobuild/remoteEntry.js`,
