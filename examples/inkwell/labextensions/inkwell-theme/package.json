@@ -1,0 +1,13 @@
+{
+  "name": "inkwell-theme",
+  "version": "0.1.0",
+  "description": "JupyterLab themes: Inkwell Paper, Inkwell Night",
+  "jupyterlab": {
+    "extension": true,
+    "themePath": "themes",
+    "_build": {
+      "load": "static/remoteEntry.js",
+      "extension": "./extension"
+    }
+  }
+}

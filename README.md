@@ -86,6 +86,16 @@ Design choices:
   executed against JupyterLab 4.6.6. `tools/` holds the scripts that
   regenerate and check them for a new version.
 
+## Example
+
+[`examples/inkwell`](examples/inkwell) is a JupyterLab distribution that a
+coding agent built with these skills and a product brief: a writing studio
+with a home page in place of the launcher, its own themes and fonts, new
+commands, a shorter menu bar and toolbar, and a launch command. It has no
+build step.
+
+![The Inkwell home page](examples/inkwell/screenshots/home.webp)
+
 ## Install
 
 ### Claude Code

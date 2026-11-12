@@ -1,0 +1,11 @@
+{
+  "appName": "Inkwell",
+  "disabledExtensions": {
+    "@jupyterlab/extensionmanager-extension": true,
+    "@jupyterlab/debugger-extension": true,
+    "@jupyterlab/application-extension:property-inspector": true,
+    "@jupyterlab/running-extension:sidebar": true,
+    "@jupyterlab/apputils-extension:announcements": true,
+    "@jupyterlab/application-extension:logo": true
+  }
+}

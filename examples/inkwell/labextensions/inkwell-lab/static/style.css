@@ -1,0 +1,352 @@
+/*
+ * Styles of Inkwell's own widgets: brand, word count, home page, About
+ * dialog, splash, focus mode. Colors come from the theme variables.
+ */
+
+/*
+ * Brand in the top bar.
+ */
+.inkwell-brand {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0 18px 0 12px;
+  cursor: pointer;
+  user-select: none;
+}
+.inkwell-brand-mark {
+  display: flex;
+}
+.inkwell-brand-word {
+  font-family: var(--jp-content-font-family);
+  font-size: 19px;
+  font-style: italic;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--jp-ui-font-color0);
+  line-height: 1;
+}
+
+/*
+ * Word count in the top bar.
+ */
+.inkwell-word-count {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 16px 0 10px;
+  font-size: 12px;
+  color: var(--jp-ui-font-color2);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.inkwell-word-count-value {
+  color: var(--jp-ui-font-color1);
+  font-weight: 600;
+}
+.inkwell-word-count-read::before {
+  content: '\00b7';
+  margin-right: 10px;
+  color: var(--jp-ui-font-color3);
+}
+.inkwell-word-count.inkwell-hidden {
+  visibility: hidden;
+}
+
+/*
+ * Home page.
+ */
+.inkwell-home-content {
+  overflow: auto;
+  background: var(--jp-layout-color0);
+}
+.inkwell-home {
+  box-sizing: border-box;
+  max-width: 940px;
+  margin: 0 auto;
+  padding: 64px 48px 80px;
+  color: var(--jp-ui-font-color0);
+  font-family: var(--jp-ui-font-family);
+}
+.inkwell-home-kicker {
+  margin: 0 0 18px;
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--jp-brand-color1);
+}
+.inkwell-home-title {
+  margin: 0 0 20px;
+  font-family: var(--jp-content-font-family);
+  font-size: 54px;
+  font-weight: 500;
+  line-height: 1.04;
+  letter-spacing: -0.02em;
+  color: var(--jp-ui-font-color0);
+}
+.inkwell-home-title em {
+  display: block;
+  font-style: italic;
+  color: var(--jp-ui-font-color2);
+}
+.inkwell-home-lede {
+  max-width: 620px;
+  margin: 0 0 40px;
+  font-family: var(--jp-content-font-family);
+  font-size: 19px;
+  line-height: 1.55;
+  color: var(--jp-ui-font-color2);
+}
+.inkwell-home-actions {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 52px;
+}
+.inkwell-action {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  min-height: 150px;
+  padding: 22px 22px 20px;
+  border: 1px solid var(--jp-border-color2);
+  border-radius: 14px;
+  background: var(--jp-layout-color1);
+  color: var(--jp-ui-font-color0);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+.inkwell-action:hover:not([disabled]) {
+  border-color: var(--jp-brand-color2);
+  box-shadow: 0 14px 30px -20px rgba(0, 0, 0, 0.55);
+  transform: translateY(-1px);
+}
+.inkwell-action:focus-visible {
+  outline: 2px solid var(--jp-focus-outline-color);
+  outline-offset: 2px;
+}
+.inkwell-action[disabled] {
+  opacity: 0.55;
+  cursor: default;
+}
+.inkwell-action-icon {
+  display: flex;
+}
+.inkwell-action-icon svg {
+  width: 26px;
+  height: 26px;
+}
+.inkwell-action-title {
+  margin-top: 18px;
+  font-family: var(--jp-content-font-family);
+  font-size: 25px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.inkwell-action-text {
+  font-size: 13px;
+  color: var(--jp-ui-font-color2);
+}
+.inkwell-action[data-action='new-essay'] {
+  border-color: var(--jp-accept-color-normal);
+  background: var(--jp-accept-color-normal);
+  color: #fff;
+}
+.inkwell-action[data-action='new-essay']:hover {
+  background: var(--jp-accept-color-hover);
+}
+.inkwell-action[data-action='new-essay'] .inkwell-action-text {
+  color: rgba(255, 255, 255, 0.82);
+}
+.inkwell-action[data-action='new-essay'] .jp-icon3[fill],
+.inkwell-action[data-action='new-essay'] .jp-icon3 {
+  fill: #fff;
+}
+.inkwell-action-icon [class*='jp-icon-contrast'] {
+  fill: var(--jp-brand-color1);
+}
+.inkwell-home-recent {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  gap: 40px;
+}
+.inkwell-home-column h2 {
+  margin: 0 0 4px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--jp-border-color2);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--jp-ui-font-color2);
+}
+.inkwell-home-files {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.inkwell-home-file {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  column-gap: 16px;
+  width: 100%;
+  padding: 12px 10px;
+  border: none;
+  border-bottom: 1px solid var(--jp-border-color3);
+  border-radius: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.inkwell-home-file:hover {
+  background: var(--jp-layout-color1);
+}
+.inkwell-home-file-title {
+  grid-column: 1;
+  overflow: hidden;
+  font-family: var(--jp-content-font-family);
+  font-size: 19px;
+  line-height: 1.3;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--jp-ui-font-color0);
+}
+.inkwell-home-file-name {
+  grid-column: 1;
+  grid-row: 2;
+  font-family: var(--jp-code-font-family);
+  font-size: 11.5px;
+  color: var(--jp-ui-font-color3);
+}
+.inkwell-home-file-time {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  align-self: center;
+  font-size: 12px;
+  color: var(--jp-ui-font-color2);
+  white-space: nowrap;
+}
+.inkwell-home-empty {
+  font-family: var(--jp-content-font-family);
+  font-size: 17px;
+  font-style: italic;
+  color: var(--jp-ui-font-color2);
+}
+@media (max-width: 900px) {
+  .inkwell-home {
+    padding: 40px 24px;
+  }
+  .inkwell-home-title {
+    font-size: 40px;
+  }
+  .inkwell-home-actions,
+  .inkwell-home-recent {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/*
+ * About dialog.
+ */
+.inkwell-about {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-sizing: border-box;
+  width: 400px;
+  max-width: 100%;
+  padding: 4px 8px 0;
+  text-align: center;
+  color: var(--jp-ui-font-color0);
+}
+.inkwell-about-mark svg {
+  width: 56px;
+  height: 56px;
+}
+.inkwell-about-name {
+  margin-top: 6px;
+  font-family: var(--jp-content-font-family);
+  font-size: 42px;
+  font-style: italic;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+}
+.inkwell-about-tagline {
+  margin: 4px 0 18px;
+  font-family: var(--jp-content-font-family);
+  font-size: 18px;
+  color: var(--jp-ui-font-color2);
+}
+.inkwell-about-facts {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 6px 16px;
+  box-sizing: border-box;
+  width: 100%;
+  margin: 0 0 14px;
+  padding: 14px 18px;
+  border-radius: 10px;
+  background: var(--jp-layout-color1);
+  font-size: 13px;
+  text-align: left;
+}
+.inkwell-about-facts dt {
+  color: var(--jp-ui-font-color2);
+}
+.inkwell-about-facts dd {
+  margin: 0;
+}
+.inkwell-about-note {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--jp-ui-font-color2);
+}
+
+/*
+ * Splash screen.
+ */
+@keyframes inkwell-drop {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-6px) scale(1.04);
+  }
+}
+.inkwell-splash-drop {
+  animation: inkwell-drop 1.4s ease-in-out infinite;
+}
+
+/*
+ * Focus mode: side areas collapsed (by the command), quiet chrome,
+ * narrower column, the active cell in full ink.
+ */
+body.inkwell-focus #jp-MainMenu,
+body.inkwell-focus .jp-NotebookPanel-toolbar {
+  opacity: 0.3;
+  transition: opacity 0.2s ease;
+}
+body.inkwell-focus #jp-MainMenu:hover,
+body.inkwell-focus .jp-NotebookPanel-toolbar:hover {
+  opacity: 1;
+}
+body.inkwell-focus .jp-Notebook .jp-WindowedPanel-outer {
+  padding-left: max(24px, calc((100% - 720px) / 2)) !important;
+  padding-right: max(24px, calc((100% - 720px) / 2)) !important;
+}
+body.inkwell-focus .jp-Notebook .jp-Cell:not(.jp-mod-active) {
+  opacity: 0.55;
+  transition: opacity 0.2s ease;
+}
+body.inkwell-focus .jp-Notebook .jp-Cell:hover {
+  opacity: 1;
+}

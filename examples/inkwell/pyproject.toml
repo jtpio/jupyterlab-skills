@@ -1,0 +1,35 @@
+[build-system]
+requires = ["hatchling>=1.21"]
+build-backend = "hatchling.build"
+
+[project]
+name = "inkwell-lab"
+version = "0.1.0"
+description = "Inkwell: a calm notebook studio for data essays"
+readme = "README.md"
+requires-python = ">=3.9"
+classifiers = [
+    "Framework :: Jupyter",
+    "Framework :: Jupyter :: JupyterLab",
+    "Framework :: Jupyter :: JupyterLab :: 4",
+    "Programming Language :: Python :: 3",
+]
+dependencies = [
+    "jupyterlab>=4.6,<5",
+    "matplotlib",
+    "pandas",
+]
+
+[project.scripts]
+inkwell = "inkwell_lab.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["inkwell_lab"]
+
+# Folders that pip copies below sys.prefix. JupyterLab finds them there.
+[tool.hatch.build.targets.wheel.shared-data]
+"jupyter-config" = "etc/jupyter"
+"labextensions" = "share/jupyter/labextensions"
+
+[tool.hatch.build.targets.sdist]
+include = ["inkwell_lab", "jupyter-config", "labextensions", "README.md"]
