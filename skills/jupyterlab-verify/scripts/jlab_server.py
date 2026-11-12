@@ -115,9 +115,11 @@ def start(args: argparse.Namespace) -> int:
         f"--ServerApp.root_dir={root_dir}",
         "--LabApp.expose_app_in_browser=True",
     ]
+    if args.app_class:
+        # A remix has its own application class, with the same option.
+        command.append(f"--{args.app_class}.expose_app_in_browser=True")
     if hasattr(os, "geteuid") and os.geteuid() == 0:
         command.append("--allow-root")
-    command += args.extra
 
     env = dict(os.environ)
     profile = None
@@ -126,6 +128,14 @@ def start(args: argparse.Namespace) -> int:
         profile = Path(args.profile or tempfile.mkdtemp(prefix=f"{args.name}-", dir=STATE_ROOT))
         env["JUPYTERLAB_SETTINGS_DIR"] = str(profile / "user-settings")
         env["JUPYTERLAB_WORKSPACES_DIR"] = str(profile / "workspaces")
+        if args.app_class:
+            # A remix does not read the two variables: set its options.
+            command += [
+                f"--{args.app_class}.user_settings_dir={profile / 'user-settings'}",
+                f"--{args.app_class}.workspaces_dir={profile / 'workspaces'}",
+            ]
+    # Last, so that an explicit option of the caller wins.
+    command += args.extra
     if args.project:
         # A distribution project that is not installed: JupyterLab reads its
         # config and extensions through the Jupyter path variables.
@@ -175,6 +185,7 @@ def start(args: argparse.Namespace) -> int:
         "start_options": {
             "python": args.python,
             "cmd": args.cmd,
+            "app_class": args.app_class,
             "project": args.project,
             "env": args.env,
             "extra": args.extra,
@@ -288,6 +299,11 @@ def main() -> int:
         "--cmd",
         help="command to run instead of 'python -m jupyterlab', "
         "for example the entry point of a distribution",
+    )
+    p_start.add_argument(
+        "--app-class",
+        help="class name of a custom application (a remix), for example MyApp: "
+        "the script then also sets its expose_app_in_browser option",
     )
     p_start.add_argument(
         "--project",
