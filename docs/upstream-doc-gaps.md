@@ -30,11 +30,12 @@ No issue or pull request was opened for these items.
 | 7 | `custom.css` loads from the user config folder only | Not exact | `jupyterlab-theming` |
 | 8 | A disabled plugin breaks the plugins that require its service | No warning | `jupyterlab-settings`, `jupyterlab-verify` |
 | 9 | `jupyter_server_config.d` applies only to `jpserver_extensions` | Not found (Jupyter Server) | `jupyterlab-settings` |
-| 10 | `--LabApp.expose_app_in_browser` and `window.jupyterapp` | Migration guide only | `jupyterlab-verify` |
-| 11 | The files of a prebuilt extension, as a contract | Not described | `jupyterlab-extensions`, `jupyterlab-theming` |
-| 12 | A theme must define all theme variables | Not described | `jupyterlab-theming` |
-| 13 | An application from the published npm packages | No page | `jupyterlab-remix` |
-| 14 | Plugin metadata as data (a feature, not a text) | Not available | `jupyterlab-settings`, `jupyterlab-remix` |
+| 10 | When a change takes effect: page load or server restart | Not described | `jupyterlab-settings`, `jupyterlab-verify` |
+| 11 | `--LabApp.expose_app_in_browser` and `window.jupyterapp` | Migration guide only | `jupyterlab-verify` |
+| 12 | The files of a prebuilt extension, as a contract | Not described | `jupyterlab-extensions`, `jupyterlab-theming` |
+| 13 | A theme must define all theme variables | Not described | `jupyterlab-theming` |
+| 14 | An application from the published npm packages | No page | `jupyterlab-remix` |
+| 15 | Plugin metadata as data (a feature, not a text) | Not available | `jupyterlab-settings`, `jupyterlab-remix` |
 
 ## Configuration
 
@@ -161,7 +162,7 @@ No issue or pull request was opened for these items.
 - **Where.** `docs/source/user/extensions.md`, section "Enabling and
   Disabling Extensions".
 - **Removes.** A part of "Disable or hide a feature" in
-  `skills/jupyterlab-settings/SKILL.md`. Item 14 removes the data file.
+  `skills/jupyterlab-settings/SKILL.md`. Item 15 removes the data file.
 
 ### 9. `jupyter_server_config.d` applies only to `jpserver_extensions`
 
@@ -180,9 +181,26 @@ No issue or pull request was opened for these items.
   `docs/source/user/directories.md`.
 - **Removes.** The note below the table "Server config" in `config-files.md`.
 
+### 10. When a change takes effect
+
+- **Fact.** The server reads the default overrides (item 1) and the server
+  config only when it starts. It reads page config, the extension folders
+  and the settings schemas at each page load. A new `disabledExtensions`
+  entry or a new prebuilt extension thus needs only a browser reload; a new
+  default needs a server restart.
+- **Evidence.** Test with a running server: a new override file had no
+  effect on `/lab/api/settings` until the restart; a new `page_config.d`
+  file, a new extension folder and its schema were in effect at the next
+  page load.
+- **Documentation.** One sentence: "The newly installed extension may
+  require JupyterLab to be restarted" (`docs/source/user/extensions.md`).
+- **Where.** `docs/source/user/directories.md`.
+- **Removes.** The restart rules in `skills/jupyterlab-customize/SKILL.md`
+  and `skills/jupyterlab-verify/SKILL.md`.
+
 ## Extensions and themes
 
-### 10. The application object in the browser
+### 11. The application object in the browser
 
 - **Fact.** `jupyter lab --expose-app-in-browser` (the option
   `LabApp.expose_app_in_browser`) sets `window.jupyterapp`. Test tools need
@@ -194,7 +212,7 @@ No issue or pull request was opened for these items.
   extension".
 - **Removes.** One paragraph of `skills/jupyterlab-verify/SKILL.md`.
 
-### 11. The files of a prebuilt extension
+### 12. The files of a prebuilt extension
 
 - **Fact.** JupyterLab loads a folder in `share/jupyter/labextensions/` that
   has a `package.json` with `jupyterlab._build.load` and a script that
@@ -213,7 +231,7 @@ No issue or pull request was opened for these items.
 - **Removes.** Nothing soon. The template and the rules stay in
   `skills/jupyterlab-extensions`.
 
-### 12. A theme must define all theme variables
+### 13. A theme must define all theme variables
 
 - **Fact.** The theme variables have no fallback values. A theme that
   defines only some of them leaves fonts, sizes and borders undefined, and
@@ -226,7 +244,7 @@ No issue or pull request was opened for these items.
 
 ## Applications made from the packages
 
-### 13. An application from the published npm packages
+### 14. An application from the published npm packages
 
 - **Fact.** The folder `examples/` of the repository has applications made
   from the JupyterLab packages, but they build inside the monorepo with
@@ -253,12 +271,12 @@ No issue or pull request was opened for these items.
 
 ## One feature that removes a copy of data
 
-### 14. Plugin metadata as data
+### 15. Plugin metadata as data
 
 - **Need.** For each plugin: ID, description, the token that it provides,
   the tokens that it requires. Tools need it to find the plugins that break
   when a plugin is disabled (item 8), and to plan the plugins of an
-  application (item 13).
+  application (item 14).
 - **Today.** The data exists only in the running application
   (`app.pluginRegistry`, a private member). The skills keep a copy for stock
   JupyterLab 4.6.6 in `core_plugins.json`, and `jlab_inspect.py` reads plugin
