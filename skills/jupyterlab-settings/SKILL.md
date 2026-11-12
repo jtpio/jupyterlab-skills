@@ -1,0 +1,300 @@
+---
+name: jupyterlab-settings
+description: Change JupyterLab with configuration files, no code. Use it to disable, enable or lock a plugin or a whole extension (status bar, extension manager, debugger, announcements, launcher, table of contents…), to change the default of any setting (theme, autosave, line numbers, file browser, terminal, notebook, completer), to move panels between the left, right, main and bottom areas, to edit the main menu, context menu, toolbars and keyboard shortcuts, to rename the application, and to set server options that affect the UI. Covers page config, default setting overrides, user settings and server config, their precedence, and a script that writes them with validation. Use it for requests such as "disable this extension", "hide this part of the UI", "make this the default", "remove this menu", "change this shortcut".
+compatibility: JupyterLab 4.x (tested with 4.6). The script must run with the Python of the environment that has JupyterLab.
+---
+
+# Configure JupyterLab with files
+
+JupyterLab reads four kinds of configuration. All are plain JSON files in a
+Jupyter config folder. None needs a build.
+
+| Surface | File (below a config folder) | Controls | Read |
+| --- | --- | --- | --- |
+| **Page config** | `labconfig/page_config.d/*.json` | Which plugins load (`disabledExtensions`), `appName`, other page options | Server start |
+| **Default overrides** | `labconfig/default_setting_overrides.d/*.json` | The default value of any setting of any plugin | Server start |
+| **User settings** | `<user settings dir>/<package>/<plugin>.jupyterlab-settings` | The value for one user. Highest priority | Live |
+| **Server config** | `jupyter_server_config.json`, `jupyter_server_config.d/*.json` | Server and `LabApp` options, server extensions | Server start |
+
+Precedence for one setting, highest first: **user settings → default overrides
+→ default in the schema of the plugin**. Page config is not a layer of
+settings: a disabled plugin does not load, and its settings have no effect.
+
+Config folders and their order come from `jupyter --paths`. The details are in
+[references/config-files.md](references/config-files.md).
+
+## Write with the script
+
+`scripts/jlab_config.py` writes the two `labconfig` snippets. It checks plugin
+IDs against the installation, setting keys and value types against the
+schema, and it only touches its own files (default name `50-custom.json`).
+
+```bash
+<env>/bin/python scripts/jlab_config.py [--scope env|user] [--config-dir DIR] [--name NAME] <command>
+```
+
+| Command | Effect |
+| --- | --- |
+| `disable <id>...` | Add plugins or whole packages to `disabledExtensions`. `--lock` also locks them in the Plugin Manager |
+| `enable <id>...` | Undo. `--force` writes `false`, to re-enable what another file disables |
+| `set <plugin> <key> <json>` | Set the default of a setting. `--append` adds to a list, `--merge` merges into an object |
+| `unset <plugin> [key]` | Remove an override |
+| `page <key> [json]` | Set or remove a page config key, for example `appName` |
+| `user-set <plugin> <key> <json>` | Write a user setting |
+| `apply <file.json>` | Apply many changes: `{"disable": [], "lock": [], "page": {}, "overrides": {}}` |
+| `show` | Print the snippets |
+
+Scope: `--scope env` writes to `<sys.prefix>/etc/jupyter`, `--scope user` to
+the user config folder. Without the option, the script uses `env` inside a
+virtual environment. `--config-dir` gives an explicit folder: use it with the
+`jupyter-config` folder of a distribution project.
+
+Examples:
+
+```bash
+<env>/bin/python scripts/jlab_config.py disable @jupyterlab/extensionmanager-extension @jupyterlab/apputils-extension:announcements
+```
+
+```bash
+<env>/bin/python scripts/jlab_config.py set @jupyterlab/apputils-extension:themes theme '"JupyterLab Dark"'
+```
+
+```bash
+<env>/bin/python scripts/jlab_config.py set @jupyterlab/notebook-extension:tracker codeCellConfig '{"lineNumbers": true}'
+```
+
+Values are JSON. Quote them for the shell. A bare word is taken as a string.
+
+You can also write the files by hand: the formats are below. Then check them
+with `jlab_inspect.py page-config` and `jlab_inspect.py overrides`.
+
+## Disable or hide a feature
+
+```json
+{
+  "disabledExtensions": {
+    "@jupyterlab/extensionmanager-extension": true,
+    "@jupyterlab/apputils-extension:announcements": true
+  }
+}
+```
+
+A key matches in four ways: a plugin ID, a package name (all its plugins), or
+a regular expression on either. `true` disables. `false` re-enables what a
+file of lower priority disables.
+
+Before you disable a plugin:
+
+1. **Prefer a setting when one exists.** Examples:
+   `@jupyterlab/statusbar-extension:plugin` → `visible: false`,
+   `@jupyterlab/extensionmanager-extension:plugin` → `enabled: false`,
+   `@jupyterlab/cell-toolbar-extension:plugin` → `showToolbar: false`.
+2. **Mind the dependents.** A plugin that provides a service token breaks
+   the plugins that require it: they log activation errors in the browser
+   console. `jlab_config.py disable` knows the core plugins and adds their
+   dependents to the snippet (it prints them; `--no-cascade` turns this
+   off). For plugins of other extensions, ask the running application:
+   `jlab_probe.cjs --dependents <id>` (skill `jupyterlab-verify`).
+3. **Keep the foundations.** Do not disable plugins marked "core service" in
+   the catalog (`:paths`, `:router`, `:shell`, `:settings`, `:state`,
+   `:translator`, `:resolver`…).
+
+Hide one sidebar tab without disabling its plugin: there is no general
+setting. Disable the plugin that adds the panel
+(`@jupyterlab/running-extension:sidebar`, `@jupyterlab/toc-extension:tracker`,
+`@jupyterlab/extensionmanager-extension`, `@jupyterlab/debugger-extension`,
+`@jupyterlab/application-extension:property-inspector`), or hide the tab with
+CSS (skill `jupyterlab-theming`). The cookbook has the full table.
+
+`lockedExtensions` has the same format. A locked plugin cannot be toggled by
+the user in the Plugin Manager or with `jupyter labextension enable`.
+
+The official CLI does the same for one plugin and writes
+`labconfig/page_config.json`:
+
+```bash
+jupyter labextension disable @jupyterlab/extensionmanager-extension --level=sys_prefix
+```
+
+## Change a default
+
+```json
+{
+  "@jupyterlab/apputils-extension:themes": { "theme": "JupyterLab Dark" },
+  "@jupyterlab/docmanager-extension:plugin": { "autosaveInterval": 30 },
+  "@jupyterlab/notebook-extension:tracker": {
+    "codeCellConfig": { "lineNumbers": true }
+  }
+}
+```
+
+Top-level keys are plugin IDs. Inner keys are the settings of the schema.
+
+- An **object** value merges into the default of the schema: give only the
+  keys that change (`codeCellConfig.lineNumbers`).
+- A **list or scalar** value replaces the default.
+- A wrong plugin ID or key is ignored without an error. Find them with
+  `jlab_inspect.py find <text>` and `jlab_inspect.py schema <plugin>`.
+
+## Layout: move panels and bars
+
+Plugin `@jupyterlab/application-extension:shell`.
+
+```json
+{
+  "@jupyterlab/application-extension:shell": {
+    "activityBarPosition": "top",
+    "startMode": "single",
+    "dockPanelPadding": false,
+    "layout": {
+      "multiple": {
+        "filebrowser": { "area": "right" },
+        "table-of-contents": { "area": "right", "options": { "rank": 10 } },
+        "Terminal": { "area": "down" }
+      },
+      "single": {
+        "filebrowser": { "area": "right" }
+      }
+    }
+  }
+}
+```
+
+- `layout` has one object for the default mode (`multiple`) and one for the
+  simple mode (`single`). Set both when the change must hold in both modes.
+- A key is a **widget ID** (`filebrowser`) or a **widget type**
+  (`Terminal`, `Notebook`, `Console`). Areas: `left`, `right`, `main`, `down`.
+  `options.rank` orders the tabs of a side area.
+- `activityBarPosition`: `side`, `top` or `bottom`. `startMode`: `""`,
+  `single` or `multiple`.
+- Widget IDs and types: [references/ui-identifiers.md](references/ui-identifiers.md).
+  For extensions, read them from the probe summary (`shell`).
+
+A layout that the user changed by hand is stored in the workspace and wins
+over these defaults for that workspace.
+
+## Menus, context menu, toolbars, shortcuts
+
+These four settings are **lists that merge** with the built-in items. Give
+only your changes. To remove a built-in item, repeat its identity with
+`"disabled": true`.
+
+| What | Plugin | Key | Identity of an item |
+| --- | --- | --- | --- |
+| Main menu | `@jupyterlab/mainmenu-extension:plugin` | `menus` | menu `id`; inside a menu: `command` + `args` |
+| Context menu | `@jupyterlab/application-extension:context-menu` | `contextMenu` | `command` + `selector` + `args` |
+| Notebook toolbar | `@jupyterlab/notebook-extension:panel` | `toolbar` | `name` |
+| Other toolbars | see `ui-identifiers.md` | `toolbar` | `name` |
+| Shortcuts | `@jupyterlab/shortcuts-extension:shortcuts` | `shortcuts` | `command` + `keys` + `selector` |
+
+```json
+{
+  "@jupyterlab/mainmenu-extension:plugin": {
+    "menus": [
+      { "id": "jp-mainmenu-run", "disabled": true },
+      {
+        "id": "jp-mainmenu-file",
+        "items": [{ "command": "filebrowser:open-path", "disabled": true }]
+      },
+      {
+        "id": "my-menu",
+        "label": "Studio",
+        "rank": 50,
+        "items": [
+          { "command": "notebook:create-new", "rank": 1 },
+          { "type": "separator", "rank": 2 },
+          { "command": "apputils:change-theme", "args": { "theme": "JupyterLab Dark" }, "rank": 3 }
+        ]
+      }
+    ]
+  },
+  "@jupyterlab/notebook-extension:panel": {
+    "toolbar": [
+      { "name": "restart-and-run", "disabled": true },
+      { "name": "clear-all", "command": "notebook:clear-all-cell-outputs", "rank": 12 }
+    ]
+  },
+  "@jupyterlab/shortcuts-extension:shortcuts": {
+    "shortcuts": [
+      { "command": "application:toggle-left-area", "keys": ["Accel B"], "selector": "body", "disabled": true },
+      { "command": "apputils:activate-command-palette", "keys": ["Accel K"], "selector": "body" }
+    ]
+  }
+}
+```
+
+- Menu IDs, toolbar item names, context menu selectors:
+  [references/ui-identifiers.md](references/ui-identifiers.md).
+- Default shortcuts: [references/default-shortcuts.md](references/default-shortcuts.md).
+  `Accel` is Cmd on macOS and Ctrl elsewhere.
+- Command IDs: `core-commands.md` of the skill `jupyterlab-inspect`.
+- A menu item or toolbar button for a command that does not exist is not
+  shown. A new command needs an extension (skill `jupyterlab-extensions`).
+- The top bar (right of the menus) is the toolbar `TopBar`, setting
+  `toolbar` of `@jupyterlab/application-extension:top-bar`.
+- Turn the context menu off: `"disabled": true` in
+  `@jupyterlab/application-extension:context-menu`.
+
+## Application name and other page options
+
+`appName` in page config sets the title of the browser tab and the name in
+dialogs:
+
+```json
+{ "appName": "My Lab" }
+```
+
+Other options a snippet can set: `quitButton`, `terminalsAvailable`,
+`notebookStartsKernel`. See
+[references/config-files.md](references/config-files.md).
+
+## Server options
+
+Server and `LabApp` options go in the single file `jupyter_server_config.json`
+(or `.py`) of a config folder:
+
+```json
+{
+  "ServerApp": { "quit_button": false },
+  "LabApp": { "custom_css": true }
+}
+```
+
+The drop-in folder `jupyter_server_config.d/` is merged only for
+`ServerApp.jpserver_extensions` (which server extensions are on). General
+options in a `.d` file have no effect. A distribution should pass such options
+from its launch command (skill `jupyterlab-distribution`).
+
+## User settings
+
+Use them when the change is for one person and must win over every default.
+The file path splits the plugin ID at the colon:
+
+```
+<user settings dir>/@jupyterlab/apputils-extension/themes.jupyterlab-settings
+```
+
+```bash
+<env>/bin/python scripts/jlab_config.py user-set @jupyterlab/apputils-extension:themes theme '"JupyterLab Dark"'
+```
+
+The file is JSON5 (comments allowed). A running application picks a change up
+without a restart. Do not use user settings to ship defaults: they belong to
+the user.
+
+## Cookbook
+
+[references/recipes.md](references/recipes.md) has the exact snippet for
+common requests: quiet startup, minimal UI, single-document mode, kiosk-like
+lock-down, editor and notebook defaults, file browser, terminal, menus and
+toolbars.
+
+## After each change
+
+1. `jlab_inspect.py page-config` and `overrides`: the change is in the merged
+   result, no file is invalid, no ID is flagged.
+2. Restart the server.
+3. Probe in a browser with a clean profile (skill `jupyterlab-verify`):
+   `--expect-no-plugin`, `--expect-setting`, `--fail-on-console-error`.
+4. Tell the user which files changed and how to undo: delete the snippet, or
+   run `jlab_config.py enable` / `unset`.

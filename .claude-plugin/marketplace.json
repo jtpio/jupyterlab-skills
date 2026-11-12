@@ -1,0 +1,15 @@
+{
+  "name": "jupyterlab-skills",
+  "owner": {
+    "name": "Jeremy Tuloup"
+  },
+  "plugins": [
+    {
+      "name": "jupyterlab-skills",
+      "source": "./",
+      "description": "Agent skills to customize JupyterLab: inspect an installation, change configuration, create extensions and themes without a build step, package the result as an installable distribution, and verify it in a browser.",
+      "homepage": "https://github.com/jtpio/jupyterlab-skills",
+      "license": "BSD-3-Clause"
+    }
+  ]
+}
