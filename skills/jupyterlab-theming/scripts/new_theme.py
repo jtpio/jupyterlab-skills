@@ -76,12 +76,25 @@ ENTRY = r"""/*
   const SHARED = ['@jupyterlab/apputils'];
   let shareScope = null;
 
+  function compareVersions(a, b) {
+    const pa = a.split(/[.-]/).map(part => parseInt(part, 10) || 0);
+    const pb = b.split(/[.-]/).map(part => parseInt(part, 10) || 0);
+    for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
+      const diff = (pa[i] || 0) - (pb[i] || 0);
+      if (diff !== 0) {
+        return diff;
+      }
+    }
+    return 0;
+  }
+
   async function loadShared(name) {
     const versions = shareScope && shareScope[name];
     if (!versions) {
       throw new Error(`${NAME}: JupyterLab does not share the package ${name}`);
     }
-    const keys = Object.keys(versions).sort();
+    const keys = Object.keys(versions).sort(compareVersions);
+    // The copy that the application already uses keeps the tokens identical.
     const key = keys.find(version => versions[version].loaded) || keys[keys.length - 1];
     const factory = await versions[key].get();
     return factory();

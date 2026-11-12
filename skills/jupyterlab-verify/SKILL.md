@@ -20,15 +20,17 @@ application. Two scripts give that proof without a person at the screen:
 python scripts/jlab_server.py start --python <env>/bin/python --root-dir /tmp/lab-demo
 ```
 
-The command prints JSON with `url` (it includes the token). Then:
-
 ```bash
-node scripts/jlab_probe.cjs --url "<url>" --screenshot /tmp/lab.png --fail-on-console-error
+node scripts/jlab_probe.cjs --screenshot /tmp/lab.png --fail-on-console-error
 ```
 
 ```bash
 python scripts/jlab_server.py stop
 ```
+
+`start` prints JSON with the `url` of the server (it includes the token). The
+probe finds the server by its name: `--server <name>`, default `default`.
+For a server that the script did not start, pass `--url "<url with token>"`.
 
 The probe prints a summary: title, application name and version, theme,
 mode, number of plugins and commands, extensions, disabled plugins, menus,
@@ -41,37 +43,58 @@ broken layout.
 ## The server script
 
 ```bash
-python scripts/jlab_server.py start [--name NAME] [--python PY | --cmd CMD] [--root-dir DIR] [--port N] [--env KEY=VALUE] [-- extra server args]
+python scripts/jlab_server.py start [--name NAME] [--python PY | --cmd CMD] [--project DIR] [--root-dir DIR] [--port N] [--env KEY=VALUE] [-- extra server args]
 ```
 
 - `--python`: Python of the environment under test. The server runs
   `python -m jupyterlab`.
 - `--cmd`: a command to run instead, for example the launch command of a
   distribution: `--cmd /tmp/test-env/bin/my-lab`.
+- `--project`: a distribution project (skill `jupyterlab-distribution`) to
+  load without an install. The server reads `DIR/jupyter-config` and
+  `DIR/labextensions` in front of the folders of the environment. Use it
+  while you develop; the final test is the wheel in a clean environment.
 - `--root-dir`: folder that the file browser shows. Use a scratch folder
   with a few sample files, not the project of the user: the probe can create
   notebooks.
-- `--name`: label, when several servers run (`before`, `after`).
+- `--name`: label of the server. Use a name of your own (`before`, `after`,
+  the project name) when more than one server can run on the machine.
 - **Clean profile.** By default the server gets empty user settings and
   workspaces (`JUPYTERLAB_SETTINGS_DIR`, `JUPYTERLAB_WORKSPACES_DIR` in a
   temporary folder). You then see the defaults, not what a person saved.
   `--keep-user-state` uses the real ones.
 - It always adds `--LabApp.expose_app_in_browser=True` (the probe needs it),
   a random token, and `--allow-root` when the user is root.
-- `stop [--name NAME | --all]`, `status`.
+- `restart [--name NAME]`: stop and start again with the same options and
+  the same URL, and a new clean profile.
+- `url [--name NAME]` prints the URL again. `status` lists the servers.
+- `stop [--name NAME]` stops one server. `stop --all` stops the servers that
+  were started from the current folder; servers started from other folders
+  can belong to other sessions and stay (`--everywhere` stops them too).
 - When the server does not start, the script prints the end of its log. The
   path of the log is in the JSON (`log`).
+- "A server named … already runs": if it is not yours, do not stop it. Use
+  another `--name`.
 
-Restart the server after each change to page config, overrides, server
-config, a `package.json` or a schema of an extension, and after you install
-or remove an extension. A change in JavaScript or CSS of an installed
+Restart the server (`restart`) after each change to page config, overrides,
+server config, a `package.json` or a schema of an extension, and after you
+install or remove an extension. A change in JavaScript or CSS of an installed
 extension needs no restart: run the probe again.
+
+The profile lives as long as the server. What a probe run saves as a user
+setting stays for the next runs: a theme change
+(`apputils:change-theme`), a new start mode. `restart` gives a clean profile
+again.
 
 ## The probe
 
 ```bash
-node scripts/jlab_probe.cjs --url "<url>" [actions] [checks] [output]
+node scripts/jlab_probe.cjs [--server NAME | --url URL] [actions] [checks] [output]
 ```
+
+Each run starts from a clean workspace: no tab of an earlier run is open.
+`--keep-workspace` keeps the tabs. Files that a run creates in the root
+folder (`Untitled.ipynb`) stay on disk.
 
 Checks, each can repeat:
 
@@ -83,7 +106,8 @@ Checks, each can repeat:
 | `--expect-selector <css>` / `--expect-no-selector <css>` | A visible element matches / none does |
 | `--expect-title <text>` | The page title contains the text |
 | `--expect-theme <name>` | The active theme has this name |
-| `--expect-setting '<plugin>:<key>=<json>'` | The value in effect of a setting equals the JSON |
+| `--expect-eval '<js>'` | The JavaScript expression is true in the page; `app` is the application |
+| `--expect-setting '<plugin>:<key>=<json>'` | The value in effect of a setting matches the JSON. `<key>` can be a path (`codeCellConfig.lineNumbers=true`). An object matches when the setting has at least its keys and values |
 | `--fail-on-console-error` | The browser console has no error |
 
 Actions, run in the given order before the checks and the screenshot:
@@ -91,9 +115,13 @@ Actions, run in the given order before the checks and the screenshot:
 | Option | Does |
 | --- | --- |
 | `--exec '<command>'` or `--exec '<command>:{"arg": 1}'` | Run an application command |
-| `--click '<css>'` | Click an element |
+| `--activate <widget id>` | Show a widget: open its sidebar, or select its tab |
+| `--click '<css>'` | Click the first visible element that matches |
+| `--press <keys>` | Press a key or a chord: `Control+Shift+P`, `Meta+K`, `Escape`. Proves that a shortcut works |
+| `--type '<text>'` | Type into the element that has the focus |
+| `--pause <ms>` | Wait between two actions, for example after a notebook opens |
 | `--eval '<js>'` | Evaluate JavaScript in the page; `app` is the application. The result prints on stderr as `eval: …` |
-| `--wait <ms>` | Wait after the actions (default 500) |
+| `--wait <ms>` | Wait after all the actions (default 500) |
 
 Output:
 
@@ -112,7 +140,7 @@ Output:
 A plugin is gone, a setting applies, nothing broke:
 
 ```bash
-node scripts/jlab_probe.cjs --url "<url>" \
+node scripts/jlab_probe.cjs \
   --expect-no-plugin @jupyterlab/extensionmanager-extension:plugin \
   --expect-setting '@jupyterlab/apputils-extension:themes:theme="JupyterLab Dark"' \
   --expect-theme "JupyterLab Dark" \
@@ -122,7 +150,7 @@ node scripts/jlab_probe.cjs --url "<url>" \
 An extension loaded and its panel shows:
 
 ```bash
-node scripts/jlab_probe.cjs --url "<url>" \
+node scripts/jlab_probe.cjs \
   --expect-plugin my-lab-tweaks:plugin \
   --expect-command my-lab-tweaks:open \
   --exec my-lab-tweaks:open \
@@ -133,7 +161,7 @@ node scripts/jlab_probe.cjs --url "<url>" \
 A notebook, for a look at a theme or a toolbar:
 
 ```bash
-node scripts/jlab_probe.cjs --url "<url>" \
+node scripts/jlab_probe.cjs \
   --exec 'notebook:create-new:{"kernelName":"python3"}' --wait 2500 \
   --scale 2 --screenshot /tmp/notebook.png
 ```
@@ -141,7 +169,7 @@ node scripts/jlab_probe.cjs --url "<url>" \
 What breaks when a plugin is disabled:
 
 ```bash
-node scripts/jlab_probe.cjs --url "<url>" --dependents @jupyterlab/statusbar-extension:plugin
+node scripts/jlab_probe.cjs --dependents @jupyterlab/statusbar-extension:plugin
 ```
 
 `failToActivate` lists the plugins that require the plugin, directly or
@@ -152,15 +180,46 @@ plugin is still enabled.
 Find IDs in a running application (also those of third-party extensions):
 
 ```bash
-node scripts/jlab_probe.cjs --url "<url>" --dump /tmp/lab.json
+node scripts/jlab_probe.cjs --dump /tmp/lab.json
 ```
 
 ```bash
 python -c "import json; d = json.load(open('/tmp/lab.json')); print('\n'.join(c['id'] + '  ' + c['label'] for c in d['commands'] if 'theme' in c['id']))"
 ```
 
+A shortcut works, and a sidebar panel shows:
+
+```bash
+node scripts/jlab_probe.cjs \
+  --press Control+K --expect-selector '.jp-ModalCommandPalette' \
+  --press Escape \
+  --activate my-notes-panel --expect-selector '.my-notes-panel' \
+  --screenshot /tmp/panel.png
+```
+
+Notes for actions:
+
+- `Accel` of JupyterLab is `Control` on Linux and Windows and `Meta` on
+  macOS. The probe runs Chromium on the machine of the server.
+- A command that opens a modal (the command palette) needs the focus: the
+  modal closes when another widget takes the focus. After
+  `notebook:create-new`, add `--pause 1500` before the key press.
+- `--expect-selector` counts visible elements only. A sidebar panel is
+  hidden until its tab is active (`--activate <widget id>`); a document is
+  hidden when another tab is in front.
+- `--exec` waits up to 5 s for the command. A command that opens a dialog
+  finishes only when the dialog closes: the probe then continues, with the
+  dialog open, so a check or a screenshot can see it.
+- Click with `--click`, not with `element.click()` in `--eval`. Toolbar
+  buttons and the "+" of a tab bar react to pointer events, which a
+  synthetic click does not send.
+- Prefer `--exec` steps to a long script in `--eval`. Several asynchronous
+  steps in one `--eval` can run before JupyterLab is ready for them and log
+  errors that a person would never see.
+
 Before and after: start two servers with `--name before` (a stock
-environment) and `--name after`, take the same screenshot of both.
+environment) and `--name after`, take the same screenshot of both
+(`--server before`, `--server after`).
 
 ## Read the result
 
@@ -175,6 +234,8 @@ environment) and `--name after`, take the same screenshot of both.
 | `expect-theme` fails | The theme name is wrong, or the theme extension did not load | Names are case-sensitive; check `federatedExtensions` |
 | `expect-selector` fails but the element exists | The element is hidden: a tab that is not active, a collapsed sidebar | `--exec` the command that shows it (`application:activate-…`, `filebrowser:activate`), or check with `--eval` |
 | A 404 in the console | A stylesheet, font or icon path is wrong | Paths are relative to `static/` or to the theme CSS file |
+| A console error that you cannot link to your change | It can come from the automation itself, or from stock JupyterLab | Run the same steps on a stock environment (`--name before`). If the error is there too, it is not yours: say so in the report |
+| `Skipping … shortcut because it collides` (a warning, in the dump) | Two shortcuts have the same keys and selector | See "Keyboard shortcuts" in the skill `jupyterlab-settings` |
 | The screenshot shows a "news" or "update" prompt | Stock behavior | Disable announcements or set `fetchNews` (skill `jupyterlab-settings`) |
 
 Console **warnings** do not fail a run. They are in the dump
@@ -204,6 +265,7 @@ verified in a browser.
 
 ## Clean up
 
-Stop the servers that you started (`stop --all`). Remove test notebooks from
-the root folder when it was not a scratch folder. The profiles are in the
-system temporary folder, below `jlab-verify/`.
+Stop each server that you started (`stop --name <name>`, or `stop --all`
+from the folder where you started them). Remove test notebooks from the root
+folder when it was not a scratch folder. The profiles are in the system
+temporary folder, below `jlab-verify/`.

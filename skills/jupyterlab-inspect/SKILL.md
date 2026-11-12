@@ -16,7 +16,9 @@ Run it with the Python of the target environment:
 <env>/bin/python scripts/jlab_inspect.py <command>
 ```
 
-Add `--json` before the command for machine-readable output.
+Add `--json` before the command for machine-readable output. Add
+`--project <dir>` before the command to include a distribution project that
+is not installed (its `jupyter-config` and `labextensions` folders).
 
 ## Commands
 

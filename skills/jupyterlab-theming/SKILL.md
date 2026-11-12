@@ -210,7 +210,9 @@ Also restyle, when the palette changes a lot:
   (`--jp-notebook-icon-color`, `--jp-jupyter-icon-color`).
 - **Scrollbars**: `--jp-scrollbar-thumb-color`,
   `--jp-scrollbar-background-color`; they apply when the theme registers with
-  `themeScrollbars: true` (in `THEMES` of `static/remoteEntry.js`).
+  `themeScrollbars: true` (in `THEMES` of `static/remoteEntry.js`). The
+  built-in light theme leaves them empty: a light theme with themed
+  scrollbars must set its own values.
 
 The full list with the light and dark values:
 [references/css-variables.md](references/css-variables.md).
@@ -272,6 +274,13 @@ A theme file can hold any CSS. Typical additions in `index.css`:
 
 Rules in a theme apply only while the theme is active. Rules that must hold
 with every theme belong in a stylesheet (level 2).
+
+Two themes of one extension can share rules: put them in
+`themes/<name>/common.css` and start each `index.css` with
+`@import url('../common.css');`.
+
+In a distribution project, run `jlab_dist.py check --fix` after you add the
+theme: it marks the extension as owned by the Python package.
 
 ## Check the result
 

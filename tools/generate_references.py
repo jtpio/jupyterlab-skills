@@ -145,11 +145,23 @@ def ui_page(dump: dict, version: str) -> str:
     lines += ["", "## Main menus", "", "| Menu ID | Label | Rank | Defined in |", "| --- | --- | --- | --- |"]
     toolbars: list[str] = []
     context: list[str] = []
+    menu_items: list[str] = []
     seen: set[str] = set()
+
+    def collect_items(menu_id: str, items: list) -> None:
+        for item in items:
+            if item.get("type") == "submenu" and "submenu" in item:
+                collect_items(item["submenu"].get("id", menu_id), item["submenu"].get("items", []))
+            elif "command" in item:
+                args = f"`{cell(json.dumps(item['args']))}`" if item.get("args") else ""
+                menu_items.append(
+                    f"| `{menu_id}` | `{item['command']}` | {item.get('rank', '')} | {args} |"
+                )
     for path in sorted(schemas.rglob("*.json")):
         plugin = f"{path.parent.relative_to(schemas).as_posix()}:{path.stem}"
         schema = json.loads(path.read_text())
         for menu in schema.get("jupyter.lab.menus", {}).get("main", []):
+            collect_items(menu["id"], menu.get("items", []))
             if "label" in menu and menu["id"] not in seen:
                 seen.add(menu["id"])
                 lines.append(
@@ -179,6 +191,17 @@ def ui_page(dump: dict, version: str) -> str:
                 )
     lines += [
         "",
+        "## Main menu items",
+        "",
+        "Rank orders the items of a menu, lowest first. Use it to place a new item,",
+        "and copy `command` and `args` to disable an item.",
+        "",
+        "| Menu | Command | Rank | Args |",
+        "| --- | --- | --- | --- |",
+        *sorted(menu_items),
+    ]
+    lines += [
+        "",
         "## Toolbar items",
         "",
         "Change a toolbar with the `toolbar` setting of the plugin in the last column.",
@@ -204,22 +227,29 @@ def ui_page(dump: dict, version: str) -> str:
 
 def shortcuts_page(dump: dict, version: str) -> str:
     """
-    Default keyboard shortcuts.
+    Default keyboard shortcuts, as the schemas define them.
     """
+    schemas = Path(get_app_dir()) / "schemas"
+    rows = []
+    for path in sorted(schemas.rglob("*.json")):
+        for item in json.loads(path.read_text()).get("jupyter.lab.shortcuts", []):
+            rows.append(item)
     lines = [
         "# Default keyboard shortcuts",
         "",
-        f"From a stock JupyterLab {version}. To change a default shortcut, disable it (same",
-        "`command`, `keys` and `selector`, plus `\"disabled\": true`) and add the new one, in the",
-        "`shortcuts` setting of `@jupyterlab/shortcuts-extension:shortcuts`.",
-        "`Accel` is Cmd on macOS and Ctrl on other systems.",
+        f"From the schemas of a stock JupyterLab {version}. `Accel` is Cmd on macOS and",
+        "Ctrl on other systems. Copy `keys` and `selector` exactly as shown when you",
+        "disable a default: JupyterLab identifies a shortcut by its keys and selector.",
         "",
-        "| Command | Keys | Selector |",
-        "| --- | --- | --- |",
+        "Shortcuts with `Cmd` exist on macOS only.",
+        "",
+        "| Command | Keys | Selector | Args |",
+        "| --- | --- | --- | --- |",
     ]
-    for item in sorted(dump["shortcuts"], key=lambda entry: entry["command"]):
+    for item in sorted(rows, key=lambda entry: (entry["command"], entry["keys"])):
         keys = ", ".join(f"`{key}`" for key in item["keys"])
-        lines.append(f"| `{item['command']}` | {keys} | `{cell(item['selector'])}` |")
+        args = f"`{cell(json.dumps(item['args']))}`" if item.get("args") else ""
+        lines.append(f"| `{item['command']}` | {keys} | `{cell(item['selector'])}` | {args} |")
     lines.append("")
     return "\n".join(lines)
 

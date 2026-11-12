@@ -85,7 +85,13 @@ def start(args: argparse.Namespace) -> int:
         old = json.loads(path.read_text())
         if is_alive(old["pid"]):
             print(json.dumps(old, indent=2))
-            print(f"Server '{args.name}' already runs. Stop it first.", file=sys.stderr)
+            print(
+                f"A server named '{args.name}' already runs (root folder {old['root_dir']}, "
+                f"started from {old.get('started_from', '?')}).\n"
+                "If you started it, stop it first. If not, it belongs to another "
+                "session: use another --name.",
+                file=sys.stderr,
+            )
             return 1
         path.unlink()
 
@@ -120,6 +126,16 @@ def start(args: argparse.Namespace) -> int:
         profile = Path(args.profile or tempfile.mkdtemp(prefix=f"{args.name}-", dir=STATE_ROOT))
         env["JUPYTERLAB_SETTINGS_DIR"] = str(profile / "user-settings")
         env["JUPYTERLAB_WORKSPACES_DIR"] = str(profile / "workspaces")
+    if args.project:
+        # A distribution project that is not installed: JupyterLab reads its
+        # config and extensions through the Jupyter path variables.
+        project = Path(args.project).resolve()
+        for variable, folder in (
+            ("JUPYTER_CONFIG_PATH", project / "jupyter-config"),
+            ("JUPYTER_PATH", project),
+        ):
+            current = env.get(variable)
+            env[variable] = str(folder) + (os.pathsep + current if current else "")
     for item in args.env:
         key, _, value = item.partition("=")
         env[key] = value
@@ -155,6 +171,16 @@ def start(args: argparse.Namespace) -> int:
         "log": str(log),
         "profile": str(profile) if profile else None,
         "command": command,
+        "started_from": os.getcwd(),
+        "start_options": {
+            "python": args.python,
+            "cmd": args.cmd,
+            "project": args.project,
+            "env": args.env,
+            "extra": args.extra,
+            "keep_user_state": args.keep_user_state,
+            "timeout": args.timeout,
+        },
     }
     path.write_text(json.dumps(state, indent=2))
     print(json.dumps(state, indent=2))
@@ -165,7 +191,17 @@ def stop(args: argparse.Namespace) -> int:
     """
     Stop one server, or all of them.
     """
-    names = [p.stem for p in STATE_ROOT.glob("*.json")] if args.all else [args.name]
+    names = [args.name]
+    if args.all:
+        names = []
+        here = os.getcwd()
+        for path in sorted(STATE_ROOT.glob("*.json")):
+            state = json.loads(path.read_text())
+            # Servers started from other folders can belong to other sessions.
+            if args.everywhere or state.get("started_from") == here:
+                names.append(path.stem)
+            else:
+                print(f"Left '{path.stem}' running: started from {state.get('started_from')}.")
     for name in names:
         path = state_file(name)
         if not path.exists():
@@ -183,6 +219,41 @@ def stop(args: argparse.Namespace) -> int:
                 os.killpg(pid, signal.SIGKILL)
         path.unlink()
         print(f"Stopped '{name}' (pid {pid}).")
+    return 0
+
+
+def restart(args: argparse.Namespace) -> int:
+    """
+    Stop a server and start it again with the same options and a new profile.
+    """
+    path = state_file(args.name)
+    if not path.exists():
+        print(f"No server named '{args.name}'.", file=sys.stderr)
+        return 1
+    state = json.loads(path.read_text())
+    options = state["start_options"]
+    stop(argparse.Namespace(name=args.name, all=False, everywhere=False))
+    return start(
+        argparse.Namespace(
+            name=args.name,
+            root_dir=state["root_dir"],
+            port=state["port"],
+            token=state["token"],
+            profile=None,
+            **options,
+        )
+    )
+
+
+def url(args: argparse.Namespace) -> int:
+    """
+    Print the URL of a running server.
+    """
+    path = state_file(args.name)
+    if not path.exists():
+        print(f"No server named '{args.name}'.", file=sys.stderr)
+        return 1
+    print(json.loads(path.read_text())["url"])
     return 0
 
 
@@ -218,6 +289,11 @@ def main() -> int:
         help="command to run instead of 'python -m jupyterlab', "
         "for example the entry point of a distribution",
     )
+    p_start.add_argument(
+        "--project",
+        help="distribution project to load without an install: "
+        "its jupyter-config and labextensions folders",
+    )
     p_start.add_argument("--root-dir", default=".", help="folder that the server shows")
     p_start.add_argument("--port", type=int, default=0, help="port (default: a free port)")
     p_start.add_argument("--token", help="token (default: random)")
@@ -234,8 +310,25 @@ def main() -> int:
 
     p_stop = sub.add_parser("stop", help="stop a server")
     p_stop.add_argument("--name", default="default")
-    p_stop.add_argument("--all", action="store_true")
+    p_stop.add_argument(
+        "--all", action="store_true", help="all servers started from the current folder"
+    )
+    p_stop.add_argument(
+        "--everywhere",
+        action="store_true",
+        help="with --all: also the servers started from other folders",
+    )
     p_stop.set_defaults(func=stop)
+
+    p_restart = sub.add_parser(
+        "restart", help="stop and start again: same options, same URL, new clean profile"
+    )
+    p_restart.add_argument("--name", default="default")
+    p_restart.set_defaults(func=restart)
+
+    p_url = sub.add_parser("url", help="print the URL of a server")
+    p_url.add_argument("--name", default="default")
+    p_url.set_defaults(func=url)
 
     p_status = sub.add_parser("status", help="list the servers")
     p_status.set_defaults(func=status)

@@ -78,7 +78,7 @@ leaves a gap or shifts the tab bar. Use these instead:
 | Bar | How |
 | --- | --- |
 | Status bar | Setting `visible: false` of `@jupyterlab/statusbar-extension:plugin` |
-| Activity bars | An activity bar without tabs does not show: disable the plugins of its tabs. The command `application:toggle-side-tabbar` toggles the left one |
+| Activity bars | An activity bar without tabs does not show: disable the plugins of its tabs. The command `application:toggle-side-tabbar` toggles the left one, and the right one with the args `{"side": "right"}` |
 | Top bar | In simple mode only: command `application:toggle-header`. In the default mode it stays: restyle it, or remove its content (logo plugin, menus) |
 
 Smaller toolbars:
@@ -109,6 +109,7 @@ Centered, narrower notebook:
 
 ```css
 .jp-Notebook .jp-WindowedPanel-outer {
+  box-sizing: border-box;
   padding-left: max(20px, calc((100% - 900px) / 2)) !important;
   padding-right: max(20px, calc((100% - 900px) / 2)) !important;
 }
@@ -135,6 +136,27 @@ body {
   --jp-code-font-size: 15px;
 }
 ```
+
+Outline (table of contents) items. They are web components: the theme
+variables do not reach their background, which stays white or grey. Style the
+shadow part:
+
+```css
+.jp-TableOfContents-content .jp-tocItem,
+.jp-TableOfContents-content .jp-tocItem::part(positioning-region) {
+  background: transparent;
+}
+.jp-TableOfContents-content .jp-tocItem::part(positioning-region):hover,
+.jp-TableOfContents-content .jp-tocItem[selected]::part(positioning-region) {
+  background: var(--jp-layout-color2);
+}
+```
+
+Other parts of the interface that use the same web components (tree views,
+some buttons and fields of the settings editor) take colors from the tokens
+of the Jupyter UI toolkit (`--neutral-fill-stealth-rest`, `--accent-fill-rest`…).
+When an element ignores the `--jp-` variables, inspect it:
+`--eval "getComputedStyle(document.querySelector('<selector>')).backgroundColor"`.
 
 Round the launcher cards:
 

@@ -16,7 +16,7 @@ All code below was run on JupyterLab 4.6 in a no-build extension.
 | Launcher (home page) | `@jupyterlab/launcher-extension:plugin` | `ILauncher` | `launcher:create` |
 | Splash screen | `@jupyterlab/apputils-extension:splash` | `ISplashScreen` | |
 | Logo, top left | `@jupyterlab/application-extension:logo` | | |
-| About dialog | `@jupyterlab/help-extension:about` | | `help:about` |
+| About dialog | `@jupyterlab/help-extension:about` | | `help:about`, and its Help menu item |
 | Favicon | (none) | | |
 | Tab title | (none: page config `appName`) | | |
 | Command palette | `@jupyterlab/apputils-extension:palette` | `ICommandPalette` | `apputils:activate-command-palette` |
@@ -293,8 +293,31 @@ const about = {
 };
 ```
 
-The Help menu keeps its entry because the command ID is the same. The label
-of the entry is the label of the command.
+The Help menu entry belongs to the schema of the disabled plugin, so it goes
+away with it. Put it back in the schema of your extension
+(`schemas/<name>/plugin.json`):
+
+```json
+{
+  "jupyter.lab.menus": {
+    "main": [
+      {
+        "id": "jp-mainmenu-help",
+        "items": [{ "command": "help:about", "rank": 0 }]
+      }
+    ]
+  }
+}
+```
+
+The same lines work in the `menus` override of
+`@jupyterlab/mainmenu-extension:plugin`. The label of the entry is the label
+of the command.
+
+General rule: a menu item, toolbar button or shortcut that a core plugin
+declares in its schema is lost when the plugin is disabled, also when the
+command still exists. `jlab_inspect.py --json schema <plugin id>` shows what
+a plugin declares.
 
 ## Favicon
 

@@ -167,7 +167,7 @@ ENTRY = r"""/*
     const { ICommandPalette, Dialog, showDialog } = lab['@jupyterlab/apputils'];
 
     const about = {
-      id: `${NAME}:about`,
+      id: `${NAME}:plugin`,
       description: `Adds the About ${APP_NAME} command.`,
       autoStart: true,
       optional: [ICommandPalette],
@@ -317,7 +317,7 @@ def new(args: argparse.Namespace) -> int:
     name = args.name
     if not NAME_PATTERN.match(name):
         fail("the name must use lower-case letters, digits and hyphens")
-    project = Path(args.dest).resolve() / name
+    project = Path(args.dest).resolve() / (args.dir or name)
     if project.exists():
         fail(f"{project} already exists")
     module = name.replace("-", "_")
@@ -366,12 +366,36 @@ def new(args: argparse.Namespace) -> int:
                 "description": f"Core extension of {app}",
                 "jupyterlab": {
                     "extension": True,
+                    "schemaDir": "schemas",
                     "_build": {"load": "static/remoteEntry.js", "extension": "./extension"},
                 },
             },
             indent=2,
         )
         + "\n"
+    )
+    # The schema of the plugin <name>:plugin: menus, toolbar items and
+    # shortcuts of the application go here, with no code.
+    schemas = extension / "schemas" / name
+    schemas.mkdir(parents=True)
+    (schemas / "plugin.json").write_text(
+        json.dumps(
+            {
+                "title": app,
+                "description": f"Settings of {app}.",
+                "jupyter.lab.menus": {"main": [], "context": []},
+                "jupyter.lab.toolbars": {},
+                "jupyter.lab.shortcuts": [],
+                "type": "object",
+                "properties": {},
+                "additionalProperties": False,
+            },
+            indent=2,
+        )
+        + "\n"
+    )
+    (schemas / "package.json.orig").write_text(
+        json.dumps({"name": name, "version": args.version}, indent=2) + "\n"
     )
     (extension / "install.json").write_text(install_json(name))
     (extension / "static" / "remoteEntry.js").write_text(fill(ENTRY, values))
@@ -490,6 +514,20 @@ def check(args: argparse.Namespace) -> int:
             problems.append(f"labextensions/{expected}: missing file for jupyterlab._build.load")
         if folder.is_symlink():
             problems.append(f"labextensions/{expected} is a symlink: copy the files instead")
+        install = folder / "install.json"
+        manager = None
+        if install.is_file():
+            manager = json.loads(install.read_text()).get("packageManager")
+        if manager != "python":
+            # pip owns the files of a wheel: the uninstall hint must say so.
+            if args.fix:
+                install.write_text(install_json(name))
+                print(f"Fixed labextensions/{expected}/install.json")
+            else:
+                problems.append(
+                    f"labextensions/{expected}/install.json does not name the Python "
+                    "package as its owner: run check with --fix"
+                )
     pyproject = (project / "pyproject.toml").read_text()
     for needle in ('"jupyter-config" = "etc/jupyter"', '"labextensions" = "share/jupyter/labextensions"'):
         if needle not in pyproject:
@@ -529,6 +567,7 @@ def main() -> int:
     p = sub.add_parser("new", help="create a distribution project")
     p.add_argument("name", help="package name, for example my-lab")
     p.add_argument("--dest", default=".", help="parent folder (default: current folder)")
+    p.add_argument("--dir", help="name of the project folder (default: the package name)")
     p.add_argument("--app-name", help="name shown in the browser tab")
     p.add_argument("--command", help="name of the launch command (default: the package name)")
     p.add_argument("--description")
@@ -562,6 +601,7 @@ def main() -> int:
     p = sub.add_parser("check", help="check a project and its wheel")
     p.add_argument("project")
     p.add_argument("--wheel", help="wheel to inspect (default: the newest in dist/)")
+    p.add_argument("--fix", action="store_true", help="repair what can be repaired")
     p.set_defaults(func=check)
 
     args = parser.parse_args()

@@ -27,7 +27,8 @@ python scripts/jlab_dist.py new my-lab --app-name "My Lab" --python <env>/bin/py
 
 1. **Create** the project (above). `--python` pins the JupyterLab version
    range to that of an environment. Other options: `--command` (name of the
-   launch command, default: the package name), `--description`,
+   launch command, default: the package name), `--dir` (name of the project
+   folder, default: the package name), `--description`,
    `--depends <requirement>` (repeat for each extra dependency), `--dest`.
 2. **Fill** it, in one of two ways (they combine):
    - Write into the project: config with
@@ -46,20 +47,37 @@ python scripts/jlab_dist.py new my-lab --app-name "My Lab" --python <env>/bin/py
      It merges the snippets named `50-custom.json` (the default name of
      `jlab_config.py`; change with `--snippet`) and copies the extensions that
      `jlab_ext.py` installed (add others with `--extension <name>`).
-3. **Check** the project:
+3. **Run it while you work**, with no install. The server reads the project
+   folders directly:
 
    ```bash
-   python scripts/jlab_dist.py check my-lab
+   python <verify>/jlab_server.py start --name my-lab --python <env>/bin/python --project my-lab --root-dir /tmp/my-lab-demo
    ```
 
-4. **Build** the wheel:
+   ```bash
+   node <verify>/jlab_probe.cjs --server my-lab --fail-on-console-error --screenshot my-lab.png
+   ```
+
+   After a change to a JSON file: `jlab_server.py restart --name my-lab`.
+   `<env>` is any environment with JupyterLab that does **not** have the
+   distribution installed. The inspect script reads the project the same
+   way: `<env>/bin/python <inspect>/jlab_inspect.py --project my-lab overrides`.
+4. **Check** the project. `--fix` marks every extension in `labextensions/`
+   as owned by the package (themes and extensions that other scripts
+   created are not):
+
+   ```bash
+   python scripts/jlab_dist.py check my-lab --fix
+   ```
+
+5. **Build** the wheel:
 
    ```bash
    cd my-lab && uv build --wheel
    ```
 
    Without uv: `python -m pip install build && python -m build --wheel`.
-5. **Check the wheel** (`check` lists its data files when `dist/` has one),
+6. **Check the wheel** (`check` lists its data files when `dist/` has one),
    then **test in a clean environment**. This is the real test: it proves
    that the wheel alone carries everything.
 
@@ -72,12 +90,13 @@ python scripts/jlab_dist.py new my-lab --app-name "My Lab" --python <env>/bin/py
    ```
 
    ```bash
-   node <verify>/jlab_probe.cjs --url "<url>" --expect-title "My Lab" --fail-on-console-error --screenshot my-lab.png
+   node <verify>/jlab_probe.cjs --server my-lab --expect-title "My Lab" --fail-on-console-error --screenshot my-lab.png
    ```
 
-   `<verify>` is `scripts/` of the skill `jupyterlab-verify`. Without uv:
-   `python -m venv` and `pip install`.
-6. **Hand over**: the path of the wheel, the install and run commands, and
+   `<verify>` is `scripts/` of the skill `jupyterlab-verify`, `<inspect>`
+   that of `jupyterlab-inspect`. Without uv: `python -m venv` and
+   `pip install`.
+7. **Hand over**: the path of the wheel, the install and run commands, and
    what the distribution changes. Do not publish to PyPI and do not push to a
    remote unless the user asks.
 
@@ -96,11 +115,12 @@ my-lab/
 │       ├── page_config.d/my-lab.json
 │       └── default_setting_overrides.d/my-lab.json
 └── labextensions/                     → share/jupyter/labextensions/
-    └── my-lab/                        core extension: About command, style.css
+    └── my-lab/                        core extension of the application
         ├── package.json
         ├── install.json
+        ├── schemas/my-lab/plugin.json     menus, toolbar items, shortcuts, settings
         └── static/
-            ├── remoteEntry.js
+            ├── remoteEntry.js             plugins: starts with an About command
             └── style.css
 ```
 
@@ -115,9 +135,11 @@ The two arrows are these lines of `pyproject.toml`:
 - Every file below `jupyter-config/` and `labextensions/` goes into the
   wheel. Keep only what must ship.
 - Each folder in `labextensions/` is one extension. The core extension
-  `my-lab` is the place for the code and CSS of the application itself. Add
-  more folders for themes or for separate features. Real folders only: no
-  symlinks.
+  `my-lab` is the place for the code and CSS of the application itself. Its
+  schema belongs to the plugin `my-lab:plugin`: declare the menus, toolbar
+  buttons and shortcuts of your own commands there (skill
+  `jupyterlab-extensions`). Add more folders for themes or for separate
+  features. Real folders only: no symlinks.
 - Name the snippets after the package (`my-lab.json`): files of different
   packages in the same `.d` folder must not collide.
 - More server-side files go the same way. For example
@@ -173,7 +195,9 @@ From a local wheel: `uvx --from ./dist/my_lab-0.1.0-py3-none-any.whl my-lab`.
 | More features | `--depends jupyterlab-git` and other extension packages | |
 
 The scaffold already adds the command `<name>:about` ("About My Lab"). To
-make it the Help → About entry, see `replace-core.md`.
+make it the Help → About entry, see `replace-core.md`: disable the core About
+plugin, register `help:about`, and put the Help menu item back in the
+schema.
 
 ## Dependencies
 

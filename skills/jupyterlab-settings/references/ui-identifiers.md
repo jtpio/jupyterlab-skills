@@ -48,6 +48,168 @@ Use a widget ID as a key of the `layout` setting of
 | `jp-mainmenu-settings-language` | Language (submenu of `jp-mainmenu-settings`) | | `@jupyterlab/translation-extension:plugin` |
 | `jp-mainmenu-file-workspaces` | Workspaces (submenu of `jp-mainmenu-file`) | | `@jupyterlab/workspaces-extension:menu` |
 
+## Main menu items
+
+Rank orders the items of a menu, lowest first. Use it to place a new item,
+and copy `command` and `args` to disable an item.
+
+| Menu | Command | Rank | Args |
+| --- | --- | --- | --- |
+| `jp-mainmenu-codefold` | `codemirror:fold-all` | 5 |  |
+| `jp-mainmenu-codefold` | `codemirror:fold-current` | 1 |  |
+| `jp-mainmenu-codefold` | `codemirror:fold-subregions` | 3 |  |
+| `jp-mainmenu-codefold` | `codemirror:unfold-all` | 6 |  |
+| `jp-mainmenu-codefold` | `codemirror:unfold-current` | 2 |  |
+| `jp-mainmenu-codefold` | `codemirror:unfold-subregions` | 4 |  |
+| `jp-mainmenu-edit` | `documentsearch:highlightNext` | 10 |  |
+| `jp-mainmenu-edit` | `documentsearch:highlightPrevious` | 10 |  |
+| `jp-mainmenu-edit` | `documentsearch:startWithReplace` | 10 |  |
+| `jp-mainmenu-edit` | `documentsearch:start` | 10 |  |
+| `jp-mainmenu-edit` | `editmenu:clear-all` | 10 |  |
+| `jp-mainmenu-edit` | `editmenu:clear-current` | 10 |  |
+| `jp-mainmenu-edit` | `editmenu:go-to-line` | 200 |  |
+| `jp-mainmenu-edit` | `editmenu:redo` | 0 |  |
+| `jp-mainmenu-edit` | `editmenu:undo` | 0 |  |
+| `jp-mainmenu-edit` | `notebook:copy-cell` | 5 |  |
+| `jp-mainmenu-edit` | `notebook:cut-cell` | 5 |  |
+| `jp-mainmenu-edit` | `notebook:delete-cell` | 6 |  |
+| `jp-mainmenu-edit` | `notebook:deselect-all` | 7 |  |
+| `jp-mainmenu-edit` | `notebook:merge-cell-above` | 9 |  |
+| `jp-mainmenu-edit` | `notebook:merge-cell-below` | 9 |  |
+| `jp-mainmenu-edit` | `notebook:merge-cells` | 9 |  |
+| `jp-mainmenu-edit` | `notebook:move-cell-down` | 8 |  |
+| `jp-mainmenu-edit` | `notebook:move-cell-up` | 8 |  |
+| `jp-mainmenu-edit` | `notebook:paste-and-replace-cell` | 5 |  |
+| `jp-mainmenu-edit` | `notebook:paste-cell-above` | 5 |  |
+| `jp-mainmenu-edit` | `notebook:paste-cell-below` | 5 |  |
+| `jp-mainmenu-edit` | `notebook:redo-cell-action` | 4 |  |
+| `jp-mainmenu-edit` | `notebook:select-all` | 7 |  |
+| `jp-mainmenu-edit` | `notebook:split-cell-at-cursor` | 9 |  |
+| `jp-mainmenu-edit` | `notebook:undo-cell-action` | 4 |  |
+| `jp-mainmenu-file-new` | `console:create` | 1 |  |
+| `jp-mainmenu-file-new` | `fileeditor:create-new-markdown-file` | 30 |  |
+| `jp-mainmenu-file-new` | `fileeditor:create-new` | 30 |  |
+| `jp-mainmenu-file-new` | `notebook:create-new` | 10 |  |
+| `jp-mainmenu-file-workspaces` | `workspace-ui:clone` | 2 |  |
+| `jp-mainmenu-file-workspaces` | `workspace-ui:create-new` | 1 |  |
+| `jp-mainmenu-file-workspaces` | `workspace-ui:delete` | 10 |  |
+| `jp-mainmenu-file-workspaces` | `workspace-ui:export` | 7 |  |
+| `jp-mainmenu-file-workspaces` | `workspace-ui:import` | 6 |  |
+| `jp-mainmenu-file-workspaces` | `workspace-ui:open` | 0 |  |
+| `jp-mainmenu-file-workspaces` | `workspace-ui:rename` | 3 |  |
+| `jp-mainmenu-file-workspaces` | `workspace-ui:reset` | 9 |  |
+| `jp-mainmenu-file-workspaces` | `workspace-ui:save-as` | 5 |  |
+| `jp-mainmenu-file-workspaces` | `workspace-ui:save` | 4 |  |
+| `jp-mainmenu-file` | `application:close-all` | 3.2 |  |
+| `jp-mainmenu-file` | `application:close` | 3 |  |
+| `jp-mainmenu-file` | `apputils:print` | 98 |  |
+| `jp-mainmenu-file` | `docmanager:clone` | 2 |  |
+| `jp-mainmenu-file` | `docmanager:download` | 6 |  |
+| `jp-mainmenu-file` | `docmanager:duplicate` | 5 |  |
+| `jp-mainmenu-file` | `docmanager:reload` | 5 |  |
+| `jp-mainmenu-file` | `docmanager:rename` | 5 |  |
+| `jp-mainmenu-file` | `docmanager:restore-checkpoint` | 5 |  |
+| `jp-mainmenu-file` | `docmanager:save-all` | 4 |  |
+| `jp-mainmenu-file` | `docmanager:save-as` | 4 |  |
+| `jp-mainmenu-file` | `docmanager:save` | 4 |  |
+| `jp-mainmenu-file` | `filebrowser:open-path` | 1 |  |
+| `jp-mainmenu-file` | `filebrowser:open-url` | 1 |  |
+| `jp-mainmenu-file` | `filemenu:close-and-cleanup` | 3.1 |  |
+| `jp-mainmenu-file` | `filemenu:create-console` | 2.1 |  |
+| `jp-mainmenu-file` | `filemenu:logout` | 99 |  |
+| `jp-mainmenu-file` | `filemenu:shutdown` | 99 |  |
+| `jp-mainmenu-file` | `hub:control-panel` | 100 |  |
+| `jp-mainmenu-file` | `hub:logout` | 100 |  |
+| `jp-mainmenu-file` | `launcher:create` | 0.99 |  |
+| `jp-mainmenu-help` | `apputils:display-shortcuts` | 0.1 |  |
+| `jp-mainmenu-help` | `help:about` | 0 |  |
+| `jp-mainmenu-help` | `help:jupyter-forum` | 2 |  |
+| `jp-mainmenu-help` | `inspector:toggle` | 0.1 |  |
+| `jp-mainmenu-kernel` | `debugger:restart-debug` | 1.2 |  |
+| `jp-mainmenu-kernel` | `kernelmenu:change` | 3 |  |
+| `jp-mainmenu-kernel` | `kernelmenu:interrupt` | 0 |  |
+| `jp-mainmenu-kernel` | `kernelmenu:reconnect-to-kernel` | 1.5 |  |
+| `jp-mainmenu-kernel` | `kernelmenu:restart-and-clear` | 1 |  |
+| `jp-mainmenu-kernel` | `kernelmenu:restart` | 1 |  |
+| `jp-mainmenu-kernel` | `kernelmenu:shutdownAll` | 2 |  |
+| `jp-mainmenu-kernel` | `kernelmenu:shutdown` | 2 |  |
+| `jp-mainmenu-kernel` | `notebook:restart-and-run-to-selected` | 1 |  |
+| `jp-mainmenu-kernel` | `runmenu:restart-and-run-all` | 1.1 |  |
+| `jp-mainmenu-run` | `notebook:render-all-markdown` | 12 |  |
+| `jp-mainmenu-run` | `notebook:run-all-above` | 11 |  |
+| `jp-mainmenu-run` | `notebook:run-all-below` | 11 |  |
+| `jp-mainmenu-run` | `notebook:run-cell-and-insert-below` | 10 |  |
+| `jp-mainmenu-run` | `notebook:run-cell` | 10 |  |
+| `jp-mainmenu-run` | `notebook:run-in-console` | 10 |  |
+| `jp-mainmenu-run` | `runmenu:restart-and-run-all` | 999 |  |
+| `jp-mainmenu-run` | `runmenu:run-all` | 999 |  |
+| `jp-mainmenu-run` | `runmenu:run` | 0 |  |
+| `jp-mainmenu-settings-apputilstheme` | `apputils:adaptive-theme` |  |  |
+| `jp-mainmenu-settings-apputilstheme` | `apputils:decr-font-size` |  | `{"key": "code-font-size"}` |
+| `jp-mainmenu-settings-apputilstheme` | `apputils:decr-font-size` |  | `{"key": "content-font-size1"}` |
+| `jp-mainmenu-settings-apputilstheme` | `apputils:decr-font-size` |  | `{"key": "ui-font-size1"}` |
+| `jp-mainmenu-settings-apputilstheme` | `apputils:incr-font-size` |  | `{"key": "code-font-size"}` |
+| `jp-mainmenu-settings-apputilstheme` | `apputils:incr-font-size` |  | `{"key": "content-font-size1"}` |
+| `jp-mainmenu-settings-apputilstheme` | `apputils:incr-font-size` |  | `{"key": "ui-font-size1"}` |
+| `jp-mainmenu-settings-apputilstheme` | `apputils:theme-scrollbars` |  |  |
+| `jp-mainmenu-settings-consoleexecute` | `console:interaction-mode` |  | `{"interactionMode": "notebook"}` |
+| `jp-mainmenu-settings-consoleexecute` | `console:interaction-mode` |  | `{"interactionMode": "terminal"}` |
+| `jp-mainmenu-settings-fileeditorindent` | `fileeditor:change-tabs` |  |  |
+| `jp-mainmenu-settings-fileeditorindent` | `fileeditor:change-tabs` |  | `{"size": "1"}` |
+| `jp-mainmenu-settings-fileeditorindent` | `fileeditor:change-tabs` |  | `{"size": "2"}` |
+| `jp-mainmenu-settings-fileeditorindent` | `fileeditor:change-tabs` |  | `{"size": "4"}` |
+| `jp-mainmenu-settings-fileeditorindent` | `fileeditor:change-tabs` |  | `{"size": "8"}` |
+| `jp-mainmenu-settings` | `docmanager:toggle-autosave` | 4 |  |
+| `jp-mainmenu-settings` | `extensionmanager:toggle` | 100 |  |
+| `jp-mainmenu-settings` | `filebrowser:toggle-navigate-to-current-directory` | 5 |  |
+| `jp-mainmenu-settings` | `fileeditor:change-font-size` | 30 | `{"delta": -1, "isMenu": true}` |
+| `jp-mainmenu-settings` | `fileeditor:change-font-size` | 30 | `{"delta": 1, "isMenu": true}` |
+| `jp-mainmenu-settings` | `fileeditor:toggle-autoclosing-brackets-universal` | 30 |  |
+| `jp-mainmenu-settings` | `settingeditor:open` | 1000 |  |
+| `jp-mainmenu-tabs` | `application:activate-next-tab-bar` | 0 |  |
+| `jp-mainmenu-tabs` | `application:activate-next-tab` | 0 |  |
+| `jp-mainmenu-tabs` | `application:activate-previous-tab-bar` | 0 |  |
+| `jp-mainmenu-tabs` | `application:activate-previous-tab` | 0 |  |
+| `jp-mainmenu-tabs` | `tabsmenu:activate-previously-used-tab` | 0 |  |
+| `jp-mainmenu-view-appearance-activity-bar-position` | `application:set-activity-bar-position` | 0 | `{"position": "side"}` |
+| `jp-mainmenu-view-appearance-activity-bar-position` | `application:set-activity-bar-position` | 1 | `{"position": "top"}` |
+| `jp-mainmenu-view-appearance-activity-bar-position` | `application:set-activity-bar-position` | 2 | `{"position": "bottom"}` |
+| `jp-mainmenu-view-appearance` | `application:reset-layout` | 53 |  |
+| `jp-mainmenu-view-appearance` | `application:toggle-down-area` | 15 |  |
+| `jp-mainmenu-view-appearance` | `application:toggle-fullscreen-mode` | 0 |  |
+| `jp-mainmenu-view-appearance` | `application:toggle-header` | 16 |  |
+| `jp-mainmenu-view-appearance` | `application:toggle-left-area` | 11 |  |
+| `jp-mainmenu-view-appearance` | `application:toggle-mode` | 0 |  |
+| `jp-mainmenu-view-appearance` | `application:toggle-presentation-mode` | 0 |  |
+| `jp-mainmenu-view-appearance` | `application:toggle-right-area` | 13 |  |
+| `jp-mainmenu-view-appearance` | `application:toggle-side-tabbar` | 12 | `{"side": "left"}` |
+| `jp-mainmenu-view-appearance` | `application:toggle-side-tabbar` | 14 | `{"side": "right"}` |
+| `jp-mainmenu-view-appearance` | `statusbar:toggle` | 15 |  |
+| `jp-mainmenu-view-appearance` | `viewmenu:show-minimap` | 50 |  |
+| `jp-mainmenu-view-appearance` | `workspace-indicator:toggle` | 16 |  |
+| `jp-mainmenu-view` | `apputils:activate-command-palette` | 0 |  |
+| `jp-mainmenu-view` | `apputils:display-notifications` | 9.92 |  |
+| `jp-mainmenu-view` | `debugger:show-panel` | 5 |  |
+| `jp-mainmenu-view` | `extensionmanager:show-panel` | 9 |  |
+| `jp-mainmenu-view` | `filebrowser:toggle-hidden-files` | 9.95 |  |
+| `jp-mainmenu-view` | `filebrowser:toggle-main` | 1 |  |
+| `jp-mainmenu-view` | `logconsole:open` | 9.95 |  |
+| `jp-mainmenu-view` | `notebook:hide-all-cell-code` | 10 |  |
+| `jp-mainmenu-view` | `notebook:hide-all-cell-outputs` | 10 |  |
+| `jp-mainmenu-view` | `notebook:hide-cell-code` | 10 |  |
+| `jp-mainmenu-view` | `notebook:hide-cell-outputs` | 10 |  |
+| `jp-mainmenu-view` | `notebook:show-all-cell-code` | 11 |  |
+| `jp-mainmenu-view` | `notebook:show-all-cell-outputs` | 11 |  |
+| `jp-mainmenu-view` | `notebook:show-cell-code` | 11 |  |
+| `jp-mainmenu-view` | `notebook:show-cell-outputs` | 11 |  |
+| `jp-mainmenu-view` | `notebook:toggle-render-side-by-side-current` | 12 |  |
+| `jp-mainmenu-view` | `property-inspector:show-panel` | 2 |  |
+| `jp-mainmenu-view` | `running:show-panel` | 3 |  |
+| `jp-mainmenu-view` | `toc:show-panel` | 4 |  |
+| `jp-mainmenu-view` | `viewmenu:line-numbering` | 10 |  |
+| `jp-mainmenu-view` | `viewmenu:match-brackets` | 10 |  |
+| `jp-mainmenu-view` | `viewmenu:word-wrap` | 10 |  |
+
 ## Toolbar items
 
 Change a toolbar with the `toolbar` setting of the plugin in the last column.

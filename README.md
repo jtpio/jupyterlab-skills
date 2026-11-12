@@ -169,7 +169,11 @@ python skills/jupyterlab-verify/scripts/jlab_server.py start --python .venv/bin/
 ```
 
 ```bash
-node skills/jupyterlab-verify/scripts/jlab_probe.cjs --url "<url from the last command>" --screenshot lab.png
+node skills/jupyterlab-verify/scripts/jlab_probe.cjs --screenshot lab.png --fail-on-console-error
+```
+
+```bash
+python skills/jupyterlab-verify/scripts/jlab_server.py stop
 ```
 
 ## Maintain
@@ -184,7 +188,7 @@ python skills/jupyterlab-verify/scripts/jlab_server.py start --python <env>/bin/
 ```
 
 ```bash
-node skills/jupyterlab-verify/scripts/jlab_probe.cjs --url "<url>" --dump /tmp/stock.json
+node skills/jupyterlab-verify/scripts/jlab_probe.cjs --dump /tmp/stock.json
 ```
 
 ```bash

@@ -141,12 +141,84 @@ def known_plugins() -> set[str]:
     return found
 
 
+def installed_extensions() -> set[str]:
+    """
+    Names of the prebuilt extensions in the labextensions folders.
+    """
+    names: set[str] = set()
+    for root in jupyter_path("labextensions"):
+        for pattern in ("*/package.json", "@*/*/package.json"):
+            for path in Path(root).glob(pattern):
+                names.add(path.parent.relative_to(root).as_posix())
+    return names
+
+
+def default_shortcuts() -> list[dict]:
+    """
+    Shortcuts that the schemas of the installation define.
+    """
+    found: list[dict] = []
+    for path in schema_files().values():
+        try:
+            found += json.loads(path.read_text()).get("jupyter.lab.shortcuts", [])
+        except json.JSONDecodeError:
+            continue
+    return found
+
+
+def check_shortcuts(entries: list) -> None:
+    """
+    Warn about entries that JupyterLab drops because of a key collision.
+
+    JupyterLab identifies a shortcut by its keys and selector, not by its
+    command. Overrides count as defaults, like the shortcuts of the schemas.
+    """
+
+    def identity(entry: dict) -> tuple:
+        return (tuple(entry.get("keys", [])), entry.get("selector"))
+
+    stock = default_shortcuts()
+    disabled = {identity(e) for e in entries if isinstance(e, dict) and e.get("disabled")}
+    for entry in entries:
+        if not isinstance(entry, dict) or "keys" not in entry:
+            continue
+        keys = " + ".join(entry["keys"])
+        same = [d for d in stock if identity(d) == identity(entry) and not d.get("disabled")]
+        if entry.get("disabled"):
+            if not same:
+                warn(
+                    f"the disabled shortcut {keys} on '{entry.get('selector')}' matches no "
+                    "default shortcut: keys and selector must be those of the default."
+                )
+            continue
+        if identity(entry) in disabled:
+            warn(
+                f"{entry.get('command')} on {keys}: a disabled entry with the same keys and "
+                "selector removes this shortcut too. Give the new shortcut another "
+                "selector that matches the same elements, for example 'html body' "
+                "in place of 'body'."
+            )
+            continue
+        others = sorted({d["command"] for d in same if d["command"] != entry.get("command")})
+        if others:
+            warn(
+                f"{keys} on '{entry.get('selector')}' is already the shortcut of "
+                f"{', '.join(others)}. JupyterLab keeps one of them only. Add an entry "
+                "that disables the old one (same keys and selector, \"disabled\": true) "
+                "and give the new shortcut another selector that matches the same "
+                "elements, for example 'html body' in place of 'body'."
+            )
+
+
 def check_plugin(target: str, plugins: set[str]) -> None:
     """
     Warn when a plugin or package name matches nothing in the installation.
     """
     packages = {plugin.split(":", 1)[0] for plugin in plugins}
     if target in plugins or target in packages:
+        return
+    # The plugin IDs of a hand-written extension are not always in its files.
+    if target.split(":", 1)[0] in installed_extensions():
         return
     try:
         pattern = re.compile(target)
@@ -321,6 +393,8 @@ def cmd_set(args: argparse.Namespace) -> None:
     else:
         section[args.key] = value
     write(path, data)
+    if args.key == "shortcuts" and not args.no_validate:
+        check_shortcuts(section[args.key])
     if args.key in LIST_KEYS_MERGED_BY_LAB:
         print(
             f"Note: JupyterLab merges '{args.key}' with the built-in items. "
@@ -399,6 +473,8 @@ def cmd_apply(args: argparse.Namespace) -> None:
             if not args.no_validate:
                 check_setting(plugin, key, value)
             overrides.setdefault(plugin, {})[key] = value
+            if key == "shortcuts" and not args.no_validate:
+                check_shortcuts(value)
     write(overrides_path, overrides)
 
 

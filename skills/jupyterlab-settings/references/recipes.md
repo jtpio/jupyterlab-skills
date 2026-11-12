@@ -290,6 +290,14 @@ Overrides.
 
 `defaultConfig` of the CodeMirror plugin applies to all editors. The `…Config`
 keys of the notebook and the file editor apply to one kind of editor and win.
+Each of them (`codeCellConfig`, `markdownCellConfig`, `rawCellConfig`,
+`editorConfig`, `promptCellConfig`) accepts every key of `defaultConfig`,
+also the keys that its own default does not list: `lineWrap`, `lineNumbers`,
+`tabSize`, `rulers`, `autoClosingBrackets`… List the keys with
+`jlab_inspect.py schema @jupyterlab/codemirror-extension:plugin`.
+
+`defaultCell: "markdown"` makes new cells Markdown cells. The first cell of a
+new notebook stays a code cell.
 
 Do not start a kernel when a notebook opens (page config):
 
@@ -547,6 +555,34 @@ Overrides, plugin `@jupyterlab/shortcuts-extension:shortcuts`.
   `.jp-Notebook.jp-mod-commandMode:not(.jp-mod-readWrite) :focus`,
   `.jp-Notebook.jp-mod-editMode`, `.jp-FileEditor`, `.jp-CodeConsole`.
 - The default list is in `default-shortcuts.md`.
+
+Take a key that another command uses. JupyterLab identifies a shortcut by
+keys and selector, so the disabled entry would also remove a new shortcut
+with the same selector. Give the new one a selector with a different text
+that matches the same elements (`html body` for `body`):
+
+```json
+{
+  "@jupyterlab/shortcuts-extension:shortcuts": {
+    "shortcuts": [
+      {
+        "command": "apputils:print",
+        "keys": ["Accel P"],
+        "selector": "body",
+        "disabled": true
+      },
+      {
+        "command": "apputils:activate-command-palette",
+        "keys": ["Accel P"],
+        "selector": "html body"
+      }
+    ]
+  }
+}
+```
+
+Without the disabled entry, JupyterLab keeps only one of the two commands
+(the one that sorts first by name) and logs a warning.
 
 ## Lock down
 

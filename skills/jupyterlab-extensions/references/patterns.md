@@ -113,7 +113,8 @@ activate: app => {
 ```
 
 Use `'right'` for the right side. A sidebar tab shows `title.icon`; the
-caption is the tooltip. Ranks of the built-in left tabs: file browser 100,
+caption is the tooltip. The panel is closed until the user selects its tab;
+open it from code with `app.shell.activateById('my-notes-panel')`. Ranks of the built-in left tabs: file browser 100,
 running 200, table of contents 400, extension manager 1000.
 
 ## Main area panel
@@ -144,7 +145,8 @@ Options of `app.shell.add(widget, 'main', options)`: `mode`
 (`'split-right'`, `'split-left'`, `'split-top'`, `'split-bottom'`,
 `'tab-after'`, `'tab-before'`), `ref` (ID of the widget to place it next to),
 `activate`. `MainAreaWidget` gives the panel a toolbar (`widget.toolbar`) and
-focus handling.
+focus handling. A panel that needs no toolbar hides it:
+`widget.toolbar.hide()`.
 
 ## Panel that survives a reload
 
@@ -365,6 +367,22 @@ const plugin = {
 - `panel.sessionContext.session.kernel`: the kernel connection.
 - Insert a cell: `NotebookActions.insertBelow(panel.content)`, then
   `panel.content.activeCell.model.sharedModel.setSource('print(1)')`.
+- Insert several cells at an index, with content, in one step:
+
+  ```js
+  const notebook = panel.content;
+  const index = notebook.activeCellIndex + 1;
+  notebook.model.sharedModel.insertCells(index, [
+    { cell_type: 'markdown', source: '## New section' },
+    { cell_type: 'code', source: '' }
+  ]);
+  notebook.activeCellIndex = index;
+  ```
+
+- React to edits: `panel.content.model.contentChanged.connect(callback)`
+  fires for each change in the notebook; `model.cells.changed` fires when
+  cells are added, moved or removed. Debounce the callback when it is not
+  cheap (a word count).
 - Other trackers work the same way: `IEditorTracker` (`@jupyterlab/fileeditor`),
   `IConsoleTracker` (`@jupyterlab/console`), `ITerminalTracker`
   (`@jupyterlab/terminal`).
@@ -631,5 +649,33 @@ const plugin = {
 ```
 
 `ILabShell` adds to `app.shell`: `mode` (`'single-document'` or
-`'multiple-document'`), `collapseLeft()`, `expandLeft()`, `collapseRight()`,
+`'multiple-document'`, can be set), `collapseLeft()`, `expandLeft()`,
+`collapseRight()`, `expandRight()`, `leftCollapsed`, `rightCollapsed`,
 `isEmpty(area)`, `currentChanged`, `layoutModified`.
+
+A focus mode is a command that saves this state, then collapses both sides:
+
+```js
+let saved = null;
+app.commands.addCommand(`${NAME}:toggle-focus`, {
+  label: 'Toggle Focus Mode',
+  isToggled: () => saved !== null,
+  execute: () => {
+    if (saved === null) {
+      saved = { left: !labShell.leftCollapsed, right: !labShell.rightCollapsed };
+      labShell.collapseLeft();
+      labShell.collapseRight();
+      document.body.classList.add('my-focus');
+    } else {
+      if (saved.left) {
+        labShell.expandLeft();
+      }
+      if (saved.right) {
+        labShell.expandRight();
+      }
+      document.body.classList.remove('my-focus');
+      saved = null;
+    }
+  }
+});
+```

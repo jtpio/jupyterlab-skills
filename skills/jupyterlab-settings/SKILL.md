@@ -85,7 +85,11 @@ file of lower priority disables.
 
 Before you disable a plugin:
 
-1. **Prefer a setting when one exists.** Examples:
+1. **Prefer a setting when one exists.** It is not always better: the news
+   prompt at the first start goes away with the setting `fetchNews` set to
+   `"false"`, or with the plugin
+   `@jupyterlab/apputils-extension:announcements` disabled. Both are fine;
+   the cookbook has both. Examples of settings:
    `@jupyterlab/statusbar-extension:plugin` → `visible: false`,
    `@jupyterlab/extensionmanager-extension:plugin` → `enabled: false`,
    `@jupyterlab/cell-toolbar-extension:plugin` → `showToolbar: false`.
@@ -185,7 +189,7 @@ only your changes. To remove a built-in item, repeat its identity with
 | Context menu | `@jupyterlab/application-extension:context-menu` | `contextMenu` | `command` + `selector` + `args` |
 | Notebook toolbar | `@jupyterlab/notebook-extension:panel` | `toolbar` | `name` |
 | Other toolbars | see `ui-identifiers.md` | `toolbar` | `name` |
-| Shortcuts | `@jupyterlab/shortcuts-extension:shortcuts` | `shortcuts` | `command` + `keys` + `selector` |
+| Shortcuts | `@jupyterlab/shortcuts-extension:shortcuts` | `shortcuts` | `keys` + `selector` (not the command) |
 
 ```json
 {
@@ -234,6 +238,42 @@ only your changes. To remove a built-in item, repeat its identity with
   `toolbar` of `@jupyterlab/application-extension:top-bar`.
 - Turn the context menu off: `"disabled": true` in
   `@jupyterlab/application-extension:context-menu`.
+
+### Keyboard shortcuts: the rules
+
+JupyterLab identifies a shortcut by its **keys and selector**. The command
+does not count. Shortcuts from an overrides file are defaults, like the
+built-in ones, and these rules apply between defaults:
+
+1. An entry with `"disabled": true` removes **every** default shortcut with
+   the same keys and selector, also one that you add in the same file.
+2. Two enabled shortcuts with the same keys and selector: JupyterLab keeps
+   one (the command that sorts first by name) and logs a warning. The other
+   one is lost without an error.
+
+So, to give a key that is in use to another command:
+
+```json
+{
+  "@jupyterlab/shortcuts-extension:shortcuts": {
+    "shortcuts": [
+      { "command": "apputils:print", "keys": ["Accel P"], "selector": "body", "disabled": true },
+      { "command": "apputils:activate-command-palette", "keys": ["Accel P"], "selector": "html body" }
+    ]
+  }
+}
+```
+
+The new shortcut has a selector that matches the same elements but is a
+different text (`html body` for `body`, `body .jp-Notebook` for
+`.jp-Notebook`). Rule 1 then does not remove it.
+
+- Before you choose keys, look for them in
+  [references/default-shortcuts.md](references/default-shortcuts.md). Copy
+  `keys` and `selector` from there exactly (`Accel`, not `Ctrl`).
+- `jlab_config.py set … shortcuts …` warns about both cases.
+- A free key needs one entry. To move a command to a free key: one entry
+  that disables the old keys, one entry with the new keys.
 
 ## Application name and other page options
 

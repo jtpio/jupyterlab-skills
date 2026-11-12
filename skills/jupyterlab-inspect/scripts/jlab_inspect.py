@@ -17,6 +17,28 @@ import re
 import sys
 from pathlib import Path
 
+def use_project(argv: list[str]) -> None:
+    """
+    Put a distribution project in front of the Jupyter paths.
+
+    It must run before the import of jupyter_core, which reads the variables.
+    """
+    if "--project" not in argv:
+        return
+    index = argv.index("--project")
+    if index + 1 >= len(argv):
+        return
+    project = Path(argv[index + 1]).resolve()
+    for variable, folder in (
+        ("JUPYTER_CONFIG_PATH", project / "jupyter-config"),
+        ("JUPYTER_PATH", project),
+    ):
+        current = os.environ.get(variable)
+        os.environ[variable] = str(folder) + (os.pathsep + current if current else "")
+
+
+use_project(sys.argv)
+
 try:
     from jupyter_core.paths import (
         jupyter_config_dir,
@@ -507,6 +529,12 @@ def main() -> int:
     """
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--json", action="store_true", help="machine-readable output")
+    parser.add_argument(
+        "--project",
+        metavar="DIR",
+        help="also read a distribution project that is not installed: "
+        "DIR/jupyter-config and DIR/labextensions",
+    )
     sub = parser.add_subparsers(dest="action", required=True)
     sub.add_parser("paths", help="folders, and where to write").set_defaults(func=cmd_paths)
     sub.add_parser("extensions", help="prebuilt extensions").set_defaults(func=cmd_extensions)

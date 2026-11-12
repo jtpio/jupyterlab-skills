@@ -45,11 +45,18 @@ python scripts/jlab_ext.py install ./extensions/my-lab-tweaks --python <env>/bin
    change in the JavaScript or CSS needs only a browser reload. A change in
    `package.json` or in a schema needs a server restart.
 6. Verify with the probe of `jupyterlab-verify`:
-   `--expect-plugin my-lab-tweaks:plugin --fail-on-console-error`.
+   `--expect-plugin my-lab-tweaks:plugin --fail-on-console-error`. A sidebar
+   panel is hidden until its tab is active: add `--activate <widget id>`
+   before a check or a screenshot of it.
 
 For a distribution project, create the extension directly in its
-`labextensions/` folder (`--dest <project>/labextensions`) and install the
-project. `uninstall <name>` removes what `install` put in place.
+`labextensions/` folder (`--dest <project>/labextensions`), or add plugins to
+the core extension that the project already has. Run the project without an
+install: `jlab_server.py start --project <project>` (skill
+`jupyterlab-verify`). `uninstall <name>` removes what `install` put in place.
+
+`add-schema <folder>` adds the settings schema to an extension that was
+created without `--schema`.
 
 ## The file you edit
 

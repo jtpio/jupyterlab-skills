@@ -61,6 +61,49 @@ def read_package(source: Path) -> dict:
         fail(f"{path} is not valid JSON: {error}")
 
 
+def write_schema(target: Path, name: str, description: str, version: str) -> Path:
+    """
+    Write an empty settings schema for the plugin <name>:plugin.
+    """
+    schemas = target / "schemas" / name
+    schemas.mkdir(parents=True, exist_ok=True)
+    schema = {
+        "title": name,
+        "description": description,
+        "jupyter.lab.menus": {"main": [], "context": []},
+        "jupyter.lab.toolbars": {},
+        "jupyter.lab.shortcuts": [],
+        "type": "object",
+        "properties": {},
+        "additionalProperties": False,
+    }
+    path = schemas / "plugin.json"
+    path.write_text(json.dumps(schema, indent=2) + "\n")
+    # The settings handler reads the version from this file.
+    (schemas / "package.json.orig").write_text(
+        json.dumps({"name": name, "version": version}, indent=2) + "\n"
+    )
+    return path
+
+
+def add_schema(args: argparse.Namespace) -> int:
+    """
+    Add a settings schema to an extension that has none.
+    """
+    source = Path(args.source).resolve()
+    package = read_package(source)
+    name = package["name"]
+    path = source / "schemas" / name / "plugin.json"
+    if path.exists():
+        fail(f"{path} already exists")
+    write_schema(source, name, package.get("description", name), package.get("version", "0.1.0"))
+    package.setdefault("jupyterlab", {})["schemaDir"] = "schemas"
+    (source / "package.json").write_text(json.dumps(package, indent=2) + "\n")
+    print(f"Created {path}")
+    print(f"The schema belongs to the plugin '{name}:plugin': one plugin must have this ID.")
+    return 0
+
+
 def new(args: argparse.Namespace) -> int:
     """
     Write the files of a new extension.
@@ -113,23 +156,7 @@ def new(args: argparse.Namespace) -> int:
     if args.style:
         (static / "style.css").write_text(f"/*\n * Styles of {name}.\n */\n")
     if args.schema:
-        schemas = target / "schemas" / name
-        schemas.mkdir(parents=True)
-        schema = {
-            "title": name,
-            "description": description,
-            "jupyter.lab.menus": {"main": [], "context": []},
-            "jupyter.lab.toolbars": {},
-            "jupyter.lab.shortcuts": [],
-            "type": "object",
-            "properties": {},
-            "additionalProperties": False,
-        }
-        (schemas / "plugin.json").write_text(json.dumps(schema, indent=2) + "\n")
-        # The settings handler reads the version from this file.
-        (schemas / "package.json.orig").write_text(
-            json.dumps({"name": name, "version": args.version}, indent=2) + "\n"
-        )
+        write_schema(target, name, description, args.version)
 
     print(f"Created {target}")
     print(f"Edit {static / 'remoteEntry.js'}: SHARED and createPlugins().")
@@ -333,6 +360,10 @@ def main() -> int:
         help="plugin or package that this extension replaces (can repeat)",
     )
     p_new.set_defaults(func=new)
+
+    p_schema = sub.add_parser("add-schema", help="add a settings schema to an extension")
+    p_schema.add_argument("source")
+    p_schema.set_defaults(func=add_schema)
 
     p_check = sub.add_parser("check", help="check an extension folder")
     p_check.add_argument("source")

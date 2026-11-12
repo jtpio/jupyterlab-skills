@@ -9,9 +9,15 @@
 'use strict';
 
 const fs = require('fs');
+const os = require('os');
 const path = require('path');
 
-const HELP = `Usage: node jlab_probe.cjs --url <lab url with token> [options]
+const HELP = `Usage: node jlab_probe.cjs [--server <name> | --url <lab url with token>] [options]
+
+Target
+  --server <name>              a server that jlab_server.py started (default: "default")
+  --url <url>                  any JupyterLab URL, with its token
+  --keep-workspace             keep the tabs of the last run (default: start from a clean workspace)
 
 Output
   --screenshot <file.png>      save a screenshot (after --exec and --wait)
@@ -21,7 +27,11 @@ Output
 
 Actions (in the given order, before the checks and the screenshot)
   --exec <command[:json]>      run an application command, with optional JSON args
-  --click <css selector>       click an element
+  --click <css selector>       click the first visible element that matches
+  --press <keys>               press a key or a chord, for example Control+Shift+P or Escape
+  --type <text>                type text into the focused element
+  --activate <widget id>       show a widget: open its sidebar or select its tab
+  --pause <ms>                 wait between two actions
   --eval <javascript>          evaluate an expression in the page (app = window.jupyterapp)
   --wait <ms>                  wait after the actions (default 500)
 
@@ -34,7 +44,10 @@ Checks (each can repeat; exit code 1 when one fails)
   --expect-no-selector <css>   no visible element matches
   --expect-title <text>        the page title contains the text
   --expect-theme <name>        the active theme has this name
-  --expect-setting <id>:<key>=<json>   the composite value of a setting
+  --expect-setting <id>:<key>=<json>   the value in effect of a setting. <key> can be a
+                               path (codeCellConfig.lineNumbers). An object matches when
+                               the setting has at least its keys and values
+  --expect-eval <javascript>   the expression is true in the page (app = window.jupyterapp)
   --fail-on-console-error      console errors and page errors fail the run
 
 Browser
@@ -54,9 +67,10 @@ function parseArgs(argv) {
     'scale',
     'color-scheme',
     'timeout',
-    'dependents'
+    'dependents',
+    'server'
   ]);
-  const flags = new Set(['full', 'fail-on-console-error', 'help']);
+  const flags = new Set(['full', 'fail-on-console-error', 'help', 'keep-workspace']);
   const options = { actions: [], checks: [] };
   for (let i = 0; i < argv.length; i++) {
     const arg = argv[i];
@@ -74,7 +88,7 @@ function parseArgs(argv) {
     }
     if (single.has(key)) {
       options[key] = value;
-    } else if (['exec', 'click', 'eval'].includes(key)) {
+    } else if (['exec', 'click', 'eval', 'press', 'type', 'activate', 'pause'].includes(key)) {
       options.actions.push({ type: key, value });
     } else if (key.startsWith('expect-')) {
       options.checks.push({ type: key.slice('expect-'.length), value });
@@ -83,6 +97,41 @@ function parseArgs(argv) {
     }
   }
   return options;
+}
+
+/*
+ * Read the URL of a server that jlab_server.py started.
+ */
+function serverUrl(name) {
+  const file = path.join(os.tmpdir(), 'jlab-verify', `${name}.json`);
+  if (!fs.existsSync(file)) {
+    return null;
+  }
+  return JSON.parse(fs.readFileSync(file, 'utf8')).url;
+}
+
+/*
+ * Add the "reset" parameter: JupyterLab then ignores the saved workspace.
+ */
+function withReset(url) {
+  const parsed = new URL(url);
+  if (!parsed.searchParams.has('reset')) {
+    parsed.searchParams.append('reset', '');
+  }
+  return parsed.toString().replace('reset=', 'reset');
+}
+
+/*
+ * Tell if `actual` has the keys and values of `expected`.
+ */
+function contains(actual, expected) {
+  if (expected === null || typeof expected !== 'object' || Array.isArray(expected)) {
+    return JSON.stringify(actual) === JSON.stringify(expected);
+  }
+  if (actual === null || typeof actual !== 'object') {
+    return false;
+  }
+  return Object.keys(expected).every(key => contains(actual[key], expected[key]));
 }
 
 function loadPlaywright() {
@@ -272,13 +321,26 @@ async function runChecks(page, state, checks) {
     } else if (type === 'theme') {
       ok = state.theme === value;
       detail = `theme is "${state.theme}"`;
+    } else if (type === 'eval') {
+      try {
+        const result = await page.evaluate(source => {
+          const app = window.jupyterapp;
+          return Promise.resolve(eval(source)).then(value => !!value);
+        }, value);
+        ok = result === true;
+        detail = 'the expression is not true';
+      } catch (error) {
+        ok = false;
+        detail = error.message.split('\n')[0];
+      }
     } else if (type === 'setting') {
       const match = /^(.+?):([^:=]+)=(.*)$/.exec(value);
       if (!match) {
         ok = false;
         detail = 'format is <plugin id>:<key>=<json>';
       } else {
-        const [, id, key, raw] = match;
+        const [, id, keyPath, raw] = match;
+        const [key, ...rest] = keyPath.split('.');
         const actual = await page.evaluate(
           async ([pluginId, settingKey]) => {
             const config = JSON.parse(
@@ -293,11 +355,16 @@ async function runChecks(page, state, checks) {
             }
             const data = await response.json();
             const user = data.settings || {};
-            if (settingKey in user) {
-              return { value: user[settingKey] };
-            }
             const property = (data.schema.properties || {})[settingKey];
-            return { value: property ? property.default : undefined };
+            const fallback = property ? property.default : undefined;
+            if (!(settingKey in user)) {
+              return { value: fallback };
+            }
+            // An object of the user settings completes the default object.
+            const both =
+              user[settingKey] && fallback && typeof fallback === 'object' &&
+              !Array.isArray(fallback) && typeof user[settingKey] === 'object';
+            return { value: both ? { ...fallback, ...user[settingKey] } : user[settingKey] };
           },
           [id, key]
         );
@@ -307,10 +374,12 @@ async function runChecks(page, state, checks) {
         } catch (error) {
           expected = raw;
         }
-        ok =
-          !actual.error &&
-          JSON.stringify(actual.value) === JSON.stringify(expected);
-        detail = actual.error || `value is ${JSON.stringify(actual.value)}`;
+        let current = actual.value;
+        for (const part of rest) {
+          current = current === null || current === undefined ? undefined : current[part];
+        }
+        ok = !actual.error && contains(current, expected);
+        detail = actual.error || `value is ${JSON.stringify(current)}`;
       }
     } else {
       ok = false;
@@ -325,9 +394,27 @@ async function runChecks(page, state, checks) {
 
 async function main() {
   const options = parseArgs(process.argv.slice(2));
-  if (options.help || !options.url) {
+  if (options.help) {
     console.log(HELP);
-    process.exit(options.help ? 0 : 2);
+    process.exit(0);
+  }
+  if (options.url === '') {
+    console.error('error: --url is empty. Pass the "url" that jlab_server.py printed, or use --server <name>.');
+    process.exit(2);
+  }
+  if (!options.url) {
+    const name = options.server || 'default';
+    options.url = serverUrl(name);
+    if (!options.url) {
+      console.error(
+        `error: no server named "${name}". Start one with jlab_server.py, or pass --url.\n` +
+          'Run with --help for the options.'
+      );
+      process.exit(2);
+    }
+  }
+  if (!options['keep-workspace']) {
+    options.url = withReset(options.url);
   }
   const { chromium } = loadPlaywright();
   const [width, height] = (options.viewport || '1440x900').split('x').map(Number);
@@ -378,15 +465,32 @@ async function main() {
         const index = action.value.indexOf(':{');
         const id = index === -1 ? action.value : action.value.slice(0, index);
         const args = index === -1 ? {} : JSON.parse(action.value.slice(index + 1));
-        // The result of a command can be a widget: do not return it.
-        await page.evaluate(
+        // The result of a command can be a widget: do not return it. A command
+        // that opens a dialog resolves only when the dialog closes: do not wait.
+        const finished = await page.evaluate(
           async ([commandId, commandArgs]) => {
-            await window.jupyterapp.commands.execute(commandId, commandArgs);
+            const done = window.jupyterapp.commands
+              .execute(commandId, commandArgs)
+              .then(() => true);
+            const timeout = new Promise(resolve => setTimeout(() => resolve(false), 5000));
+            return Promise.race([done, timeout]);
           },
           [id, args]
         );
+        if (!finished) {
+          console.error(`exec: ${id} did not finish in 5 s (an open dialog?). The probe continues.`);
+        }
       } else if (action.type === 'click') {
-        await page.click(action.value);
+        // Hidden copies of an element exist in the tabs that are not active.
+        await page.locator(action.value).locator('visible=true').first().click();
+      } else if (action.type === 'press') {
+        await page.keyboard.press(action.value);
+      } else if (action.type === 'type') {
+        await page.keyboard.type(action.value);
+      } else if (action.type === 'pause') {
+        await page.waitForTimeout(Number(action.value));
+      } else if (action.type === 'activate') {
+        await page.evaluate(id => window.jupyterapp.shell.activateById(id), action.value);
       } else if (action.type === 'eval') {
         const result = await page.evaluate(
           source => {
