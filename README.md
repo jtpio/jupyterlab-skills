@@ -102,20 +102,17 @@ Design choices:
 
 ## Examples
 
-Three applications that a coding agent built with these skills and a product
+Two applications that a coding agent built with these skills and a product
 brief, with no other source of JupyterLab knowledge.
 
 | Example | Kind | What it shows |
 | --- | --- | --- |
 | [`examples/inkwell`](examples/inkwell) | Distribution: JupyterLab with configuration, a theme and no-build extensions | A writing studio: a home page in place of the launcher, its own themes and fonts, new commands, a shorter menu bar and toolbar. No build step |
 | [`examples/lectern`](examples/lectern) | Remix: a new application from JupyterLab packages, with its own shell | A two-pane lesson reader: the text of a lesson on the left, its notebook on the right. Its own bundle and server class |
-| [`examples/meridian`](examples/meridian) | Distribution: JupyterLab with published extensions as dependencies, configuration, themes and no-build extensions | A desktop code editor look: activity bar, Explorer tree, panel with the terminal, command palette at the top, Quick Open, language server, Git, search across files. No build step |
 
 ![The Inkwell home page](examples/inkwell/screenshots/home.webp)
 
 ![A lesson in Lectern](examples/lectern/screenshots/lesson.webp)
-
-![A Python file in Meridian](examples/meridian/screenshots/editor.webp)
 
 ## Install
 
