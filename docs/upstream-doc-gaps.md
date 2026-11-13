@@ -36,6 +36,7 @@ No issue or pull request was opened for these items.
 | 13 | A theme must define all theme variables | Not described | `jupyterlab-theming` |
 | 14 | An application from the published npm packages | No page | `jupyterlab-remix` |
 | 15 | Plugin metadata as data (a feature, not a text) | Not available | `jupyterlab-settings`, `jupyterlab-remix` |
+| 18 | The files of `static/` in an extension are served as immutable for one year | No match in the two extension pages | `jupyterlab-extensions` |
 
 ## Configuration
 
