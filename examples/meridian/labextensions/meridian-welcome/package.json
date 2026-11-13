@@ -1,6 +1,6 @@
 {
   "name": "meridian-welcome",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Welcome page of Meridian, in place of the launcher",
   "jupyterlab": {
     "extension": true,

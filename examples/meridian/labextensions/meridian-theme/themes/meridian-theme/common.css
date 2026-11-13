@@ -460,10 +460,14 @@ body {
   background: transparent;
 }
 
+/*
+ * The delay is for the color only. A delay on all properties also holds back
+ * the position of the handle, and a drag then moves it too far.
+ */
 .lm-SplitPanel-handle:hover,
 .lm-SplitPanel-handle:active {
   background: var(--mer-focus);
-  transition-delay: 0.2s;
+  transition: background-color 0s 0.2s;
 }
 
 /*

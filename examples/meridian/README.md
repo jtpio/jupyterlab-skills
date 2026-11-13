@@ -27,9 +27,10 @@ step. Every other JupyterLab extension installs and loads as usual.
 A coding agent built Meridian as a test of the skills in this repository. It
 got the skills and a product brief. It could not see this repository, the
 other examples or any earlier work. The project is the output of that run,
-with two additions: this README (the agent wrote most of it) and the `demo/`
-folder, which is the workspace that the agent made for its checks. It shows
-what the skills produce; it is not a maintained product.
+with these additions: this README (the agent wrote most of it), the `demo/`
+folder, which is the workspace that the agent made for its checks, and the
+smoke test with the corrections that it brought (see below). It shows what
+the skills produce; it is not a maintained product.
 
 The brief asked the agent to reuse published extensions and to write code
 only for what no extension gives. Nothing here needs a build step. There is
@@ -44,7 +45,7 @@ uv build --wheel
 ```
 
 ```bash
-uvx --from dist/meridian_lab-0.1.0-py3-none-any.whl meridian demo
+uvx --from dist/meridian_lab-0.1.1-py3-none-any.whl meridian demo
 ```
 
 Install the wheel in its own environment: the configuration applies to each
@@ -57,6 +58,30 @@ The Git view needs `git`, and the search across files needs `rg`
 ([ripgrep](https://github.com/BurntSushi/ripgrep)) on the `PATH`. The `demo/`
 folder is not a Git repository: run `git init` in a copy of it to see the
 Source Control view with content.
+
+## Smoke test
+
+`tests/smoke.cjs` starts Meridian on a copy of `demo/`, drags each divider
+with the mouse and compares the sizes: side bar, panel, editors side by side,
+sections of the Explorer, secondary side bar. It also hides and shows the
+side bar and the panel, makes the window smaller, and reads the browser
+console. It needs Node.js and Playwright
+(`npm install --no-save playwright`, then `npx playwright install chromium`).
+
+```bash
+node tests/smoke.cjs --meridian <env>/bin/meridian
+```
+
+Version 0.1.1 corrects what the first run of this test found in the output
+of the agent:
+
+- A style rule delayed all properties of a divider, also its position. A
+  drag then moved the divider much farther than the pointer.
+- A view that moved to the secondary side bar did not show until a reload,
+  and an empty area stayed open on the right in some cases.
+- On a narrow window, the command field was on top of the menus.
+- JupyterLab 4.6 makes the panel smaller each time it shows it again.
+  Meridian now puts its size back.
 
 ## What it changes
 
@@ -106,6 +131,7 @@ meridian/
 │   ├── meridian-editor/            editor theme, notebook cell gutter
 │   ├── meridian-icons/             Codicons and Seti icons
 │   └── meridian-theme/             themes "Meridian Dark" and "Meridian Light", fonts
+├── tests/smoke.cjs                 smoke test of the layout, with a browser
 └── demo/                           a small Python project to open
 ```
 

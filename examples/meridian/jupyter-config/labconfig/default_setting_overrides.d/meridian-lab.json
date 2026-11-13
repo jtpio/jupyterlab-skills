@@ -15,7 +15,7 @@
     "dockPanelPadding": false,
     "layout": {
       "multiple": {
-        "filebrowser": {
+        "File Browser": {
           "area": "left",
           "options": {
             "rank": 100
@@ -33,7 +33,7 @@
             "rank": 300
           }
         },
-        "jp-debugger-sidebar": {
+        "Debugger": {
           "area": "left",
           "options": {
             "rank": 400
@@ -45,19 +45,19 @@
             "rank": 500
           }
         },
-        "jp-running-sessions": {
+        "Sessions and Tabs": {
           "area": "left",
           "options": {
             "rank": 600
           }
         },
-        "table-of-contents": {
+        "Table of Contents": {
           "area": "left",
           "options": {
             "rank": 700
           }
         },
-        "jp-property-inspector": {
+        "Property Inspector": {
           "area": "left",
           "options": {
             "rank": 800

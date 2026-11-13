@@ -1,6 +1,6 @@
 {
   "name": "meridian-editor",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Editor colors and notebook cell gutter of Meridian",
   "jupyterlab": {
     "extension": true,

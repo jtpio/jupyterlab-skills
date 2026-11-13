@@ -49,10 +49,20 @@ body {
   bottom: 0;
   left: 50%;
   transform: translateX(-50%);
-  width: min(38vw, 600px);
+  width: min(38vw, 600px, calc(100vw - 880px));
   display: flex;
   align-items: center;
   z-index: 1;
+}
+
+/*
+ * The field is in the center of the window. On a narrow window, it gets
+ * shorter and then goes away, to stay clear of the menus.
+ */
+@media (max-width: 1000px) {
+  .meridian-CommandCenter {
+    display: none;
+  }
 }
 
 .meridian-CommandCenter-box {
@@ -173,6 +183,18 @@ body {
   overflow: hidden;
   text-overflow: ellipsis;
   box-sizing: border-box;
+}
+
+/*
+ * The Properties view puts its children in a row: the title must be above.
+ */
+#jp-property-inspector.meridian-View {
+  flex-direction: column;
+}
+
+#jp-property-inspector.meridian-View > .lm-Widget {
+  flex: 1 1 auto;
+  min-height: 0;
 }
 
 .jp-search-replace-tab.meridian-View .jp-search-replace-header h2,

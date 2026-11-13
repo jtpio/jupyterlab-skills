@@ -9,7 +9,7 @@
 
   const NAME = 'meridian-lab';
   const APP_NAME = 'Meridian';
-  const VERSION = '0.1.0';
+  const VERSION = '0.1.1';
 
   const SHARED = [
     '@jupyterlab/application',
@@ -302,7 +302,9 @@
       activate: (app, labShell, browser, palette) => {
         const { commands } = app;
 
-        const findLeft = id => Array.from(labShell.widgets('left')).find(w => w.id === id);
+        // A person can move a view to the other side bar.
+        const findView = id =>
+          [...labShell.widgets('left'), ...labShell.widgets('right')].find(w => w.id === id);
 
         const focusInput = (root, selector) => {
           const field = root && root.node.querySelector(selector);
@@ -317,7 +319,7 @@
             caption: `Show ${view.title}`,
             execute: () => {
               app.shell.activateById(view.id);
-              const widget = view.id === 'filebrowser' ? browser : findLeft(view.id);
+              const widget = view.id === 'filebrowser' ? browser : findView(view.id);
               if (view.id === 'jp-search-replace') {
                 focusInput(widget, 'jp-text-field');
               } else if (view.id === 'filebrowser' && widget) {
@@ -344,7 +346,7 @@
           label: 'Replace in Files',
           execute: async () => {
             await commands.execute(cmd('show-search'));
-            const panel = findLeft('jp-search-replace');
+            const panel = findView('jp-search-replace');
             const toggle = panel && panel.node.querySelector('.jp-search-replace-collapser, [title*="Replace"]');
             const replaceField = panel && panel.node.querySelectorAll('jp-text-field')[1];
             if (toggle && !replaceField) {
@@ -375,7 +377,7 @@
         });
 
         for (const view of VIEWS) {
-          const widget = view.id === 'filebrowser' ? browser : findLeft(view.id);
+          const widget = view.id === 'filebrowser' ? browser : findView(view.id);
           if (widget && view.icon) {
             widget.title.icon = icon(view.icon);
           }
@@ -383,7 +385,7 @@
 
         void app.restored.then(() => {
           for (const view of VIEWS) {
-            const widget = view.id === 'filebrowser' ? browser : findLeft(view.id);
+            const widget = view.id === 'filebrowser' ? browser : findView(view.id);
             if (!widget) {
               continue;
             }
@@ -395,28 +397,17 @@
             widget.node.insertBefore(header, widget.node.firstChild);
           }
           if (browser) {
-            setUpExplorer(app, browser, findLeft('table-of-contents'));
+            setUpExplorer(app, browser, findView('table-of-contents'));
           }
           addManageButton(app);
-          hideEmptyRightArea(labShell);
+          // JupyterLab hides a side area only when its side bar changes. With
+          // no view on the right, that does not occur, and an empty area shows.
+          if (labShell.isEmpty('right')) {
+            labShell.collapseRight();
+          }
         });
       }
     };
-
-    /*
-     * The secondary side bar takes no room while it has no view.
-     */
-    function hideEmptyRightArea(labShell) {
-      const left = Array.from(labShell.widgets('left'))[0];
-      const split = left && left.parent && left.parent.parent && left.parent.parent.parent;
-      if (!split || !split.widgets || split.widgets.length < 3) {
-        return;
-      }
-      const rightArea = split.widgets[split.widgets.length - 1];
-      const update = () => rightArea.setHidden(Array.from(labShell.widgets('right')).length === 0);
-      labShell.layoutModified.connect(update);
-      update();
-    }
 
     function setUpExplorer(app, browser, toc) {
       const toolbar = new Toolbar();
@@ -510,6 +501,41 @@
           }
           return widget;
         };
+
+        /*
+         * JupyterLab makes the panel smaller each time it shows it again: it
+         * applies the saved size before the layout knows that the panel is
+         * visible. Apply that size again, after the layout.
+         */
+        const keepPanelSize = () => {
+          const node = document.getElementById('jp-down-stack');
+          if (!node || typeof ResizeObserver === 'undefined') {
+            return;
+          }
+          const verticalSplit = () => {
+            let widget = Array.from(labShell.widgets('down'))[0];
+            while (widget && typeof widget.setRelativeSizes !== 'function') {
+              widget = widget.parent;
+            }
+            return widget || null;
+          };
+          let fraction = 0;
+          let hidden = true;
+          new ResizeObserver(() => {
+            const split = node.offsetHeight > 0 ? verticalSplit() : null;
+            if (!split) {
+              hidden = true;
+              return;
+            }
+            if (hidden && fraction > 0) {
+              split.setRelativeSizes([1 - fraction, fraction]);
+            } else {
+              fraction = split.relativeSizes()[1];
+            }
+            hidden = false;
+          }).observe(node);
+        };
+        void app.restored.then(keepPanelSize);
 
         commands.addCommand(cmd('toggle-panel'), {
           label: 'Toggle Panel Visibility',

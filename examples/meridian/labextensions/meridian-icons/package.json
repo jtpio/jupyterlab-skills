@@ -1,6 +1,6 @@
 {
   "name": "meridian-icons",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Codicons and Seti file icons for Meridian",
   "jupyterlab": {
     "extension": true,
