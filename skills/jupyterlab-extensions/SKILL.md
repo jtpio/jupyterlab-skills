@@ -257,6 +257,7 @@ favicon and the tab title.
 - dialogs and notifications
 - file types
 - stylesheets and assets
+- the down area: show, hide, and a correction for its size in JupyterLab 4.6
 
 The table of shared packages and tokens is in
 [references/tokens.md](references/tokens.md).

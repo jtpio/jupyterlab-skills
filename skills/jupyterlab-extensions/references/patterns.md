@@ -27,6 +27,7 @@ TypeScript extension, the same names are imports.
 - [Menus from code](#menus-from-code)
 - [File types](#file-types)
 - [Stylesheets and assets](#stylesheets-and-assets)
+- [Down area: show, hide, keep its size](#down-area-show-hide-keep-its-size)
 - [React to the application state](#react-to-the-application-state)
 
 ## Command, palette, shortcut
@@ -669,17 +670,77 @@ const staticUrl = URLExt.join(
   NAME,
   'static'
 );
-const logoUrl = `${staticUrl}/logo.svg`;
+// STAMP is the "?v=..." of the entry file (see the template). Without it,
+// the browser keeps the old file for one year.
+const logoUrl = `${staticUrl}/logo.svg${STAMP}`;
 ```
 
 In CSS, a relative `url(logo.svg)` resolves next to the stylesheet. Fonts
 work the same way: put `.woff2` files in `static/fonts/` and write
 `@font-face { src: url(fonts/Name.woff2) format('woff2'); }`. Do not load
 fonts or scripts from a CDN: JupyterLab often runs without internet access.
+A file that CSS names has no stamp in its URL: give it a new name when its
+content changes.
 
 Use the CSS variables of the theme (`var(--jp-layout-color1)`,
 `var(--jp-ui-font-color1)`, `var(--jp-brand-color1)`) so that your widgets
 follow the light and dark themes. See the skill `jupyterlab-theming`.
+
+## Down area: show, hide, keep its size
+
+The down area is the panel below the main area (log console, or terminals
+when the layout setting puts them there). `shell.collapseDown()` hides it,
+`shell.expandDown()` shows it, `shell.downCollapsed` and
+`shell.isEmpty('down')` tell its state.
+
+JupyterLab 4.6 makes the down area smaller each time it shows again (212 px,
+then 106 px, then 59 px in a test): it applies the saved size before the
+layout knows that the area is visible. An application that hides and shows
+the area with a key needs this correction. It sets the size again after the
+layout:
+
+`SHARED`: `@jupyterlab/application`
+
+```js
+const { ILabShell } = lab['@jupyterlab/application'];
+
+const plugin = {
+  id: `${NAME}:down-area-size`,
+  autoStart: true,
+  requires: [ILabShell],
+  activate: (app, labShell) => {
+    void app.restored.then(() => {
+      const node = document.getElementById('jp-down-stack');
+      // The split panel that holds the main area and the down area.
+      const split = () => {
+        let widget = Array.from(labShell.widgets('down'))[0];
+        while (widget && typeof widget.setRelativeSizes !== 'function') {
+          widget = widget.parent;
+        }
+        return widget || null;
+      };
+      let fraction = 0;
+      let hidden = true;
+      new ResizeObserver(() => {
+        const panel = node.offsetHeight > 0 ? split() : null;
+        if (!panel) {
+          hidden = true;
+          return;
+        }
+        if (hidden && fraction > 0) {
+          panel.setRelativeSizes([1 - fraction, fraction]);
+        } else {
+          fraction = panel.relativeSizes()[1];
+        }
+        hidden = false;
+      }).observe(node);
+    });
+  }
+};
+```
+
+Check it with the probe: read `#jp-down-stack` `offsetHeight`, hide and show
+the area two times, and read it again.
 
 ## React to the application state
 

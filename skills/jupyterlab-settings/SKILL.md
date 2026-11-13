@@ -191,6 +191,9 @@ Plugin `@jupyterlab/application-extension:shell`.
 - With no widget in the right area, JupyterLab leaves that area open and
   empty. Close it from an extension when the application starts:
   `if (shell.isEmpty('right')) shell.collapseRight()`.
+- JupyterLab 4.6 makes the down area smaller each time it is hidden and
+  shown again. An application that hides it with a key needs the correction
+  in "Down area" of `jupyterlab-extensions/references/patterns.md`.
 - The meaning of each key:
   [Layout](https://jupyterlab.readthedocs.io/en/stable/user/interface_customization.html#layout-customization)
   in the JupyterLab documentation.
