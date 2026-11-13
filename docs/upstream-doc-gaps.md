@@ -289,6 +289,30 @@ No issue or pull request was opened for these items.
 - **Removes.** `core_plugins.json` in two skills, the regular expressions in
   `jlab_inspect.py` and `jlab_config.py`, and `tools/update_plugin_data.py`.
 
+## Found after the Meridian recording
+
+### 18. The files of `static/` in an extension are served as immutable
+
+- **Fact.** `jupyterlab_server` adds the URL of each `static/` folder below a
+  labextensions folder to `static_immutable_cache` (`app.py`: "they should
+  have all hashed name"). The server then sends
+  `Cache-Control: public, max-age=31536000, immutable` for these files. The
+  build of a normal extension gives each file a hashed name. A file with a
+  fixed name, such as the `static/remoteEntry.js` of an extension with no
+  build, stays in the browser for one year: an edit or an upgrade does not
+  show. No server option turns this off (`cache_files=False` does not).
+  `package.json`, the schemas and the themes are served with `no-cache`.
+- **Works.** A query in `jupyterlab._build.load`
+  (`static/remoteEntry.js?v=<hash>`): JupyterLab keeps it in the URL of the
+  script. Tested with one browser profile: 0.1.0 then 0.1.2 of Meridian.
+- **Documentation.** No match for "immutable", "max-age" or "cache" in
+  `docs/source/extension/extension_dev.md` and `extension_tutorial.md` on
+  `main` (13 November 2026). Other pages were not searched.
+- **Where.** `docs/source/extension/extension_dev.md`, section "Prebuilt
+  Extensions", with item 12.
+- **Removes.** The paragraph on the stamp in
+  `skills/jupyterlab-extensions/SKILL.md`. The stamp code stays.
+
 ## Faults in the code, found by the Meridian smoke test
 
 These two are not gaps in the documentation. They are faults in JupyterLab

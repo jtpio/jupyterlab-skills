@@ -38,7 +38,9 @@ python ../jupyterlab-extensions/scripts/jlab_ext.py new my-style --dest ./extens
 ```
 
 Write the rules in `static/style.css`, install the extension, restart the
-server once. Later edits need only a browser reload. If the skill
+server once. After a later edit, run `jlab_ext.py stamp <folder>` and reload
+the page: the browser keeps the files of `static/` for one year, and only a
+new stamp in their URL makes it load them again. If the skill
 `jupyterlab-extensions` is not available, create the three files by hand: see
 "Stylesheet-only extension" in
 [references/selectors.md](references/selectors.md).

@@ -23,6 +23,12 @@
 
   const STYLESHEETS = ['style.css'];
 
+  /*
+   * The "?v=..." of this file, for the other files of static/. The browser
+   * keeps them for one year: only a new URL loads a changed file.
+   */
+  const STAMP = document.currentScript ? new URL(document.currentScript.src).search : '';
+
   function createPlugins(lab) {
     const { HighlightStyle, syntaxHighlighting } = lab['@codemirror/language'];
     const { EditorView } = lab['@codemirror/view'];
@@ -295,7 +301,7 @@
     for (const file of STYLESHEETS) {
       const link = document.createElement('link');
       link.rel = 'stylesheet';
-      link.href = base + file;
+      link.href = base + file + STAMP;
       link.dataset.extension = NAME;
       document.head.appendChild(link);
     }

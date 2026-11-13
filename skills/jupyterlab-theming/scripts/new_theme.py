@@ -10,6 +10,7 @@ the variables leaves the rest of the interface without style.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import re
@@ -251,6 +252,10 @@ def main() -> int:
             "_build": {"load": "static/remoteEntry.js", "extension": "./extension"},
         },
     }
+    # The browser keeps the files of static/ for one year: a hash in the URL
+    # makes it load a changed file.
+    digest = hashlib.sha256(b"remoteEntry.js" + (static / "remoteEntry.js").read_bytes())
+    package["jupyterlab"]["_build"]["load"] += f"?v={digest.hexdigest()[:8]}"
     (target / "package.json").write_text(json.dumps(package, indent=2) + "\n")
     (target / "install.json").write_text(
         json.dumps(

@@ -11,6 +11,7 @@ installs JupyterLab plus configuration, extensions and a launch command.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import re
@@ -160,6 +161,12 @@ ENTRY = r"""/*
   const STYLESHEETS = ['style.css'];
 
   /*
+   * The "?v=..." of this file, for the stylesheets. The browser keeps the
+   * files of static/ for one year: only a new URL loads a changed file.
+   */
+  const STAMP = document.currentScript ? new URL(document.currentScript.src).search : '';
+
+  /*
    * Return the plugin, or the list of plugins.
    * `lab` maps each name in SHARED to its module.
    */
@@ -229,7 +236,7 @@ ENTRY = r"""/*
     for (const file of STYLESHEETS) {
       const link = document.createElement('link');
       link.rel = 'stylesheet';
-      link.href = base + file;
+      link.href = base + file + STAMP;
       link.dataset.extension = NAME;
       document.head.appendChild(link);
     }
@@ -258,6 +265,35 @@ ENTRY = r"""/*
   window._JUPYTERLAB[NAME] = container;
 })();
 """
+
+
+def stamp_value(source: Path) -> str:
+    """
+    Path of the entry file with a hash of all files of static/.
+
+    JupyterLab tells the browser to keep the files of static/ for one year.
+    Only a new URL makes the browser load a changed file.
+    """
+    static = source / "static"
+    digest = hashlib.sha256()
+    for file in sorted(path for path in static.rglob("*") if path.is_file()):
+        digest.update(file.relative_to(static).as_posix().encode())
+        digest.update(file.read_bytes())
+    return f"static/remoteEntry.js?v={digest.hexdigest()[:8]}"
+
+
+def write_stamp(source: Path) -> str:
+    """
+    Write the stamped path of the entry file into package.json.
+    """
+    file = source / "package.json"
+    package = json.loads(file.read_text())
+    value = stamp_value(source)
+    build = package.setdefault("jupyterlab", {}).setdefault("_build", {})
+    if build.get("load") != value:
+        build["load"] = value
+        file.write_text(json.dumps(package, indent=2) + "\n")
+    return value
 
 
 def fail(message: str) -> None:
@@ -400,12 +436,14 @@ def new(args: argparse.Namespace) -> int:
     (extension / "install.json").write_text(install_json(name))
     (extension / "static" / "remoteEntry.js").write_text(fill(ENTRY, values))
     (extension / "static" / "style.css").write_text(f"/*\n * Styles of {app}.\n */\n")
+    write_stamp(extension)
 
     print(f"Created {project}")
     print(f"  config:     {labconfig}")
     print(f"  extension:  {extension}")
     print(f"  command:    {command}  ({module}/cli.py)")
-    print("Next: edit the config and the extension, then build with 'uv build --wheel'.")
+    print("Next: edit the config and the extension. Before each build, run")
+    print(f"'python {Path(__file__).name} check {project} --fix', then 'uv build --wheel'.")
     return 0
 
 
@@ -510,8 +548,18 @@ def check(args: argparse.Namespace) -> int:
         expected = folder.relative_to(root).as_posix()
         if package.get("name") != expected:
             problems.append(f"labextensions/{expected}: package.json name is {package.get('name')}")
-        if not build.get("load") or not (folder / build["load"]).is_file():
+        load = (build.get("load") or "").split("?")[0]
+        if not load or not (folder / load).is_file():
             problems.append(f"labextensions/{expected}: missing file for jupyterlab._build.load")
+        elif load == "static/remoteEntry.js" and build["load"] != stamp_value(folder):
+            # Without a new URL, a browser keeps the files of an older version.
+            if args.fix:
+                print(f"Fixed labextensions/{expected}: {write_stamp(folder)}")
+            else:
+                problems.append(
+                    f"labextensions/{expected}: the stamp of static/ is absent or old, and a "
+                    "browser can keep the old files: run check with --fix"
+                )
         if folder.is_symlink():
             problems.append(f"labextensions/{expected} is a symlink: copy the files instead")
         install = folder / "install.json"

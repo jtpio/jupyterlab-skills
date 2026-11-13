@@ -33,6 +33,12 @@
    */
   const STYLESHEETS = ['style.css'];
 
+  /*
+   * The "?v=..." of this file, for the other files of static/. The browser
+   * keeps them for one year: only a new URL loads a changed file.
+   */
+  const STAMP = document.currentScript ? new URL(document.currentScript.src).search : '';
+
   const MARK_SVG =
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">' +
     '<path class="jp-icon-brand0" fill="#2b45b8" d="M12 2.2c4.1 5.1 6.9 8.9 6.9 12.4a6.9 6.9 0 0 1-13.8 0C5.1 11.1 7.9 7.3 12 2.2z"/>' +
@@ -414,7 +420,7 @@
       description: 'The Inkwell favicon.',
       autoStart: true,
       activate: () => {
-        const url = `${staticUrl()}/favicon.svg`;
+        const url = `${staticUrl()}/favicon.svg${STAMP}`;
         document.querySelectorAll('link.favicon').forEach(link => {
           link.type = 'image/svg+xml';
           link.href = url;
@@ -752,7 +758,7 @@
     for (const file of STYLESHEETS) {
       const link = document.createElement('link');
       link.rel = 'stylesheet';
-      link.href = base + file;
+      link.href = base + file + STAMP;
       link.dataset.extension = NAME;
       document.head.appendChild(link);
     }

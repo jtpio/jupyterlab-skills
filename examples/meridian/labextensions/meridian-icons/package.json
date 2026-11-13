@@ -1,11 +1,11 @@
 {
   "name": "meridian-icons",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Codicons and Seti file icons for Meridian",
   "jupyterlab": {
     "extension": true,
     "_build": {
-      "load": "static/remoteEntry.js",
+      "load": "static/remoteEntry.js?v=51175aec",
       "extension": "./extension"
     }
   }

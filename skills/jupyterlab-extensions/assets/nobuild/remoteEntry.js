@@ -22,6 +22,12 @@
   const STYLESHEETS = [__STYLESHEETS__];
 
   /*
+   * The "?v=..." of this file, for the stylesheets. The browser keeps the
+   * files of static/ for one year: only a new URL loads a changed file.
+   */
+  const STAMP = document.currentScript ? new URL(document.currentScript.src).search : '';
+
+  /*
    * Return the plugin, or the list of plugins.
    * `lab` maps each name in SHARED to its module.
    */
@@ -88,7 +94,7 @@
     for (const file of STYLESHEETS) {
       const link = document.createElement('link');
       link.rel = 'stylesheet';
-      link.href = base + file;
+      link.href = base + file + STAMP;
       link.dataset.extension = NAME;
       document.head.appendChild(link);
     }

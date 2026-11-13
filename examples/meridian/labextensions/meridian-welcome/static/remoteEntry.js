@@ -23,6 +23,12 @@
 
   const STYLESHEETS = ['style.css'];
 
+  /*
+   * The "?v=..." of this file, for the other files of static/. The browser
+   * keeps them for one year: only a new URL loads a changed file.
+   */
+  const STAMP = document.currentScript ? new URL(document.currentScript.src).search : '';
+
   const FIRST_STEPS = [
     { icon: 'sparkle', title: 'Find any command', text: 'The Command Palette runs every command of Meridian.', command: 'meridian-lab:show-commands', keys: 'Accel Shift P' },
     { icon: 'go-to-file', title: 'Open a file by its name', text: 'Quick Open finds a file of the workspace as you type.', command: 'quickopen:activate', keys: 'Accel P' },
@@ -352,7 +358,7 @@
     for (const file of STYLESHEETS) {
       const link = document.createElement('link');
       link.rel = 'stylesheet';
-      link.href = base + file;
+      link.href = base + file + STAMP;
       link.dataset.extension = NAME;
       document.head.appendChild(link);
     }

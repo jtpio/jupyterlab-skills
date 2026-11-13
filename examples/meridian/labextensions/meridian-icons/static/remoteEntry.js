@@ -14,6 +14,12 @@
   const STYLESHEETS = ['style.css'];
 
   /*
+   * The "?v=..." of this file, for the other files of static/. The browser
+   * keeps them for one year: only a new URL loads a changed file.
+   */
+  const STAMP = document.currentScript ? new URL(document.currentScript.src).search : '';
+
+  /*
    * The SVG files in static/codicons. Each one becomes the icon
    * `meridian-icons:<name>`.
    */
@@ -165,7 +171,7 @@
 
     async function loadIcons(app) {
       const fetchText = async path => {
-        const response = await fetch(`${base}/${path}`);
+        const response = await fetch(`${base}/${path}${STAMP}`);
         if (!response.ok) {
           throw new Error(`${NAME}: cannot load ${path} (${response.status})`);
         }
@@ -271,7 +277,7 @@
     for (const file of STYLESHEETS) {
       const link = document.createElement('link');
       link.rel = 'stylesheet';
-      link.href = base + file;
+      link.href = base + file + STAMP;
       link.dataset.extension = NAME;
       document.head.appendChild(link);
     }

@@ -45,7 +45,7 @@ uv build --wheel
 ```
 
 ```bash
-uvx --from dist/meridian_lab-0.1.1-py3-none-any.whl meridian demo
+uvx --from dist/meridian_lab-0.1.2-py3-none-any.whl meridian demo
 ```
 
 Install the wheel in its own environment: the configuration applies to each
@@ -82,6 +82,13 @@ of the agent:
 - On a narrow window, the command field was on top of the menus.
 - JupyterLab 4.6 makes the panel smaller each time it shows it again.
   Meridian now puts its size back.
+
+Version 0.1.2 adds a stamp to the URL of the extension files
+(`static/remoteEntry.js?v=...`). JupyterLab tells the browser to keep these
+files for one year, so a browser that had an older version did not load the
+new files after an upgrade. Run `jlab_dist.py check . --fix` (skill
+`jupyterlab-distribution`) before a build: it writes a new stamp when a file
+in a `static/` folder changed.
 
 ## What it changes
 

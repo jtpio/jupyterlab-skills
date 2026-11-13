@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "meridian-lab"
-version = "0.1.1"
+version = "0.1.2"
 description = "JupyterLab arranged, themed and keyed like a desktop code editor"
 requires-python = ">=3.10"
 license = "BSD-3-Clause"

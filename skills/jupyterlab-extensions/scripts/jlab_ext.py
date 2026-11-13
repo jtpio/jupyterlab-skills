@@ -9,6 +9,7 @@ JavaScript file. JupyterLab loads it from share/jupyter/labextensions.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import re
@@ -104,6 +105,43 @@ def add_schema(args: argparse.Namespace) -> int:
     return 0
 
 
+def stamp_value(source: Path) -> str:
+    """
+    Path of the entry file with a hash of all files of static/.
+
+    JupyterLab tells the browser to keep the files of static/ for one year.
+    Only a new URL makes the browser load a changed file.
+    """
+    static = source / "static"
+    digest = hashlib.sha256()
+    for file in sorted(path for path in static.rglob("*") if path.is_file()):
+        digest.update(file.relative_to(static).as_posix().encode())
+        digest.update(file.read_bytes())
+    return f"static/remoteEntry.js?v={digest.hexdigest()[:8]}"
+
+
+def write_stamp(source: Path) -> str:
+    """
+    Write the stamped path of the entry file into package.json.
+    """
+    package = read_package(source)
+    value = stamp_value(source)
+    build = package.setdefault("jupyterlab", {}).setdefault("_build", {})
+    if build.get("load") != value:
+        build["load"] = value
+        (source / "package.json").write_text(json.dumps(package, indent=2) + "\n")
+    return value
+
+
+def stamp(args: argparse.Namespace) -> int:
+    """
+    Stamp an extension after a change in its static/ folder.
+    """
+    source = Path(args.source).resolve()
+    print(f"{source.name}: {write_stamp(source)}")
+    return 0
+
+
 def new(args: argparse.Namespace) -> int:
     """
     Write the files of a new extension.
@@ -157,6 +195,7 @@ def new(args: argparse.Namespace) -> int:
         (static / "style.css").write_text(f"/*\n * Styles of {name}.\n */\n")
     if args.schema:
         write_schema(target, name, description, args.version)
+    write_stamp(target)
 
     print(f"Created {target}")
     print(f"Edit {static / 'remoteEntry.js'}: SHARED and createPlugins().")
@@ -178,9 +217,15 @@ def check_source(source: Path) -> list[str]:
         problems.append("package.json has no 'jupyterlab._build' (JupyterLab ignores the folder)")
         return problems
     build = lab["_build"]
-    load = build.get("load")
+    stamped = build.get("load")
+    load = (stamped or "").split("?")[0]
     if not load or not (source / load).is_file():
-        problems.append(f"'jupyterlab._build.load' points to a missing file: {load}")
+        problems.append(f"'jupyterlab._build.load' points to a missing file: {stamped}")
+    elif load == "static/remoteEntry.js" and stamped != stamp_value(source):
+        problems.append(
+            "the stamp of static/ is absent or old, and a browser can keep the old files: "
+            f"run '{Path(__file__).name} stamp {source}'"
+        )
     if not (build.get("extension") or build.get("mimeExtension")):
         problems.append("'jupyterlab._build' needs 'extension' or 'mimeExtension'")
     disabled = lab.get("disabledExtensions", [])
@@ -277,6 +322,8 @@ def install(args: argparse.Namespace) -> int:
     Copy or link an extension folder into labextensions.
     """
     source = Path(args.source).resolve()
+    if (source / "static" / "remoteEntry.js").is_file():
+        write_stamp(source)
     problems = check_source(source)
     if problems:
         print("The extension has problems:")
@@ -299,8 +346,9 @@ def install(args: argparse.Namespace) -> int:
     else:
         shutil.copytree(source, target)
         print(f"Copied {source} to {target}")
-    print("Restart the server to load a new extension or a changed package.json.")
-    print("A change in the JavaScript or CSS only needs a browser reload.")
+    print("Restart the server to load a new extension.")
+    print(f"After a change in static/: python {Path(__file__).name} stamp {source}, then reload")
+    print("the page. Without the stamp, a browser keeps the old JavaScript and CSS.")
     return 0
 
 
@@ -368,6 +416,10 @@ def main() -> int:
     p_check = sub.add_parser("check", help="check an extension folder")
     p_check.add_argument("source")
     p_check.set_defaults(func=check)
+
+    p_stamp = sub.add_parser("stamp", help="mark a change in static/, so that browsers load it")
+    p_stamp.add_argument("source")
+    p_stamp.set_defaults(func=stamp)
 
     p_install = sub.add_parser("install", help="copy or link into labextensions")
     p_install.add_argument("source")

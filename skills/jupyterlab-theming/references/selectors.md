@@ -213,10 +213,13 @@ Without the script of the skill `jupyterlab-extensions`, create three files in
   "version": "0.1.0",
   "jupyterlab": {
     "extension": true,
-    "_build": { "load": "static/remoteEntry.js", "extension": "./extension" }
+    "_build": { "load": "static/remoteEntry.js?v=1", "extension": "./extension" }
   }
 }
 ```
+
+The browser keeps the files of `static/` for one year. Change the value of
+`?v=` after each edit of a file in `static/`: only a new URL loads it again.
 
 `static/remoteEntry.js`:
 
@@ -228,7 +231,9 @@ Without the script of the skill `jupyterlab-extensions`, create three files in
   );
   const link = document.createElement('link');
   link.rel = 'stylesheet';
-  link.href = `${config.fullLabextensionsUrl}/${NAME}/static/style.css`;
+  // The "?v=..." of this file, so that the stylesheet has a new URL too.
+  const stamp = new URL(document.currentScript.src).search;
+  link.href = `${config.fullLabextensionsUrl}/${NAME}/static/style.css${stamp}`;
   document.head.appendChild(link);
 
   window._JUPYTERLAB = window._JUPYTERLAB || {};

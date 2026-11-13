@@ -41,9 +41,16 @@ python scripts/jlab_ext.py install ./extensions/my-lab-tweaks --python <env>/bin
 4. `install <folder>` copies the folder into the labextensions folder of the
    environment (`--python`), of the user (`--user`), or into an explicit
    folder (`--labextensions-dir`). `--link` makes a symlink: edits are live.
-5. Reload the page: JupyterLab finds a new extension folder, and a change
-   in its JavaScript, CSS, `package.json` or schema, at each page load. If
-   the extension does not show, restart the server.
+5. After each change in `static/`, run `stamp <folder>`, then reload the
+   page. JupyterLab tells the browser to keep the files of `static/` for one
+   year. The stamp is a hash of these files in the URL of the entry file
+   (`"load": "static/remoteEntry.js?v=1a2b3c4d"` in `package.json`), and the
+   template adds it to the stylesheets. Without a new stamp, a browser that
+   has the old files keeps them, also after an upgrade of the package.
+   `new` and `install` write the stamp, and `check` reports an old one. The
+   probe starts a new browser each time, so it always gets the new files.
+   JupyterLab reads `package.json` and the schemas at each page load. If the
+   extension does not show, restart the server.
 6. Verify with the probe of `jupyterlab-verify`:
    `--expect-plugin my-lab-tweaks:plugin --fail-on-console-error`. A sidebar
    panel is hidden until its tab is active: add `--activate <widget id>`
@@ -215,7 +222,7 @@ applies the list when the extension is installed and enabled:
   "jupyterlab": {
     "extension": true,
     "disabledExtensions": ["@jupyterlab/launcher-extension:plugin"],
-    "_build": { "load": "static/remoteEntry.js", "extension": "./extension" }
+    "_build": { "load": "static/remoteEntry.js?v=1a2b3c4d", "extension": "./extension" }
   }
 }
 ```
@@ -263,7 +270,8 @@ The table of shared packages and tokens is in
 | `No provider for: <token>` | A `requires` token has no provider: the plugin that provides it is disabled. Move the token to `optional` |
 | `lab['…']` is undefined | The package is not in `SHARED` |
 | A menu item or toolbar button is missing | The command ID in the schema does not match a registered command, or the plugin ID does not match the schema file name |
-| Changes do not show | Browser cache: reload. Copy install: run `install` again, or use `--link`. Then restart the server |
+| Changes do not show | The browser keeps the files of `static/`: run `jlab_ext.py stamp <folder>`, then reload. Copy install: run `install` again, or use `--link`. Then restart the server |
+| A file of `static/` that your code loads (image, JSON, font) stays old | Add the stamp to its URL: `url + STAMP` |
 | Settings of the extension are not found | `schemas/<name>/plugin.json` or `schemas/<name>/package.json.orig` is missing |
 
 Always finish with the probe and `--fail-on-console-error`.

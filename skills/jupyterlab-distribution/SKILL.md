@@ -62,9 +62,11 @@ python scripts/jlab_dist.py new my-lab --app-name "My Lab" --python <env>/bin/py
    `<env>` is any environment with JupyterLab that does **not** have the
    distribution installed. The inspect script reads the project the same
    way: `<env>/bin/python <inspect>/jlab_inspect.py --project my-lab overrides`.
-4. **Check** the project. `--fix` marks every extension in `labextensions/`
-   as owned by the package (themes and extensions that other scripts
-   created are not):
+4. **Check** the project, before each build. `--fix` marks every extension
+   in `labextensions/` as owned by the package (themes and extensions that
+   other scripts created are not). It also writes a new stamp for each
+   extension whose `static/` files changed: without it, the browser of a
+   person who upgrades keeps the JavaScript and CSS of the old version.
 
    ```bash
    python scripts/jlab_dist.py check my-lab --fix

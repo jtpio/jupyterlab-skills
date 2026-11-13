@@ -1,11 +1,11 @@
 {
   "name": "meridian-welcome",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Welcome page of Meridian, in place of the launcher",
   "jupyterlab": {
     "extension": true,
     "_build": {
-      "load": "static/remoteEntry.js",
+      "load": "static/remoteEntry.js?v=73a28b6c",
       "extension": "./extension"
     },
     "disabledExtensions": [

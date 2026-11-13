@@ -11,7 +11,7 @@
       "@jupyterlab/application-extension:logo"
     ],
     "_build": {
-      "load": "static/remoteEntry.js",
+      "load": "static/remoteEntry.js?v=ec655ab9",
       "extension": "./extension"
     }
   }

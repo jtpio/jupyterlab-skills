@@ -9,7 +9,7 @@
 
   const NAME = 'meridian-lab';
   const APP_NAME = 'Meridian';
-  const VERSION = '0.1.1';
+  const VERSION = '0.1.2';
 
   const SHARED = [
     '@jupyterlab/application',
@@ -28,6 +28,12 @@
   ];
 
   const STYLESHEETS = ['style.css'];
+
+  /*
+   * The "?v=..." of this file, for the other files of static/. The browser
+   * keeps them for one year: only a new URL loads a changed file.
+   */
+  const STAMP = document.currentScript ? new URL(document.currentScript.src).search : '';
 
   const LOGO_SVG =
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">' +
@@ -106,7 +112,7 @@
     }
 
     function staticUrl(file) {
-      return URLExt.join(PageConfig.getOption('fullLabextensionsUrl'), NAME, 'static', file);
+      return URLExt.join(PageConfig.getOption('fullLabextensionsUrl'), NAME, 'static', file) + STAMP;
     }
 
     /*
@@ -1081,7 +1087,7 @@
     for (const file of STYLESHEETS) {
       const link = document.createElement('link');
       link.rel = 'stylesheet';
-      link.href = base + file;
+      link.href = base + file + STAMP;
       link.dataset.extension = NAME;
       document.head.appendChild(link);
     }

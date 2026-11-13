@@ -105,9 +105,10 @@ back. A disabled plugin is gone for everyone. An extension is code to maintain.
    `my-lab.json`). JupyterLab merges all `*.json` files of a `.d` folder.
 3. **Valid JSON only.** No comments, no trailing commas.
 4. **Restart the server** after a change in default overrides or server
-   config: it reads them only when it starts. Page config, a new extension,
-   and the JavaScript or CSS of an extension need only a browser reload. A
-   restart is never wrong.
+   config: it reads them only when it starts. Page config and a new
+   extension need only a browser reload. A change in the JavaScript or CSS
+   of an extension needs a new stamp (`jlab_ext.py stamp`) and a reload: the
+   browser keeps these files for one year. A restart is never wrong.
 5. **User settings win.** A value that the user saved in the Settings Editor
    hides your new default. Verify with a clean profile (`jupyterlab-verify`
    does this), and tell the user when a personal setting hides the change.
