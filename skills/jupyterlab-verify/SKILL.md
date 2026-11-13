@@ -136,7 +136,7 @@ Actions:
 | `--press <keys>` | Press a key or a chord: `Control+Shift+P`, `Meta+K`, `Escape`. Proves that a shortcut works |
 | `--type '<text>'` | Type into the element that has the focus |
 | `--pause <ms>` | Wait between two steps, for example after a notebook opens |
-| `--drag '<css>:<dx>,<dy>'` | Drag an element with the mouse by dx and dy pixels: a divider, a tab |
+| `--drag '<css>:<dx>,<dy>'` | Drag an element with the mouse by dx and dy pixels, in small steps: a divider, a tab. Then compare a size with `--expect-eval`: a divider must move as far as the pointer |
 | `--eval '<js>'` | Evaluate JavaScript in the page; `app` is the application. The result prints on stderr as `eval: …`. A promise is awaited: `(async () => { … })()` works |
 | `--wait <ms>` | Wait after all the actions (default 500) |
 

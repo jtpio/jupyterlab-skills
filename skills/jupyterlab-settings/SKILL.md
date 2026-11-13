@@ -162,12 +162,12 @@ Plugin `@jupyterlab/application-extension:shell`.
     "dockPanelPadding": false,
     "layout": {
       "multiple": {
-        "filebrowser": { "area": "right" },
-        "table-of-contents": { "area": "right", "options": { "rank": 10 } },
+        "File Browser": { "area": "right" },
+        "Table of Contents": { "area": "right", "options": { "rank": 10 } },
         "Terminal": { "area": "down" }
       },
       "single": {
-        "filebrowser": { "area": "right" }
+        "File Browser": { "area": "right" }
       }
     }
   }
@@ -176,14 +176,21 @@ Plugin `@jupyterlab/application-extension:shell`.
 
 - `layout` has one object for the default mode (`multiple`) and one for the
   simple mode (`single`). Set both when the change must hold in both modes.
-- A key is a **widget ID** (`filebrowser`) or a **widget type**
-  (`Terminal`, `Notebook`, `Console`). Areas: `left`, `right`, `main`, `down`.
-  `options.rank` orders the tabs of a side area.
+- A key is a **widget type** (`File Browser`, `Terminal`, `Notebook`) or,
+  for a widget with no type, its **widget ID** (`jp-git-sessions`). Areas:
+  `left`, `right`, `main`, `down`. `options.rank` orders the tabs of a side
+  area.
+- Use the type when the widget has one. An ID key for such a widget works at
+  start, but the menu item "Switch Sidebar Side" then moves nothing until a
+  reload: JupyterLab writes the new side under the type, and the ID key wins.
 - `activityBarPosition`: `side`, `top` or `bottom`. `startMode`: `""`,
   `single` or `multiple`.
-- Widget IDs: `jlab_probe.cjs --list widgets` (skill `jupyterlab-verify`)
-  prints the area, the ID and the label of each widget of the running
-  application, extensions included.
+- Types and IDs: `jlab_probe.cjs --list widgets` (skill `jupyterlab-verify`)
+  prints the area, the ID, the type and the label of each widget of the
+  running application, extensions included.
+- With no widget in the right area, JupyterLab leaves that area open and
+  empty. Close it from an extension when the application starts:
+  `if (shell.isEmpty('right')) shell.collapseRight()`.
 - The meaning of each key:
   [Layout](https://jupyterlab.readthedocs.io/en/stable/user/interface_customization.html#layout-customization)
   in the JupyterLab documentation.

@@ -318,3 +318,8 @@ theme: it marks the extension as owned by the Python package.
 - For a pair of themes, switch with
   `--exec 'apputils:change-theme:{"theme":"Paper Night"}'` and look again.
 - `--fail-on-console-error`: a 404 on a font or CSS file shows as an error.
+- When a rule touches a divider (`.lm-SplitPanel-handle`,
+  `.lm-DockPanel-handle`), drag it with `--drag` and compare a size before
+  and after. A `transition` or a `transition-delay` on all properties also
+  delays the position of the divider, and a drag then moves it much too far.
+  Name the property: `transition: background-color 0s 0.2s`.

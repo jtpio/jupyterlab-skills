@@ -161,8 +161,8 @@ bottom:
   "@jupyterlab/application-extension:shell": {
     "layout": {
       "multiple": {
-        "filebrowser": { "area": "right" },
-        "table-of-contents": { "area": "left" },
+        "File Browser": { "area": "right" },
+        "Table of Contents": { "area": "left" },
         "Terminal": { "area": "down" }
       }
     }
@@ -195,8 +195,8 @@ Order of the sidebar tabs: `options.rank`, lowest first.
   "@jupyterlab/application-extension:shell": {
     "layout": {
       "multiple": {
-        "table-of-contents": { "options": { "rank": 1 } },
-        "filebrowser": { "options": { "rank": 2 } }
+        "Table of Contents": { "options": { "rank": 1 } },
+        "File Browser": { "options": { "rank": 2 } }
       }
     }
   }

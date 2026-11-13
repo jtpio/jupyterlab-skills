@@ -30,7 +30,7 @@ Output
   --list <kind>                print a list of the running application, then exit. Kinds:
                                plugins (description, provided service, plugins that need it),
                                commands (label), tokens (service and its plugin),
-                               widgets (shell area, ID, label), shortcuts (keys, selector)
+                               widgets (shell area, ID, type, label), shortcuts (keys, selector)
   --grep <text>                with --list: only the rows that contain the text
 
 Actions and checks run in the given order. The screenshot is taken last.
@@ -220,6 +220,8 @@ async function collect(extraAreas) {
     try {
       shell[area] = Array.from(app.shell.widgets(area)).map(widget => ({
         id: widget.id,
+        // The type is the key that the layout setting uses for this widget.
+        type: (app.shell._idTypeMap && app.shell._idTypeMap.get(widget.id)) || null,
         label: widget.title.label,
         caption: widget.title.caption,
         visible: widget.isVisible
@@ -353,7 +355,7 @@ function listRows(state, kind) {
   if (kind === 'widgets') {
     return Object.entries(state.shell).flatMap(([area, widgets]) =>
       widgets.map(widget =>
-        `${area}  ${widget.id}  ${widget.label || widget.caption}${widget.visible ? '' : '  (hidden)'}`
+        `${area}  ${widget.id}  ${widget.type ? `type "${widget.type}"  ` : ''}${widget.label || widget.caption}${widget.visible ? '' : '  (hidden)'}`
       )
     );
   }
@@ -655,7 +657,12 @@ async function main() {
         const y = box.y + box.height / 2;
         await page.mouse.move(x, y);
         await page.mouse.down();
-        await page.mouse.move(x + dx, y + dy, { steps: 12 });
+        // A frame between two moves, as with a hand: the layout then updates
+        // during the drag, and a divider that follows with a delay shows.
+        for (let step = 1; step <= 12; step++) {
+          await page.mouse.move(x + (dx * step) / 12, y + (dy * step) / 12);
+          await page.waitForTimeout(20);
+        }
         await page.mouse.up();
       } else if (action.type === 'activate') {
         await page.evaluate(id => window.jupyterapp.shell.activateById(id), action.value);

@@ -289,6 +289,35 @@ No issue or pull request was opened for these items.
 - **Removes.** `core_plugins.json` in two skills, the regular expressions in
   `jlab_inspect.py` and `jlab_config.py`, and `tools/update_plugin_data.py`.
 
+## Faults in the code, found by the Meridian smoke test
+
+These two are not gaps in the documentation. They are faults in JupyterLab
+4.6.6, seen also in a stock JupyterLab, and read in its bundle. They were
+not examined on `main`, and the issue tracker was not searched.
+
+### 16. The down area gets smaller each time it shows again
+
+- **Fact.** Open a widget in the down area (212 px in the test), then call
+  `shell.collapseDown()` and `shell.expandDown()`. The area comes back with
+  106 px, and with 59 px after the next time.
+- **Cause.** `LabShell._showDownPanel` calls `setRelativeSizes` and then
+  `show()`. The split layout applies the sizes while it still gives no room
+  to the down area, so the main area takes the full height. The fit that
+  follows copies that height into the size hint of the main area
+  (`SplitLayout._fit`: `if (sizer.size > 0) sizer.sizeHint = sizer.size`).
+- **Workaround.** `examples/meridian/labextensions/meridian-lab/static/remoteEntry.js`,
+  `keepPanelSize`: set the relative sizes again after the area shows.
+
+### 17. An empty right area stays open
+
+- **Fact.** When the layout setting puts all the side widgets on the left,
+  the right area shows as an empty column. It closes at the first change of
+  the right side bar.
+- **Cause.** A side area is hidden in `SideBarHandler._refreshVisibility`,
+  which runs only when a widget or the current tab of that side changes.
+- **Workaround.** Call `shell.collapseRight()` when `shell.isEmpty('right')`
+  is true, after `app.restored`. The skill `jupyterlab-settings` has this.
+
 ## Already in the documentation
 
 The skills now link to these pages and do not repeat them:

@@ -9,13 +9,13 @@
   "@jupyterlab/application-extension:shell": {
     "layout": {
       "multiple": {
-        "table-of-contents": {
+        "Table of Contents": {
           "area": "left",
           "options": {
             "rank": 1
           }
         },
-        "filebrowser": {
+        "File Browser": {
           "area": "right",
           "options": {
             "rank": 1
@@ -23,13 +23,13 @@
         }
       },
       "single": {
-        "table-of-contents": {
+        "Table of Contents": {
           "area": "left",
           "options": {
             "rank": 1
           }
         },
-        "filebrowser": {
+        "File Browser": {
           "area": "right",
           "options": {
             "rank": 1
