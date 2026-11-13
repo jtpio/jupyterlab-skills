@@ -1,0 +1,15 @@
+{
+  "name": "meridian-editor",
+  "version": "0.1.0",
+  "description": "Editor colors and notebook cell gutter of Meridian",
+  "jupyterlab": {
+    "extension": true,
+    "_build": {
+      "load": "static/remoteEntry.js",
+      "extension": "./extension"
+    },
+    "disabledExtensions": [
+      "@jupyterlab/notebook-extension:factory"
+    ]
+  }
+}

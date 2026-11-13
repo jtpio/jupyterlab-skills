@@ -1,0 +1,20 @@
+{
+  "title": "Welcome",
+  "description": "Welcome page of Meridian.",
+  "jupyter.lab.menus": {
+    "main": [],
+    "context": []
+  },
+  "jupyter.lab.toolbars": {},
+  "jupyter.lab.shortcuts": [],
+  "type": "object",
+  "properties": {
+    "showOnStartup": {
+      "type": "boolean",
+      "title": "Show Welcome Page",
+      "description": "Open the Welcome page when no document is open.",
+      "default": true
+    }
+  },
+  "additionalProperties": false
+}

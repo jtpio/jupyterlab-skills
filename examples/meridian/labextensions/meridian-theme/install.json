@@ -1,0 +1,5 @@
+{
+  "packageManager": "python",
+  "packageName": "meridian-lab",
+  "uninstallInstructions": "Use your Python package manager to uninstall meridian-lab"
+}

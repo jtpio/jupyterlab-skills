@@ -1,0 +1,17 @@
+/*
+ * Colors of the Seti file icons. The Meridian themes refine them.
+ */
+.meridian-seti-blue { fill: #519aba; }
+.meridian-seti-grey { fill: #4d5a5e; }
+.meridian-seti-grey-light { fill: #6d8086; }
+.meridian-seti-green { fill: #8dc149; }
+.meridian-seti-orange { fill: #e37933; }
+.meridian-seti-pink { fill: #f55385; }
+.meridian-seti-purple { fill: #a074c4; }
+.meridian-seti-red { fill: #cc3e44; }
+.meridian-seti-white { fill: #d4d7d6; }
+.meridian-seti-yellow { fill: #cbcb41; }
+.meridian-seti-ignore { fill: #41535b; }
+
+body[data-jp-theme-light='true'] .meridian-seti-white { fill: #6d8086; }
+body[data-jp-theme-light='true'] .meridian-seti-yellow { fill: #b7b73b; }

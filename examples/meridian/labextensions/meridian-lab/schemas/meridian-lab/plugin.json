@@ -1,0 +1,20 @@
+{
+  "title": "Meridian",
+  "description": "Settings of Meridian.",
+  "jupyter.lab.menus": {
+    "main": [],
+    "context": []
+  },
+  "jupyter.lab.toolbars": {},
+  "jupyter.lab.shortcuts": [],
+  "type": "object",
+  "properties": {
+    "terminalGpuAcceleration": {
+      "type": "boolean",
+      "title": "Terminal GPU Acceleration",
+      "description": "Draw the terminals with WebGL. When off, the terminals use the DOM renderer, which draws the bundled font at every screen resolution.",
+      "default": false
+    }
+  },
+  "additionalProperties": false
+}
