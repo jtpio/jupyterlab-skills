@@ -317,8 +317,9 @@ No issue or pull request was opened for these items.
 ## Faults in the code, found by the Meridian smoke test
 
 These three are not gaps in the documentation. They are faults in JupyterLab
-4.6.6, seen also in a stock JupyterLab, and read in its bundle. They were
-not examined on `main`, and the issue tracker was not searched.
+4.6.6, seen also in a stock JupyterLab. The cause of the first two was read
+in its bundle. They were not examined on `main`, and the issue tracker was
+not searched.
 
 ### 16. The down area gets smaller each time it shows again
 
