@@ -1,0 +1,164 @@
+/*
+ * Meridian Dark: the colors of the default dark theme of a desktop code
+ * editor, on top of the built-in dark theme (base.css).
+ */
+@import url('../common.css');
+
+:root {
+  --mrd-accent: #0078d4;
+  --mrd-accent-hover: #026ec1;
+  --mrd-editor-bg: #1f1f1f;
+  --mrd-sidebar-bg: #181818;
+  --mrd-widget-bg: #222222;
+  --mrd-border: #2b2b2b;
+  --mrd-widget-border: #454545;
+  --mrd-fg: #cccccc;
+  --mrd-fg-strong: #ffffff;
+  --mrd-fg-muted: #9d9d9d;
+  --mrd-activity-fg: #d7d7d7;
+  --mrd-activity-inactive-fg: #868686;
+  --mrd-list-hover-bg: #2a2d2e;
+  --mrd-list-active-bg: #04395e;
+  --mrd-list-active-fg: #ffffff;
+  --mrd-list-highlight-fg: #2aaaff;
+  --mrd-list-active-highlight-fg: #2aaaff;
+  --mrd-input-bg: #313131;
+  --mrd-input-border: #3c3c3c;
+  --mrd-button2-bg: #313131;
+  --mrd-button2-hover: #3c3c3c;
+  --mrd-menubar-hover: rgba(90, 93, 94, 0.31);
+  --mrd-line-highlight-border: #282828;
+  --mrd-line-number: #6e7681;
+  --mrd-shadow: rgba(0, 0, 0, 0.36);
+
+  --jp-layout-color0: #1f1f1f;
+  --jp-layout-color1: #181818;
+  --jp-layout-color2: #2a2d2e;
+  --jp-layout-color3: #313131;
+  --jp-layout-color4: #454545;
+
+  --jp-border-color0: #454545;
+  --jp-border-color1: #3c3c3c;
+  --jp-border-color2: #2b2b2b;
+  --jp-border-color3: #252526;
+  --jp-inverse-border-color: #6e7681;
+
+  --jp-ui-font-color0: #ffffff;
+  --jp-ui-font-color1: #cccccc;
+  --jp-ui-font-color2: #9d9d9d;
+  --jp-ui-font-color3: #6e7681;
+
+  --jp-content-font-color0: #ffffff;
+  --jp-content-font-color1: #cccccc;
+  --jp-content-font-color2: #9d9d9d;
+  --jp-content-font-color3: #6e7681;
+  --jp-content-link-color: #4daafc;
+  --jp-content-link-hover-color: #75beff;
+  --jp-content-link-visited-color: #4daafc;
+
+  --jp-brand-color0: #005a9e;
+  --jp-brand-color1: #0078d4;
+  --jp-brand-color2: #2489db;
+  --jp-brand-color3: #4daafc;
+  --jp-brand-color4: #04395e;
+  --jp-accent-color0: #0078d4;
+  --jp-accent-color1: #0078d4;
+  --jp-accent-color2: #4daafc;
+  --jp-accent-color3: #04395e;
+
+  --jp-warn-color0: #cca700;
+  --jp-warn-color1: #cca700;
+  --jp-warn-color2: #e2c08d;
+  --jp-warn-color3: #5a4a00;
+  --jp-error-color0: #f14c4c;
+  --jp-error-color1: #f85149;
+  --jp-error-color2: #f48771;
+  --jp-error-color3: #5a1d1d;
+  --jp-success-color0: #89d185;
+  --jp-success-color1: #89d185;
+  --jp-success-color2: #a5e0a2;
+  --jp-success-color3: #1e3f1e;
+  --jp-info-color0: #3794ff;
+  --jp-info-color1: #3794ff;
+  --jp-info-color2: #75beff;
+  --jp-info-color3: #063b49;
+
+  --jp-input-background: #313131;
+  --jp-input-active-background: #313131;
+  --jp-input-hover-background: #313131;
+  --jp-input-border-color: #3c3c3c;
+  --jp-input-active-border-color: #0078d4;
+  --jp-input-box-shadow: none;
+  --jp-input-active-box-shadow-color: transparent;
+
+  --jp-accept-color-normal: #0078d4;
+  --jp-accept-color-hover: #026ec1;
+  --jp-accept-color-active: #005a9e;
+  --jp-reject-color-normal: #313131;
+  --jp-reject-color-hover: #3c3c3c;
+  --jp-reject-color-active: #454545;
+  --jp-warn-color-normal: #c72e2e;
+  --jp-warn-color-hover: #b52727;
+  --jp-warn-color-active: #a12020;
+
+  --jp-focus-outline-color: #0078d4;
+  --jp-dialog-background: rgba(0, 0, 0, 0.5);
+
+  --jp-cell-editor-background: #181818;
+  --jp-cell-editor-border-color: #2b2b2b;
+  --jp-cell-editor-active-background: #181818;
+  --jp-cell-editor-active-border-color: #0078d4;
+  --jp-cell-editor-box-shadow: none;
+  --jp-cell-inprompt-font-color: #569cd6;
+  --jp-cell-outprompt-font-color: #ce9178;
+  --jp-cell-prompt-not-active-font-color: #6e7681;
+  --jp-notebook-select-background: #1f1f1f;
+  --jp-notebook-multiselected-color: rgba(4, 57, 94, 0.6);
+  --jp-rendermime-table-row-background: #181818;
+  --jp-rendermime-table-row-hover-background: #2a2d2e;
+  --jp-rendermime-error-background: #5a1d1d;
+
+  --jp-toolbar-border-color: #2b2b2b;
+  --jp-toolbar-background: transparent;
+  --jp-toolbar-box-shadow: none;
+  --jp-toolbar-active-background: #313131;
+
+  --jp-editor-selected-background: #3a3d41;
+  --jp-editor-selected-focused-background: #264f78;
+  --jp-editor-cursor-color: #aeafad;
+
+  --jp-search-selected-match-background-color: #9e6a03;
+  --jp-search-selected-match-color: #ffffff;
+  --jp-search-unselected-match-background-color: rgba(234, 92, 0, 0.33);
+  --jp-search-unselected-match-color: inherit;
+
+  --jp-scrollbar-background-color: transparent;
+  --jp-scrollbar-thumb-color: 121, 121, 121;
+
+  --jp-shadow-base-lightness: 0;
+
+  --jp-mirror-editor-keyword-color: #569cd6;
+  --jp-mirror-editor-atom-color: #569cd6;
+  --jp-mirror-editor-number-color: #b5cea8;
+  --jp-mirror-editor-def-color: #dcdcaa;
+  --jp-mirror-editor-variable-color: #9cdcfe;
+  --jp-mirror-editor-variable-2-color: #569cd6;
+  --jp-mirror-editor-variable-3-color: #4ec9b0;
+  --jp-mirror-editor-punctuation-color: #cccccc;
+  --jp-mirror-editor-property-color: #9cdcfe;
+  --jp-mirror-editor-operator-color: #d4d4d4;
+  --jp-mirror-editor-comment-color: #6a9955;
+  --jp-mirror-editor-string-color: #ce9178;
+  --jp-mirror-editor-string-2-color: #ce9178;
+  --jp-mirror-editor-meta-color: #dcdcaa;
+  --jp-mirror-editor-qualifier-color: #d7ba7d;
+  --jp-mirror-editor-builtin-color: #4ec9b0;
+  --jp-mirror-editor-bracket-color: #cccccc;
+  --jp-mirror-editor-tag-color: #569cd6;
+  --jp-mirror-editor-attribute-color: #9cdcfe;
+  --jp-mirror-editor-header-color: #569cd6;
+  --jp-mirror-editor-quote-color: #6a9955;
+  --jp-mirror-editor-link-color: #4daafc;
+  --jp-mirror-editor-error-color: #f44747;
+  --jp-mirror-editor-hr-color: #6e7681;
+}

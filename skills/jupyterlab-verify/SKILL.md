@@ -123,7 +123,7 @@ Checks, each can repeat:
 | `--expect-theme <name>` | The active theme has this name |
 | `--expect-eval '<js>'` | The JavaScript expression is true in the page; `app` is the application |
 | `--expect-setting '<plugin>:<key>=<json>'` | The value in effect of a setting matches the JSON. `<key>` can be a path (`codeCellConfig.lineNumbers=true`). An object matches when the setting has at least its keys and values. A list must be equal as a whole: for one item of a list setting (`menus`, `toolbar`, `shortcuts`), check the result in the page instead |
-| `--fail-on-console-error` | The browser console has no error |
+| `--fail-on-console-error` | The browser console has no error. For a "404" error, the list `failedRequests` of the output names the address |
 
 Actions:
 
@@ -136,6 +136,7 @@ Actions:
 | `--press <keys>` | Press a key or a chord: `Control+Shift+P`, `Meta+K`, `Escape`. Proves that a shortcut works |
 | `--type '<text>'` | Type into the element that has the focus |
 | `--pause <ms>` | Wait between two steps, for example after a notebook opens |
+| `--shot <file.png>` | Save a screenshot at this step of the sequence. Several can be in one run |
 | `--drag '<css>:<dx>,<dy>'` | Drag an element with the mouse by dx and dy pixels, in small steps: a divider, a tab. Then compare a size with `--expect-eval`: a divider must move as far as the pointer |
 | `--eval '<js>'` | Evaluate JavaScript in the page; `app` is the application. The result prints on stderr as `eval: …`. A promise is awaited: `(async () => { … })()` works |
 | `--wait <ms>` | Wait after all the actions (default 500) |
@@ -145,7 +146,7 @@ Output:
 | Option | Does |
 | --- | --- |
 | `--screenshot <file.png>` | Save a screenshot |
-| `--scale 2` | Sharp image (device scale factor). Use it for images that a person will see |
+| `--scale 2` | Sharp image (device scale factor). Use it for images that a person will see. Not for a terminal: at scale 2, the browser with no window draws a terminal blank or too large. Use scale 1 for that image |
 | `--viewport 1440x900` | Size of the window |
 | `--color-scheme dark` | Browser preference, for adaptive themes |
 | `--dump <file.json>` | Save everything: plugins with their tokens, commands with labels, shortcuts, widgets, menus, settings schemas, page config |
@@ -313,4 +314,5 @@ verified in a browser.
 Stop each server that you started (`stop --name <name>`, or `stop --all`
 from the folder where you started them). Remove test notebooks from the root
 folder when it was not a scratch folder. The profiles are in the system
-temporary folder, below `jlab-verify/`.
+temporary folder, below `jlab-verify/`. Set `TMPDIR` to put them in another
+folder, with the same value for `jlab_server.py` and `jlab_probe.cjs`.

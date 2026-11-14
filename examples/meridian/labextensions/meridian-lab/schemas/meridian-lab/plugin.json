@@ -1,0 +1,20 @@
+{
+  "title": "Meridian",
+  "description": "Settings of Meridian.",
+  "jupyter.lab.menus": {
+    "main": [
+      {
+        "id": "jp-mainmenu-help",
+        "items": [{ "command": "meridian-lab:about", "rank": 0 }]
+      }
+    ],
+    "context": []
+  },
+  "jupyter.lab.toolbars": {},
+  "jupyter.lab.shortcuts": [
+    { "command": "meridian-lab:toggle-terminal", "keys": ["Accel `"], "selector": "body" }
+  ],
+  "type": "object",
+  "properties": {},
+  "additionalProperties": false
+}

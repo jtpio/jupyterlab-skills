@@ -43,6 +43,7 @@ Actions
   --type <text>                type text into the focused element
   --activate <widget id>       show a widget: open its sidebar or select its tab
   --pause <ms>                 wait between two steps
+  --shot <file.png>            save a screenshot at this step (--screenshot saves one at the end)
   --drag <css>:<dx>,<dy>       drag an element with the mouse, by dx and dy pixels
   --eval <javascript>          evaluate an expression in the page (app = window.jupyterapp)
   --wait <ms>                  wait after the actions (default 500)
@@ -72,7 +73,7 @@ Browser
   --timeout <ms>               time limit for the application to start (default 60000)
 `;
 
-const ACTIONS = ['exec', 'click', 'right-click', 'eval', 'press', 'type', 'activate', 'pause', 'drag'];
+const ACTIONS = ['exec', 'click', 'right-click', 'eval', 'press', 'type', 'activate', 'pause', 'drag', 'shot'];
 
 /*
  * Tokens whose name does not give the package that exports them.
@@ -561,6 +562,13 @@ async function main() {
     }
   });
   page.on('pageerror', error => record(consoleErrors, `pageerror: ${error.message}`));
+  // The console says "404" with no address: this list names the requests.
+  const failedRequests = [];
+  page.on('response', response => {
+    if (response.status() >= 400) {
+      record(failedRequests, `${response.status()} ${response.url()}`);
+    }
+  });
 
   const timeout = Number(options.timeout || 60000);
   let exitCode = 0;
@@ -645,6 +653,8 @@ async function main() {
         await page.keyboard.type(action.value);
       } else if (action.type === 'pause') {
         await page.waitForTimeout(Number(action.value));
+      } else if (action.type === 'shot') {
+        await page.screenshot({ path: action.value });
       } else if (action.type === 'drag') {
         const split = action.value.lastIndexOf(':');
         const [dx, dy] = action.value.slice(split + 1).split(',').map(Number);
@@ -689,6 +699,7 @@ async function main() {
     const state = await collectState();
     state.consoleErrors = consoleErrors;
     state.consoleWarnings = consoleWarnings;
+    state.failedRequests = failedRequests;
 
     if (options.dependents) {
       console.log(JSON.stringify(dependents(state, options.dependents), null, 2));
@@ -724,6 +735,7 @@ async function main() {
       ? {
           title: state.title,
           consoleErrors,
+          failedRequests,
           screenshot: options.screenshot || null,
           dump: options.dump || null,
           failures
@@ -746,6 +758,7 @@ async function main() {
             ])
           ),
           consoleErrors,
+          failedRequests,
           screenshot: options.screenshot || null,
           dump: options.dump || null,
           failures

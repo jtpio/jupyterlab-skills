@@ -258,6 +258,7 @@ favicon and the tab title.
 - file types
 - stylesheets and assets
 - the down area: show, hide, and a correction for its size in JupyterLab 4.6
+- keys that work while a terminal has the focus
 
 The table of shared packages and tokens is in
 [references/tokens.md](references/tokens.md).

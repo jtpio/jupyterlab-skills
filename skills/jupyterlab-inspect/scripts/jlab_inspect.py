@@ -14,6 +14,7 @@ import glob
 import json
 import os
 import re
+import signal
 import sys
 from pathlib import Path
 
@@ -859,4 +860,7 @@ def main() -> int:
 
 
 if __name__ == "__main__":
+    if hasattr(signal, "SIGPIPE"):
+        # A reader such as "head" can close the pipe before the end.
+        signal.signal(signal.SIGPIPE, signal.SIG_DFL)
     sys.exit(main())

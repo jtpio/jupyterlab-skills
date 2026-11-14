@@ -28,6 +28,7 @@ TypeScript extension, the same names are imports.
 - [File types](#file-types)
 - [Stylesheets and assets](#stylesheets-and-assets)
 - [Down area: show, hide, keep its size](#down-area-show-hide-keep-its-size)
+- [Keys that work in a terminal](#keys-that-work-in-a-terminal)
 - [React to the application state](#react-to-the-application-state)
 
 ## Command, palette, shortcut
@@ -741,6 +742,41 @@ const plugin = {
 
 Check it with the probe: read `#jp-down-stack` `offsetHeight`, hide and show
 the area two times, and read it again.
+
+## Keys that work in a terminal
+
+A terminal takes each key for the shell, so the shortcuts of the application
+do not work while it has the focus. This plugin sends a list of keys to the
+application first. The shell then does not get these keys (for example
+`Ctrl+P`, the previous command).
+
+`SHARED`: `@lumino/commands`
+
+```js
+const { CommandRegistry } = lab['@lumino/commands'];
+
+// The keys as in a shortcut setting.
+const KEYS = ['Accel Shift P', 'Accel P', 'Accel B', 'Accel J'];
+
+const plugin = {
+  id: `${NAME}:terminal-keys`,
+  autoStart: true,
+  activate: app => {
+    const keys = new Set(KEYS.map(CommandRegistry.normalizeKeystroke));
+    document.addEventListener(
+      'keydown',
+      event => {
+        const inTerminal = event.target.closest && event.target.closest('.jp-Terminal');
+        if (inTerminal && keys.has(CommandRegistry.keystrokeForKeydownEvent(event))) {
+          app.commands.processKeydownEvent(event);
+          event.stopPropagation();
+        }
+      },
+      true
+    );
+  }
+};
+```
 
 ## React to the application state
 

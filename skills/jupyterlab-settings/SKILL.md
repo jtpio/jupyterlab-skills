@@ -266,6 +266,10 @@ from memory: the names change between versions.
 | All commands of the running application, with labels | `jlab_probe.cjs --list commands --grep <text>` (skill `jupyterlab-verify`) |
 
 - `Accel` is Cmd on macOS and Ctrl elsewhere.
+- A shortcut does not work while a terminal has the focus: the terminal
+  takes the key for the shell. To make some keys reach the application,
+  see "Keys that work in a terminal" in
+  `jupyterlab-extensions/references/patterns.md`.
 - The format of each list is in the JupyterLab documentation:
   [toolbars](https://jupyterlab.readthedocs.io/en/stable/user/interface_customization.html#toolbars-customization),
   [menu bar](https://jupyterlab.readthedocs.io/en/stable/user/interface_customization.html#menu-bar-customization),

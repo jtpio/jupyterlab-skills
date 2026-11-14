@@ -316,7 +316,7 @@ No issue or pull request was opened for these items.
 
 ## Faults in the code, found by the Meridian smoke test
 
-These two are not gaps in the documentation. They are faults in JupyterLab
+These three are not gaps in the documentation. They are faults in JupyterLab
 4.6.6, seen also in a stock JupyterLab, and read in its bundle. They were
 not examined on `main`, and the issue tracker was not searched.
 
@@ -330,8 +330,10 @@ not examined on `main`, and the issue tracker was not searched.
   to the down area, so the main area takes the full height. The fit that
   follows copies that height into the size hint of the main area
   (`SplitLayout._fit`: `if (sizer.size > 0) sizer.sizeHint = sizer.size`).
-- **Workaround.** `examples/meridian/labextensions/meridian-lab/static/remoteEntry.js`,
-  `keepPanelSize`: set the relative sizes again after the area shows.
+- **Workaround.** "Down area" in
+  `skills/jupyterlab-extensions/references/patterns.md`: set the relative
+  sizes again after the area shows. `examples/meridian` uses it (plugin
+  `meridian-lab:down-area-size`).
 
 ### 17. An empty right area stays open
 
@@ -342,6 +344,17 @@ not examined on `main`, and the issue tracker was not searched.
   which runs only when a widget or the current tab of that side changes.
 - **Workaround.** Call `shell.collapseRight()` when `shell.isEmpty('right')`
   is true, after `app.restored`. The skill `jupyterlab-settings` has this.
+
+### 19. "Close All Tabs" gives a console error from the debugger
+
+- **Fact.** Open a text file, then a notebook, run its cells, open the
+  settings editor, then run `application:close-all`. The console has the
+  error "Could not restore the debugger state: Canceled future for
+  debug_request message before replies were done". Stock JupyterLab 4.6.6
+  gives it in two of two tries.
+- **Effect.** None that a person sees. A test that fails on each console
+  error must know this message (`examples/meridian/tests/smoke.cjs`,
+  `KNOWN_ERRORS`).
 
 ## Already in the documentation
 

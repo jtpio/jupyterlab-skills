@@ -1,0 +1,16 @@
+{
+  "name": "meridian-lab",
+  "version": "0.2.0",
+  "description": "Core extension of Meridian",
+  "jupyterlab": {
+    "extension": true,
+    "schemaDir": "schemas",
+    "_build": {
+      "load": "static/remoteEntry.js?v=e59b580a",
+      "extension": "./extension"
+    },
+    "disabledExtensions": [
+      "@jupyterlab/launcher-extension:plugin"
+    ]
+  }
+}

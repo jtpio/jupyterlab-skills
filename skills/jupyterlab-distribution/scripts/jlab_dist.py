@@ -33,7 +33,7 @@ name = "__NAME__"
 version = "__VERSION__"
 description = "__DESCRIPTION__"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 classifiers = [
     "Framework :: Jupyter",
     "Framework :: Jupyter :: JupyterLab",

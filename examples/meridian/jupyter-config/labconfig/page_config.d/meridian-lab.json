@@ -1,0 +1,6 @@
+{
+  "appName": "Meridian",
+  "disabledExtensions": {
+    "@jupyterlab/application-extension:logo": true
+  }
+}

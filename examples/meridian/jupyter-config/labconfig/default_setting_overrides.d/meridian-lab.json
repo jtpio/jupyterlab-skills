@@ -1,0 +1,383 @@
+{
+  "@jupyterlab/apputils-extension:themes": {
+    "theme": "Meridian Dark",
+    "adaptive-theme": false,
+    "preferred-dark-theme": "Meridian Dark",
+    "preferred-light-theme": "Meridian Light",
+    "theme-scrollbars": true
+  },
+  "@jupyterlab/apputils-extension:notification": {
+    "fetchNews": "false",
+    "checkForUpdates": false
+  },
+  "@jupyterlab/application-extension:shell": {
+    "dockPanelPadding": false,
+    "layout": {
+      "multiple": {
+        "File Browser": {
+          "area": "left",
+          "options": {
+            "rank": 1
+          }
+        },
+        "jp-search-replace": {
+          "area": "left",
+          "options": {
+            "rank": 2
+          }
+        },
+        "jp-git-sessions": {
+          "area": "left",
+          "options": {
+            "rank": 3
+          }
+        },
+        "Debugger": {
+          "area": "left",
+          "options": {
+            "rank": 4
+          }
+        },
+        "extensionmanager.main-view": {
+          "area": "left",
+          "options": {
+            "rank": 5
+          }
+        },
+        "Sessions and Tabs": {
+          "area": "left",
+          "options": {
+            "rank": 6
+          }
+        },
+        "Table of Contents": {
+          "area": "left",
+          "options": {
+            "rank": 7
+          }
+        },
+        "Property Inspector": {
+          "area": "left",
+          "options": {
+            "rank": 8
+          }
+        },
+        "Terminal": {
+          "area": "down"
+        }
+      },
+      "single": {
+        "File Browser": {
+          "area": "left",
+          "options": {
+            "rank": 1
+          }
+        },
+        "jp-search-replace": {
+          "area": "left",
+          "options": {
+            "rank": 2
+          }
+        },
+        "jp-git-sessions": {
+          "area": "left",
+          "options": {
+            "rank": 3
+          }
+        },
+        "Debugger": {
+          "area": "left",
+          "options": {
+            "rank": 4
+          }
+        },
+        "extensionmanager.main-view": {
+          "area": "left",
+          "options": {
+            "rank": 5
+          }
+        },
+        "Sessions and Tabs": {
+          "area": "left",
+          "options": {
+            "rank": 6
+          }
+        },
+        "Table of Contents": {
+          "area": "left",
+          "options": {
+            "rank": 7
+          }
+        },
+        "Property Inspector": {
+          "area": "left",
+          "options": {
+            "rank": 8
+          }
+        },
+        "Terminal": {
+          "area": "down"
+        }
+      }
+    }
+  },
+  "@jupyterlab/filebrowser-extension:browser": {
+    "showLastModifiedColumn": false
+  },
+  "@jupyterlab/fileeditor-extension:plugin": {
+    "editorConfig": {
+      "highlightActiveLine": true,
+      "codeFolding": true
+    }
+  },
+  "@jupyterlab/terminal-extension:plugin": {
+    "fontFamily": "'JetBrains Mono Variable', 'JetBrains Mono', monospace",
+    "fontSize": 13,
+    "theme": "inherit"
+  },
+  "jupyterlab_code_formatter:settings": {
+    "preferences": {
+      "default_formatter": {
+        "python": [
+          "ruff",
+          "ruffformat"
+        ]
+      }
+    }
+  },
+  "@jupyterlab/mainmenu-extension:plugin": {
+    "menus": [
+      {
+        "id": "jp-mainmenu-tabs",
+        "label": "Go",
+        "rank": 3.5,
+        "items": [
+          {
+            "type": "separator",
+            "rank": 10
+          },
+          {
+            "command": "quickopen:activate",
+            "rank": 11
+          },
+          {
+            "command": "apputils:activate-command-palette",
+            "rank": 12
+          }
+        ]
+      },
+      {
+        "id": "meridian-mainmenu-terminal",
+        "label": "Terminal",
+        "rank": 6,
+        "items": [
+          {
+            "command": "terminal:create-new",
+            "rank": 1
+          },
+          {
+            "command": "meridian-lab:toggle-terminal",
+            "rank": 2
+          },
+          {
+            "command": "application:toggle-down-area",
+            "rank": 3
+          }
+        ]
+      }
+    ]
+  },
+  "@jupyterlab/shortcuts-extension:shortcuts": {
+    "shortcuts": [
+      {
+        "command": "apputils:print",
+        "keys": [
+          "Accel P"
+        ],
+        "selector": "body",
+        "disabled": true
+      },
+      {
+        "command": "quickopen:activate",
+        "keys": [
+          "Accel Shift P"
+        ],
+        "selector": "body",
+        "disabled": true
+      },
+      {
+        "command": "debugger:show-panel",
+        "keys": [
+          "Accel Shift E"
+        ],
+        "selector": "body",
+        "disabled": true
+      },
+      {
+        "command": "filebrowser:toggle-main",
+        "keys": [
+          "Accel Shift F"
+        ],
+        "selector": "body",
+        "disabled": true
+      },
+      {
+        "command": "application:toggle-right-area",
+        "keys": [
+          "Accel J"
+        ],
+        "selector": "body",
+        "disabled": true
+      },
+      {
+        "command": "documentsearch:highlightPrevious",
+        "keys": [
+          "Accel Shift G"
+        ],
+        "selector": ".jp-mod-searchable",
+        "disabled": true
+      },
+      {
+        "command": "codemirror:markdown-toggle-bold",
+        "keys": [
+          "Accel B"
+        ],
+        "selector": ".cm-content[data-language='markdown']",
+        "disabled": true
+      },
+      {
+        "command": "lsp:jump-to-definition",
+        "keys": [
+          "Accel B"
+        ],
+        "selector": ".jp-Notebook .jp-CodeCell",
+        "disabled": true
+      },
+      {
+        "command": "lsp:jump-to-definition",
+        "keys": [
+          "Accel B"
+        ],
+        "selector": ".jp-FileEditor",
+        "disabled": true
+      },
+      {
+        "command": "apputils:activate-command-palette",
+        "keys": [
+          "Accel Shift P"
+        ],
+        "selector": "html body"
+      },
+      {
+        "command": "apputils:activate-command-palette",
+        "keys": [
+          "F1"
+        ],
+        "selector": "body"
+      },
+      {
+        "command": "quickopen:activate",
+        "keys": [
+          "Accel P"
+        ],
+        "selector": "html body"
+      },
+      {
+        "command": "application:toggle-down-area",
+        "keys": [
+          "Accel J"
+        ],
+        "selector": "html body"
+      },
+      {
+        "command": "terminal:create-new",
+        "keys": [
+          "Accel Shift `"
+        ],
+        "selector": "body"
+      },
+      {
+        "command": "tabsmenu:activate-by-id",
+        "args": {
+          "id": "filebrowser"
+        },
+        "keys": [
+          "Accel Shift E"
+        ],
+        "selector": "html body"
+      },
+      {
+        "command": "tabsmenu:activate-by-id",
+        "args": {
+          "id": "jp-search-replace"
+        },
+        "keys": [
+          "Accel Shift F"
+        ],
+        "selector": "html body"
+      },
+      {
+        "command": "tabsmenu:activate-by-id",
+        "args": {
+          "id": "jp-git-sessions"
+        },
+        "keys": [
+          "Accel Shift G"
+        ],
+        "selector": "body"
+      },
+      {
+        "command": "documentsearch:highlightNext",
+        "keys": [
+          "F3"
+        ],
+        "selector": ".jp-mod-searchable"
+      },
+      {
+        "command": "documentsearch:highlightPrevious",
+        "keys": [
+          "Shift F3"
+        ],
+        "selector": ".jp-mod-searchable"
+      },
+      {
+        "command": "lsp:jump-to-definition",
+        "keys": [
+          "F12"
+        ],
+        "selector": ".jp-Notebook .jp-CodeCell"
+      },
+      {
+        "command": "lsp:jump-to-definition",
+        "keys": [
+          "F12"
+        ],
+        "selector": ".jp-FileEditor"
+      },
+      {
+        "command": "jupyterlab_code_formatter:ruffformat",
+        "keys": [
+          "Alt Shift F"
+        ],
+        "selector": ".jp-FileEditor"
+      },
+      {
+        "command": "jupyterlab_code_formatter:format_all",
+        "keys": [
+          "Alt Shift F"
+        ],
+        "selector": ".jp-Notebook"
+      }
+    ]
+  },
+  "@jupyterlab/settingeditor-extension:form-ui": {
+    "toSkip": [
+      "@jupyter-lsp/jupyterlab-lsp:plugin"
+    ]
+  },
+  "@jupyterlab/docmanager-extension:plugin": {
+    "defaultViewers": {
+      "json": "Editor"
+    }
+  }
+}

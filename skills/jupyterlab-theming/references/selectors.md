@@ -18,6 +18,7 @@ in a running application. Class names with the prefix `lm-` come from Lumino
 | Area below the top bar | `#jp-main-content-panel` |
 | Left / right activity bar | `.jp-SideBar.jp-mod-left`, `.jp-SideBar.jp-mod-right` |
 | One sidebar tab | `.jp-SideBar .lm-TabBar-tab[data-id="filebrowser"]` (the widget ID) |
+| Sidebar tabs that are not active (they have their own background) | `.jp-SideBar .lm-TabBar-tab:not(.lm-mod-current)` |
 | Left / right panel content | `#jp-left-stack`, `#jp-right-stack` |
 | Main work area | `#jp-main-dock-panel` |
 | Tab bar of the main area | `.lm-DockPanel-tabBar` |
@@ -44,6 +45,7 @@ in a running application. Class names with the prefix `lm-` come from Lumino
 | File list; one row | `.jp-DirListing`, `.jp-DirListing-item` |
 | Launcher; section title; card | `.jp-Launcher`, `.jp-Launcher-sectionTitle`, `.jp-LauncherCard` |
 | Command palette | `.lm-CommandPalette`, modal: `.jp-ModalCommandPalette` |
+| Typed letters in the active palette item (examine the contrast) | `.lm-CommandPalette-item.lm-mod-active .lm-CommandPalette-itemLabel > mark` |
 | Dialog | `.jp-Dialog`, `.jp-Dialog-content` |
 | Text editor | `.jp-FileEditor` |
 | Terminal | `.jp-Terminal` |
