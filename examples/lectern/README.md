@@ -14,8 +14,9 @@ A coding agent built Lectern as a test of the skill `jupyterlab-remix` of
 this repository. It got the skills and a product brief, and no other source
 of JupyterLab knowledge. The project is the output of that run, with three
 additions: this section, the `lessons/` and `screenshots/` folders, and the
-full list of package versions in `package.json` (`overrides`). It shows what
-the skill produces; it is not a maintained product.
+full list of package versions in `package.json` (`overrides`). The
+JupyterLite build (see below) came later; it is not the work of that agent.
+The project shows what the skill produces; it is not a maintained product.
 
 ![The start page with the list of lessons](screenshots/start.webp)
 
@@ -63,13 +64,71 @@ development, `npm run build` (with source maps) and an editable install
 
 The folder `lessons/` has three sample lessons. They are not in the wheel.
 
+## JupyterLite: the same application with no server
+
+Lectern also builds as a static site. The contents, the settings and the
+kernel are then in the browser: [JupyterLite](https://jupyterlite.readthedocs.io)
+0.8 gives the services, and Pyodide runs the Python code.
+
+```bash
+npm install
+```
+
+```bash
+npm run build:lite
+```
+
+```bash
+python -m http.server 8000 --directory lite-site
+```
+
+Open `http://localhost:8000/`. The folder `lite-site/` works from any static
+host and from any subfolder, for example GitHub Pages. To use other lessons:
+`node lite/site.js <folder of lessons>` after the build.
+
+What differs from the server build:
+
+- `src/lite.js` is the entry point. It registers the service plugins of
+  `@jupyterlite/services-extension` in place of those that talk to a Jupyter
+  Server, resolves the service manager from them, and adds the Pyodide
+  kernel (`@jupyterlite/pyodide-kernel-extension`). The plugins of Lectern
+  are the same list (`src/plugins/core.js`).
+- A static site has one page, so the lesson is in the query string:
+  `?lesson=01-lists`, not `/lectern/lessons/01-lists`. The page option
+  `lessonRoutes` selects this in `src/plugins/reader.js`.
+- `rspack.lite.config.js` has three more rules: the service worker of
+  JupyterLite, the workers of the Pyodide kernel, and its wheels.
+- `lite/site.js` writes what a Jupyter Server gives at run time: the page with
+  its configuration, the list of settings schemas, and the index of the
+  lessons (`api/contents/all.json`, `files/`). It gives each notebook the
+  kernel name `python`, and it adds the wheel of `comm` to the package index
+  of the kernel, so that the kernel starts with no request to pypi.org.
+
+`node tests/lite.cjs` serves the site from a subfolder and uses it in a
+browser: the three lessons, Run all with the Pyodide kernel, Next, a reload,
+an edit that stays, an unknown lesson. It has 14 checks and needs Playwright.
+
+Limits of the JupyterLite build:
+
+- The browser needs internet access: it loads Pyodide from cdn.jsdelivr.net.
+- The first Run all takes some seconds: the kernel starts in the browser.
+- A lesson can use the Python standard library and the packages of the
+  Pyodide distribution. Other packages need `%pip install` in the notebook.
+- An edit of a notebook stays in the storage of the browser, not in a file.
+- The console can show "<id> was disposed" when a lesson closes before its
+  kernel is ready. The Pyodide kernel gives this message; nothing is wrong.
+
 ## Layout of the project
 
 ```
 package.json                 npm packages; "jupyterlab.extensions" lists the
                              packages whose schemas, themes and CSS the build copies
 rspack.config.js             the bundle
-src/index.js                 picks the core plugins, registers them and ours
+rspack.lite.config.js        the bundle of the JupyterLite site
+src/index.js                 the entry point with a Jupyter Server
+src/lite.js                  the entry point for JupyterLite
+src/styles.js                the fonts and the stylesheets
+src/plugins/core.js          picks the core plugins and adds ours
 src/app.js                   the application class
 src/shell.js                 the shell: top bar, start page, text | notebook split
 src/lessons.js               finds the lessons of a folder and their titles
@@ -83,6 +142,9 @@ lectern/app.py               the server class (URL /lectern, /lectern/lessons/..
 lectern/settings/overrides.json   default settings: notebook toolbar, shortcuts,
                              kernel shutdown on close
 lectern/static, schemas, themes   written by the build (not in git)
+lite/index.html, lite/site.js     the page and the site script of the JupyterLite build
+lite-site/                   written by the JupyterLite build (not in git)
+tests/lite.cjs               smoke test of the JupyterLite site, with a browser
 ```
 
 ## From the template, and what is new
@@ -92,7 +154,7 @@ skill (`jlab_remix.py new lectern --kind shell`).
 
 Kept from the template: the build setup (`package.json`, `rspack.config.js`,
 `pyproject.toml`), the application class (`src/app.js`), the selection of 25
-core plugins with `pick()` in `src/index.js`, the `paths` plugin, the server
+core plugins with `pick()` (now in `src/plugins/core.js`), the `paths` plugin, the server
 class and the page template.
 
 New:

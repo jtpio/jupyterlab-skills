@@ -6,3 +6,4 @@ lectern/schemas/
 lectern/themes/
 __pycache__/
 *.egg-info/
+lite-site/

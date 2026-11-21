@@ -204,7 +204,21 @@ export default {
     const contents = serviceManager.contents;
     const home = paths.urls.app;
     const prefix = `${home}/lessons/`;
-    const route = lesson => prefix + encodeURIComponent(lesson.name);
+    // A static site has one page: the lesson is then in the query string.
+    const byQuery = PageConfig.getOption('lessonRoutes') === 'query';
+    const route = lesson =>
+      byQuery
+        ? `?lesson=${encodeURIComponent(lesson.name)}`
+        : prefix + encodeURIComponent(lesson.name);
+    const nameOf = args => {
+      if (byQuery) {
+        return new URLSearchParams(args.search ?? '').get('lesson');
+      }
+      const path = args.path ?? '';
+      return path.startsWith(prefix)
+        ? decodeURIComponent(path.slice(prefix.length))
+        : null;
+    };
 
     const reader = new LessonReader();
     const start = new StartPage({
@@ -284,19 +298,14 @@ export default {
     commands.addCommand(ROUTE, {
       label: 'Show the Lesson of the URL',
       execute: args => {
-        const path = args.path ?? '';
+        const name = nameOf(args);
         queue = queue
           .then(() =>
-            path.startsWith(prefix)
-              ? showLesson(
-                  decodeURIComponent(path.slice(prefix.length)).replace(
-                    /\.(md|ipynb)$/,
-                    ''
-                  )
-                )
-              : showHome()
+            name ? showLesson(name.replace(/\.(md|ipynb)$/, '')) : showHome()
           )
-          .catch(error => console.error(`Lectern cannot show ${path}`, error));
+          .catch(error =>
+            console.error(`Lectern cannot show ${args.path ?? ''}`, error)
+          );
         return queue;
       }
     });

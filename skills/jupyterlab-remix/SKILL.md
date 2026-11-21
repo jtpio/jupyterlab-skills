@@ -371,7 +371,9 @@ errors of the probe are the reference.
   must implement, which core plugins work outside JupyterLab, known errors.
 - An application made with this skill, kind `shell` with two more areas and a
   split: `examples/lectern` of the repository
-  https://github.com/jtpio/jupyterlab-skills
+  https://github.com/jtpio/jupyterlab-skills. It also builds as a static
+  JupyterLite site, with the kernel in the browser: see `src/lite.js`,
+  `rspack.lite.config.js` and `lite/site.js` there.
 - Upstream examples: https://github.com/jupyterlab/jupyterlab/tree/main/examples
   (`app`, `federated`, `notebook`, `filebrowser`, `console`, `terminal`).
 - A full application with its own shell: https://github.com/jupyter/notebook

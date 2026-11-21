@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Lectern</title>
+    <script id="jupyter-config-data" type="application/json">
+      __CONFIG__
+    </script>
+    <script>
+      // The site works from any folder: the URLs come from the address of this page.
+      (function () {
+        const element = document.getElementById('jupyter-config-data');
+        const config = JSON.parse(element.textContent);
+        const base = new URL('./', window.location.href).pathname;
+        config.baseUrl = base;
+        config.settingsUrl = base + 'build/schemas';
+        element.textContent = JSON.stringify(config);
+      })();
+    </script>
+    <script src="build/bundle.js"></script>
+  </head>
+  <body></body>
+</html>
