@@ -165,11 +165,13 @@ refer to each other by name.
 ## Requirements
 
 - JupyterLab 4.x. The recipes were made with 4.6.
-- Python 3.9 or newer. `jlab_inspect.py` and `jlab_config.py` must run with
+- Python 3.10 or newer. `jlab_inspect.py` and `jlab_config.py` must run with
   the Python of the environment that has JupyterLab.
 - For `jupyterlab-verify`: Node.js with [Playwright](https://playwright.dev)
   and Chromium.
 - For `jupyterlab-distribution`: [uv](https://docs.astral.sh/uv/) or the
+  `build` package.
+- For `jupyterlab-remix`: Node.js 20 or newer with npm, and uv or the
   `build` package.
 
 ## Try it

@@ -1,7 +1,7 @@
 ---
 name: jupyterlab-remix
 description: Build a new application from JupyterLab packages - a "remix" with its own JavaScript bundle and its own server class, in place of a customized JupyterLab. Use it when configuration and prebuilt extensions are not enough - an application that compiles in only a chosen subset of the JupyterLab core plugins, an application with its own shell and layout (a single-document notebook application, a kiosk, a dashboard) in the style of Jupyter Notebook 7 or jupyterlab-app-cookiecutter, or a page that embeds one JupyterLab component with no plugin system, as the examples folder of the JupyterLab repository does. Gives a scaffold script with templates that were built and run, a planner that tells which core packages a selection needs and which plugins to disable, the build and packaging steps to a wheel, and the browser checks. Use it for requests such as "build my own application on JupyterLab components", "a minimal notebook app", "remix JupyterLab", "custom shell", "embed a notebook in a page".
-compatibility: Templates made and tested with the JupyterLab 4.6 npm packages. Needs Node.js 20 or newer with npm, Python 3.9 or newer, and uv or the `build` package.
+compatibility: Templates made and tested with the JupyterLab 4.6 npm packages. Needs Node.js 20 or newer with npm, Python 3.10 or newer, and uv or the `build` package.
 ---
 
 # Build a remix of JupyterLab
@@ -358,7 +358,6 @@ errors of the probe are the reference.
 | `No provider for: <token>` for a plugin whose package is in the bundle, or `npm ls @jupyterlab/apputils` shows two versions | Two copies of a core package: run `jlab_remix.py pin`, remove `node_modules` and the lock file, install again |
 | `npm error Override for … conflicts with direct dependency` | A direct dependency has a different version than its override: run `jlab_remix.py pin`, or give both the same value |
 | `window.jupyterapp is missing` in the probe | Start the server with `--app-class <Class>` and `--path <url path>` |
-| The probe reports a 404 for `/lab/api/settings` | An old copy of the probe: the current one reads the settings URL from the page config |
 | A prebuilt extension does not load in a `--federated` remix | It needs a core package that is not in the bundle |
 | Kind `shell`: `did not find a LabShell instance` or `must be activated in JupyterLab` | A core plugin that works only in the JupyterLab shell: remove its name from `pick()` |
 | Kind `shell`: text typed in a cell is lost when the cell runs | The plugin `codemirror-extension:binding` is not in the set |

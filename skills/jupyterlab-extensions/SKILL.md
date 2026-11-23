@@ -45,12 +45,11 @@ python scripts/jlab_ext.py install ./extensions/my-lab-tweaks --python <env>/bin
    page. JupyterLab tells the browser to keep the files of `static/` for one
    year. The stamp is a hash of these files in the URL of the entry file
    (`"load": "static/remoteEntry.js?v=1a2b3c4d"` in `package.json`), and the
-   template adds it to the stylesheets. Without a new stamp, a browser that
-   has the old files keeps them, also after an upgrade of the package.
-   `new` and `install` write the stamp, and `check` reports an old one. The
-   probe starts a new browser each time, so it always gets the new files.
-   JupyterLab reads `package.json` and the schemas at each page load. If the
-   extension does not show, restart the server.
+   template adds it to the stylesheets. `new` and `install` write the
+   stamp, and `check` reports an old one. The probe starts a new browser
+   each time, so it always gets the new files. JupyterLab reads
+   `package.json` and the schemas at each page load. If the extension does
+   not show, restart the server.
 6. Verify with the probe of `jupyterlab-verify`:
    `--expect-plugin my-lab-tweaks:plugin --fail-on-console-error`. A sidebar
    panel is hidden until its tab is active: add `--activate <widget id>`

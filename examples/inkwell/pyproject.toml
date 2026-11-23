@@ -7,7 +7,7 @@ name = "inkwell-lab"
 version = "0.1.0"
 description = "Inkwell: a calm notebook studio for data essays"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 classifiers = [
     "Framework :: Jupyter",
     "Framework :: Jupyter :: JupyterLab",

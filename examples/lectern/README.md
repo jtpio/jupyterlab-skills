@@ -45,7 +45,7 @@ closes it, which also stops its kernel.
 
 ## Build and run
 
-Needs Node.js 20 or newer, Python 3.9 or newer and uv.
+Needs Node.js 20 or newer, Python 3.10 or newer and uv.
 
 ```bash
 npm install

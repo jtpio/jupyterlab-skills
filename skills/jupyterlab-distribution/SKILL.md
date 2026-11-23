@@ -1,7 +1,7 @@
 ---
 name: jupyterlab-distribution
 description: Package a customized JupyterLab as one installable Python package - a "distribution" such as xtralab - that brings JupyterLab, its configuration (disabled plugins, default settings, layout, menus), its extensions and themes, extra dependencies, a launch command and its own name. Use it when the user wants an artifact to install or share instead of changes in one environment - "make this a package", "create my own JupyterLab app", "something I can pip install", "ship these customizations to my team", "turn this environment into a wheel". Gives a script that scaffolds the project, imports customizations already made in an environment, and checks the project and the wheel; plus the steps to build, test in a clean environment, and brand the application.
-compatibility: JupyterLab 4.x (tested with 4.6). Python 3.9 or newer. A build front end, uv or the `build` package. No Node.js unless the distribution contains a TypeScript extension.
+compatibility: JupyterLab 4.x (tested with 4.6). Python 3.10 or newer. A build front end, uv or the `build` package. No Node.js unless the distribution contains a TypeScript extension.
 ---
 
 # Package JupyterLab as a distribution

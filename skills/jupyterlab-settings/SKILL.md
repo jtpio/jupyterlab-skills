@@ -262,8 +262,7 @@ from memory: the names change between versions.
 | Context menu items: command, selector, rank | `jlab_inspect.py context-menu [text]` |
 | Default shortcuts: keys, selector, args | `jlab_inspect.py shortcuts [text]` |
 | A command ID that a menu, toolbar or shortcut uses | `jlab_inspect.py find <text>` |
-| The command behind a label that the user names ("Log Out") | `jlab_probe.cjs --list commands --grep "Log Out"` (skill `jupyterlab-verify`). The schemas have no labels |
-| All commands of the running application, with labels | `jlab_probe.cjs --list commands --grep <text>` (skill `jupyterlab-verify`) |
+| The command behind a label that the user names ("Log Out"), and all commands of the running application | `jlab_probe.cjs --list commands --grep "Log Out"` (skill `jupyterlab-verify`). The schemas have no labels |
 
 - `Accel` is Cmd on macOS and Ctrl elsewhere.
 - A shortcut does not work while a terminal has the focus: the terminal

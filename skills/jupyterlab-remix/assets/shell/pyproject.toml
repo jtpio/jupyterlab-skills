@@ -6,11 +6,11 @@ build-backend = "hatchling.build"
 name = "my-app"
 version = "0.1.0"
 description = "A single-document notebook application made of JupyterLab components"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 dependencies = [
     "ipykernel",
-    "jupyter_server>=2.4,<3",
-    "jupyterlab_server>=2.27,<3",
+    "jupyter_server>=2.19.0,<3",
+    "jupyterlab_server>=2.28.0,<3",
 ]
 
 [project.scripts]

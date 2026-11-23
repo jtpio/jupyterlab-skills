@@ -1,7 +1,7 @@
 ---
 name: jupyterlab-verify
 description: Prove in a real browser that a JupyterLab customization works. Starts a throwaway JupyterLab server with a clean user profile, opens it in headless Chromium, and reports what loaded - plugins, commands, sidebar widgets, menus, theme, console errors - with pass/fail checks and screenshots. Use it after every change to JupyterLab configuration, extensions, themes or a distribution; to list the exact plugin, command and widget IDs of a running application; to find which plugins break when one is disabled; and to take before/after screenshots for the user. Use it also when the user asks "does it work?", "show me", "take a screenshot of JupyterLab", or when an extension does not load.
-compatibility: Python 3.9+ for the server script. Node.js with Playwright and Chromium for the probe. JupyterLab 4.x.
+compatibility: Python 3.10+ for the server script. Node.js with Playwright and Chromium for the probe. JupyterLab 4.x.
 ---
 
 # Verify JupyterLab in a browser
@@ -149,6 +149,7 @@ Output:
 | `--scale 2` | Sharp image (device scale factor). Use it for images that a person will see. Not for a terminal: at scale 2, the browser with no window draws a terminal blank or too large. Use scale 1 for that image |
 | `--viewport 1440x900` | Size of the window |
 | `--color-scheme dark` | Browser preference, for adaptive themes |
+| `--timeout <ms>` | Time limit for the application to start (default 60000) |
 | `--dump <file.json>` | Save everything: plugins with their tokens, commands with labels, shortcuts, widgets, menus, settings schemas, page config |
 | `--areas home,text` | More shell areas to list in the summary. The probe knows the areas of JupyterLab only; an application with its own shell names its areas here |
 | `--full` | Print the full data instead of the summary |
@@ -209,7 +210,7 @@ node scripts/jlab_probe.cjs --list commands --grep theme
 | `--list plugins` | Plugin ID, description, the service that it provides, the plugins that need it |
 | `--list commands` | Command ID and label |
 | `--list tokens` | Service token and the plugin that provides it |
-| `--list widgets` | Shell area, widget ID, label, and `(hidden)` for a closed panel |
+| `--list widgets` | Shell area, widget ID, type (when the widget has one), label, and `(hidden)` for a closed panel |
 | `--list shortcuts` | Command, keys, selector, as the browser has them. `Accel` shows as `Ctrl` or `Cmd`: for the form to write in a file, use `jlab_inspect.py shortcuts` |
 
 The skill `jupyterlab-inspect` has the lists that need no browser: menus,

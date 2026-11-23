@@ -6,7 +6,7 @@ build-backend = "hatchling.build"
 name = "my-app"
 version = "0.1.0"
 description = "My App: a JupyterLab remix"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 dependencies = [
     "ipykernel>=6.5.0,!=6.30.0",
     "jupyter_server>=2.19.0,<3",
