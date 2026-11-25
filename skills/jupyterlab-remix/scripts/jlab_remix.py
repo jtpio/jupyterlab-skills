@@ -340,18 +340,20 @@ def check(args: argparse.Namespace) -> int:
     dependencies = set(package.get("dependencies", {}))
     entry = project / "src" / "index.js"
     if declared and entry.is_file():
-        imported = set(re.findall(r"""from\s+['"](@jupyterlab/[\w-]+-extension)['"]""", entry.read_text()))
-        imported |= set(re.findall(r"""import\(\s*['"](@jupyterlab/[\w-]+-extension)['"]""", entry.read_text()))
+        # The list of plugins can be in another module of src/.
+        source = "\n".join(p.read_text() for p in sorted((project / "src").rglob("*.js")))
+        imported = set(re.findall(r"""from\s+['"](@jupyterlab/[\w-]+-extension)['"]""", source))
+        imported |= set(re.findall(r"""import\(\s*['"](@jupyterlab/[\w-]+-extension)['"]""", source))
         # With pick(), the project selects plugins by name: a package that
         # gives only plugins without settings needs no copy of its schemas.
-        by_name = "pick(" in entry.read_text()
+        by_name = "pick(" in source
         for name in sorted(set() if by_name else imported - declared):
             notes.append(
-                f"{name} is imported in src/index.js but is not in 'jupyterlab.extensions': "
+                f"{name} is imported in src/ but is not in 'jupyterlab.extensions': "
                 "the build does not copy its schemas, themes and styles"
             )
         for name in sorted(declared - imported):
-            notes.append(f"{name} is in 'jupyterlab.extensions' but src/index.js does not import it")
+            notes.append(f"{name} is in 'jupyterlab.extensions' but no file of src/ imports it")
         for name in sorted((declared | imported) - dependencies):
             problems.append(f"{name} is not in 'dependencies' of package.json")
 
