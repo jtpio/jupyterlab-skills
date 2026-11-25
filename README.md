@@ -109,7 +109,7 @@ Design choices:
 
 ## Examples
 
-Three applications that a coding agent built with these skills and a product
+Two applications that a coding agent built with these skills and a product
 brief, with no other source of JupyterLab knowledge. Each one is the output
 of one run. Its README lists what was added after the run: the demo files,
 the smoke test of Meridian, the JupyterLite build of Lectern. The examples
@@ -117,11 +117,8 @@ show what the skills produce; they are not maintained products.
 
 | Example | Kind | What it shows |
 | --- | --- | --- |
-| [`examples/inkwell`](examples/inkwell) | Distribution: JupyterLab with configuration, a theme and no-build extensions | A writing studio: a home page in place of the launcher, its own themes and fonts, new commands, a shorter menu bar and toolbar. No build step |
 | [`examples/lectern`](examples/lectern) | Remix: a new application from JupyterLab packages, with its own shell | A two-pane lesson reader: the text of a lesson on the left, its notebook on the right. Its own bundle and server class. It also builds as a JupyterLite site, with no server |
 | [`examples/meridian`](examples/meridian) | Distribution: JupyterLab with published extensions as dependencies, configuration, two themes and one small no-build extension | JupyterLab with the look and the keys of a desktop code editor: activity bar, terminal in the panel below the editors, Quick Open, language server, Git, search across files. About 240 lines of custom code, and a smoke test that uses the application in a browser |
-
-![The Inkwell home page](examples/inkwell/screenshots/home.webp)
 
 ![A lesson in Lectern](examples/lectern/screenshots/lesson.webp)
 
@@ -233,7 +230,6 @@ validates each JSON block of a Markdown file against an installation.
 Then build each example and run its test. The README of each example has
 the commands. `examples/meridian/tests/smoke.cjs` uses the application in a
 browser, and `examples/lectern/tests/lite.cjs` checks the JupyterLite site.
-Inkwell has no test file: probe its wheel with `--fail-on-console-error`.
 
 One file of data is a copy: `core_plugins.json` (in the settings and remix
 skills) holds the service that each core plugin provides and requires. The
