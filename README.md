@@ -3,7 +3,8 @@
 Agent skills that let a coding agent customize JupyterLab: disable an
 extension, hide a part of the UI, change a default, add a button or a panel,
 restyle the application, or turn all of that into a package that anyone can
-install.
+install. They also let it build a new application from the JupyterLab
+packages, with its own page and layout.
 
 The skills follow the [Agent Skills](https://agentskills.io) format. They
 work in Claude Code, Codex CLI, Gemini CLI, GitHub Copilot, Cursor and other
@@ -22,7 +23,7 @@ clients that read `SKILL.md` files.
 | "Show me that it works" | `jupyterlab-verify` |
 | Any of the above, when the agent does not know where to start | `jupyterlab-customize` |
 
-The work happens in one of two places:
+The work happens in one of three places:
 
 - **In an existing environment.** The agent writes small config files and
   extension folders into the virtual environment (or the user config
@@ -31,8 +32,11 @@ The work happens in one of two places:
   style of [xtralab](https://github.com/jtpio/xtralab), whose wheel installs
   JupyterLab with the configuration, the extensions, a launch command and its
   own name.
+- **In a remix project.** The agent creates a new web application from the
+  JupyterLab npm packages, with its own bundle, page and server class. Only
+  this one has a build step, with Node.js and npm.
 
-The two connect: customize an environment, then freeze it into a
+The first two connect: customize an environment, then freeze it into a
 distribution with one command.
 
 ## The skills
@@ -83,6 +87,9 @@ Design choices:
   file that takes `@jupyterlab/*`, `@lumino/*` and React from the running
   application. No Node.js, no `node_modules`. A TypeScript path is documented
   for extensions that need npm packages.
+- **Extension files get a stamp.** JupyterLab tells the browser to keep the
+  files of an extension for one year. The scripts put a hash of the files in
+  their URL, so that a changed file loads again.
 - **Themes start complete.** `new_theme.py` copies a built-in theme and adds
   a file for the overrides, because a theme that defines only some variables
   breaks the interface.
@@ -103,7 +110,10 @@ Design choices:
 ## Examples
 
 Three applications that a coding agent built with these skills and a product
-brief, with no other source of JupyterLab knowledge.
+brief, with no other source of JupyterLab knowledge. Each one is the output
+of one run. Its README lists what was added after the run: the demo files,
+the smoke test of Meridian, the JupyterLite build of Lectern. The examples
+show what the skills produce; they are not maintained products.
 
 | Example | Kind | What it shows |
 | --- | --- | --- |
@@ -184,6 +194,8 @@ In a project with a virtual environment that has JupyterLab, ask the agent:
 - "Create a JupyterLab distribution named `quiet-lab`: no launcher, a home
   page with my recent notebooks, a warm light theme, and only the File, Edit
   and Help menus. Build the wheel and show me a screenshot."
+- "Build a notebook application from the JupyterLab packages: one notebook
+  that fills the page, a top bar with my brand, no sidebars and no tabs."
 
 ## Use the scripts without an agent
 
@@ -217,6 +229,11 @@ validates each JSON block of a Markdown file against an installation.
 ```bash
 <env>/bin/python tools/check_recipes.py skills/jupyterlab-settings/references/recipes.md skills/jupyterlab-settings/SKILL.md
 ```
+
+Then build each example and run its test. The README of each example has
+the commands. `examples/meridian/tests/smoke.cjs` uses the application in a
+browser, and `examples/lectern/tests/lite.cjs` checks the JupyterLite site.
+Inkwell has no test file: probe its wheel with `--fail-on-console-error`.
 
 One file of data is a copy: `core_plugins.json` (in the settings and remix
 skills) holds the service that each core plugin provides and requires. The
