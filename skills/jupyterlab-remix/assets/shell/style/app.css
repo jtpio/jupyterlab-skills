@@ -1,0 +1,59 @@
+body {
+  margin: 0;
+  padding: 0;
+}
+
+#my-app-shell {
+  position: absolute;
+  inset: 0;
+}
+
+/*
+ * A panel with stretch 0 in a Lumino BoxLayout takes its minimum height.
+ */
+#my-app-menu {
+  min-height: 28px;
+  background: var(--jp-layout-color1);
+  border-bottom: var(--jp-border-width) solid var(--jp-border-color1);
+}
+
+#my-app-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 12px;
+  background: var(--jp-layout-color1);
+  border-bottom: var(--jp-border-width) solid var(--jp-border-color1);
+}
+
+#my-app-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-right: auto;
+  font-size: var(--jp-ui-font-size2);
+  font-weight: 600;
+  color: var(--jp-ui-font-color0);
+}
+
+#my-app-main {
+  background: var(--jp-layout-color0);
+}
+
+.my-app-Start {
+  overflow: auto;
+  padding: 24px 48px;
+  color: var(--jp-ui-font-color1);
+  font-size: var(--jp-ui-font-size2);
+}
+
+.my-app-Start ul {
+  padding: 0;
+  list-style: none;
+  line-height: 2;
+}
+
+.my-app-Start a {
+  color: var(--jp-content-link-color);
+}

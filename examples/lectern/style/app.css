@@ -1,0 +1,616 @@
+/*
+ * Lectern: warm paper for reading, a quiet desk for code, an ink top bar.
+ * The JupyterLab variables are set on `body`: the theme sets them on
+ * `:root` and loads later.
+ */
+:root {
+  --lectern-ink: #1c2230;
+  --lectern-ink-raised: #2b3343;
+  --lectern-ink-line: #3b4558;
+  --lectern-on-ink: #f2ede3;
+  --lectern-on-ink-dim: #b3b9c5;
+  --lectern-amber: #e8b04b;
+  --lectern-paper: #fbf8f1;
+  --lectern-desk: #f3efe6;
+  --lectern-card: #fffefb;
+  --lectern-rule: #e4ddcd;
+  --lectern-rule-strong: #cfc5b0;
+  --lectern-text: #23262e;
+  --lectern-muted: #5c6272;
+  --lectern-accent: #1f6f66;
+  --lectern-accent-strong: #165a53;
+  --lectern-accent-bright: #2a877c;
+  --lectern-accent-soft: #dcece8;
+  --lectern-code-bg: #efe8d9;
+  --lectern-serif: 'Literata', georgia, 'Times New Roman', serif;
+  --lectern-sans: 'IBM Plex Sans', system-ui, sans-serif;
+  --lectern-mono: 'IBM Plex Mono', ui-monospace, 'DejaVu Sans Mono', monospace;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--lectern-paper);
+
+  --jp-ui-font-family: var(--lectern-sans);
+  --jp-ui-font-size1: 13px;
+  --jp-content-font-family: var(--lectern-serif);
+  --jp-content-font-size1: 15px;
+  --jp-content-line-height: 1.65;
+  --jp-content-heading-font-weight: 600;
+  --jp-code-font-family: var(--lectern-mono);
+  --jp-code-font-family-default: var(--lectern-mono);
+  --jp-code-font-size: 13.5px;
+  --jp-code-line-height: 1.55;
+  --jp-cell-prompt-font-family: var(--lectern-mono);
+  --jp-cell-prompt-width: 56px;
+  --jp-ui-font-color0: var(--lectern-text);
+  --jp-ui-font-color1: rgb(35 38 46 / 90%);
+  --jp-ui-font-color2: rgb(35 38 46 / 68%);
+  --jp-ui-font-color3: rgb(35 38 46 / 45%);
+  --jp-content-font-color0: var(--lectern-text);
+  --jp-content-font-color1: rgb(35 38 46 / 92%);
+  --jp-content-font-color2: rgb(35 38 46 / 68%);
+  --jp-content-font-color3: rgb(35 38 46 / 45%);
+  --jp-content-link-color: var(--lectern-accent);
+  --jp-content-link-visited-color: var(--lectern-accent-strong);
+  --jp-layout-color0: var(--lectern-desk);
+  --jp-layout-color1: var(--lectern-paper);
+  --jp-layout-color2: #ede6d7;
+  --jp-layout-color3: #dcd3c0;
+  --jp-layout-color4: #8b8371;
+  --jp-border-color0: var(--lectern-rule-strong);
+  --jp-border-color1: #d9d0bd;
+  --jp-border-color2: var(--lectern-rule);
+  --jp-border-color3: #eee8db;
+  --jp-border-radius: 6px;
+  --jp-brand-color0: var(--lectern-accent-strong);
+  --jp-brand-color1: var(--lectern-accent);
+  --jp-brand-color2: #5fa39a;
+  --jp-brand-color3: #b9dbd5;
+  --jp-brand-color4: #e3f1ee;
+  --jp-accept-color-normal: var(--lectern-accent);
+  --jp-accept-color-hover: var(--lectern-accent-strong);
+  --jp-accept-color-active: var(--lectern-accent-strong);
+  --jp-focus-outline-color: var(--lectern-accent);
+  --jp-toolbar-background: var(--lectern-paper);
+  --jp-toolbar-border-color: var(--lectern-rule);
+  --jp-toolbar-box-shadow: none;
+  --jp-cell-editor-background: var(--lectern-card);
+  --jp-cell-editor-border-color: var(--lectern-rule);
+  --jp-cell-editor-box-shadow: none;
+  --jp-cell-editor-active-background: #fff;
+  --jp-cell-editor-active-border-color: var(--lectern-accent);
+  --jp-cell-inprompt-font-color: var(--lectern-accent);
+  --jp-cell-outprompt-font-color: #9b5a1c;
+  --jp-cell-prompt-not-active-font-color: var(--lectern-muted);
+  --jp-cell-prompt-not-active-opacity: 0.8;
+  --jp-notebook-multiselected-color: var(--lectern-accent-soft);
+  --jp-notebook-select-background: var(--lectern-desk);
+  --jp-rendermime-error-background: #f9e7e1;
+  --jp-input-active-border-color: var(--lectern-accent);
+  --jp-editor-selected-background: #e6dfcf;
+  --jp-editor-selected-focused-background: #cde4df;
+  --jp-mirror-editor-keyword-color: #9b3c1c;
+  --jp-mirror-editor-builtin-color: var(--lectern-accent);
+  --jp-mirror-editor-def-color: #2c5aa0;
+  --jp-mirror-editor-variable-color: var(--lectern-text);
+  --jp-mirror-editor-variable-2-color: #2c5aa0;
+  --jp-mirror-editor-variable-3-color: #2c5aa0;
+  --jp-mirror-editor-property-color: #2c5aa0;
+  --jp-mirror-editor-string-color: #4a7520;
+  --jp-mirror-editor-string-2-color: #6b4f8a;
+  --jp-mirror-editor-number-color: #a35400;
+  --jp-mirror-editor-atom-color: #a35400;
+  --jp-mirror-editor-comment-color: #736d5d;
+  --jp-mirror-editor-operator-color: #6b4f8a;
+  --jp-mirror-editor-punctuation-color: #4a4f5c;
+  --jp-mirror-editor-bracket-color: #6b6658;
+  --jp-mirror-editor-meta-color: #9b3c1c;
+  --jp-mirror-editor-header-color: var(--lectern-accent);
+  --jp-mirror-editor-quote-color: #4a7520;
+  --jp-mirror-editor-link-color: var(--lectern-accent);
+  --jp-mirror-editor-tag-color: #9b3c1c;
+  --jp-mirror-editor-attribute-color: #2c5aa0;
+}
+
+#lectern-shell {
+  position: absolute;
+  inset: 0;
+  font-family: var(--lectern-sans);
+  color: var(--lectern-text);
+}
+
+/*
+ * Top bar. A panel with stretch 0 in a Lumino BoxLayout takes its minimum
+ * height.
+ */
+#lectern-top {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  min-height: 52px;
+  padding: 0 14px 0 10px;
+  background: var(--lectern-ink);
+  color: var(--lectern-on-ink);
+}
+
+#lectern-brand {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 9px;
+  padding: 6px 10px;
+  border: 0;
+  border-radius: 7px;
+  background: none;
+  color: var(--lectern-on-ink);
+  font-family: var(--lectern-serif);
+  font-size: 19px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+}
+
+#lectern-brand:hover {
+  background: var(--lectern-ink-raised);
+}
+
+#lectern-brand svg {
+  display: block;
+  width: 22px;
+  height: 22px;
+  color: var(--lectern-amber);
+}
+
+#lectern-title {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  margin: 0 12px 0 10px;
+  padding-left: 18px;
+  border-left: 1px solid var(--lectern-ink-line);
+}
+
+.lectern-Title-name {
+  overflow: hidden;
+  font-family: var(--lectern-serif);
+  font-size: 16px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lectern-Title-position {
+  flex: none;
+  padding: 2px 9px;
+  border-radius: 10px;
+  background: var(--lectern-amber);
+  color: var(--lectern-ink);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.lectern-Separator {
+  flex: none;
+  width: 1px;
+  height: 24px;
+  margin: 0 8px;
+  background: var(--lectern-ink-line);
+}
+
+.lectern-TopButton {
+  flex: none;
+}
+
+.lectern-TopButton .jp-ToolbarButtonComponent {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  height: 34px;
+  padding: 0 12px;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--lectern-on-ink);
+  cursor: pointer;
+}
+
+.lectern-TopButton .jp-ToolbarButtonComponent:hover:not(:disabled) {
+  background: var(--lectern-ink-raised);
+}
+
+.lectern-TopButton .jp-ToolbarButtonComponent:disabled {
+  opacity: 0.38;
+  cursor: default;
+}
+
+.lectern-TopButton .jp-ToolbarButtonComponent-label {
+  color: inherit;
+  font-family: var(--lectern-sans);
+  font-size: 13.5px;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.lectern-TopButton .jp-ToolbarButtonComponent svg {
+  display: block;
+  flex: none;
+  width: 16px;
+  height: 16px;
+  margin-right: 7px;
+  color: inherit;
+}
+
+.lectern-TopButton .jp-ToolbarButtonComponent.lm-mod-toggled {
+  box-shadow: none;
+  outline: none;
+}
+
+#lectern-button-run-all .jp-ToolbarButtonComponent {
+  background: var(--lectern-accent);
+}
+
+#lectern-button-run-all .jp-ToolbarButtonComponent:hover:not(:disabled) {
+  background: var(--lectern-accent-bright);
+}
+
+#lectern-button-toggle-text .jp-ToolbarButtonComponent {
+  border-color: var(--lectern-ink-line);
+}
+
+/*
+ * Start page.
+ */
+#lectern-home,
+.lectern-Start {
+  background: var(--lectern-paper);
+}
+
+.lectern-Start {
+  overflow-y: auto;
+}
+
+.lectern-Start-page {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 64px 32px 80px;
+}
+
+.lectern-Start-heading {
+  margin: 0 0 10px;
+  font-family: var(--lectern-serif);
+  font-size: 40px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+}
+
+.lectern-Start-lead {
+  margin: 0 0 36px;
+  color: var(--lectern-muted);
+  font-family: var(--lectern-serif);
+  font-size: 18px;
+  line-height: 1.6;
+}
+
+.lectern-Start-notice {
+  margin: 0 0 28px;
+  padding: 10px 14px;
+  border-left: 3px solid var(--lectern-amber);
+  border-radius: 4px;
+  background: #fbefd9;
+  font-size: 14px;
+}
+
+.lectern-LessonList {
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--lectern-rule);
+  list-style: none;
+}
+
+.lectern-LessonList li {
+  border-bottom: 1px solid var(--lectern-rule);
+}
+
+.lectern-LessonList-link {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin: 4px 0;
+  padding: 16px 14px;
+  border-radius: 8px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.lectern-LessonList-link::after {
+  color: var(--lectern-muted);
+  font-size: 18px;
+  content: '→';
+  transition: transform 0.15s;
+}
+
+.lectern-LessonList-link:hover {
+  background: #f2ecdf;
+}
+
+.lectern-LessonList-link:hover::after {
+  color: var(--lectern-accent);
+  transform: translateX(3px);
+}
+
+.lectern-LessonList-link:focus-visible {
+  outline: 2px solid var(--lectern-accent);
+  outline-offset: 2px;
+}
+
+.lectern-LessonList-number {
+  min-width: 2.2em;
+  color: var(--lectern-accent);
+  font-family: var(--lectern-mono);
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.lectern-LessonList-body {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.lectern-LessonList-title {
+  font-family: var(--lectern-serif);
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.lectern-LessonList-files {
+  overflow: hidden;
+  color: var(--lectern-muted);
+  font-family: var(--lectern-mono);
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: pre;
+}
+
+.lectern-LessonList-note {
+  flex: none;
+  padding: 2px 9px;
+  border-radius: 10px;
+  background: #f6e6cc;
+  color: #7a4a0e;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.lectern-Start-keys {
+  margin: 36px 0 0;
+  color: var(--lectern-muted);
+  font-size: 13.5px;
+  line-height: 2;
+}
+
+.lectern-Start-keys kbd {
+  padding: 1px 6px;
+  border: 1px solid var(--lectern-rule-strong);
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  background: var(--lectern-card);
+  color: var(--lectern-text);
+  font-family: var(--lectern-mono);
+  font-size: 12px;
+}
+
+/*
+ * The two panes and the divider between them.
+ */
+#lectern-text,
+.lectern-Text {
+  background: var(--lectern-paper);
+}
+
+#lectern-main {
+  background: var(--lectern-desk);
+}
+
+#lectern-split > .lm-SplitPanel-handle {
+  background: linear-gradient(
+    90deg,
+    var(--lectern-paper) 0 3px,
+    var(--lectern-rule-strong) 3px 4px,
+    var(--lectern-desk) 4px
+  );
+}
+
+#lectern-split > .lm-SplitPanel-handle::before {
+  position: absolute;
+  top: 50%;
+  left: 1px;
+  width: 5px;
+  height: 44px;
+  margin-top: -22px;
+  border-radius: 3px;
+  background: var(--lectern-rule-strong);
+  content: '';
+  transition: background 0.15s;
+}
+
+#lectern-split > .lm-SplitPanel-handle:hover::before,
+#lectern-split > .lm-SplitPanel-handle:active::before {
+  background: var(--lectern-accent);
+}
+
+/*
+ * Text pane: a reading measure, serif type.
+ */
+.lectern-Text {
+  overflow-y: auto;
+}
+
+.lectern-Text .lectern-Text-page.jp-RenderedHTMLCommon {
+  box-sizing: border-box;
+  max-width: 42rem;
+  margin: 0 auto;
+  padding: 44px 48px 96px;
+  color: var(--lectern-text);
+  font-family: var(--lectern-serif);
+  font-size: 17px;
+  line-height: 1.72;
+}
+
+.lectern-Text .jp-RenderedHTMLCommon h1 {
+  margin: 0 0 22px;
+  font-size: 31px;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+.lectern-Text .jp-RenderedHTMLCommon h2 {
+  margin: 36px 0 12px;
+  padding-top: 22px;
+  border-top: 1px solid var(--lectern-rule);
+  font-size: 21px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.lectern-Text .jp-RenderedHTMLCommon h3 {
+  margin: 28px 0 10px;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.lectern-Text .jp-RenderedHTMLCommon p,
+.lectern-Text .jp-RenderedHTMLCommon ul,
+.lectern-Text .jp-RenderedHTMLCommon ol {
+  margin: 0 0 1em;
+}
+
+.lectern-Text .jp-RenderedHTMLCommon strong {
+  font-weight: 600;
+}
+
+.lectern-Text .jp-RenderedHTMLCommon pre {
+  padding: 12px 14px;
+  border: 1px solid var(--lectern-rule);
+  border-radius: 6px;
+  background: var(--lectern-card);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+body .jp-RenderedHTMLCommon :not(pre) > code {
+  padding: 0.1em 0.35em;
+  border-radius: 4px;
+  background: var(--lectern-code-bg);
+  color: #3a2f22;
+  font-family: var(--lectern-mono);
+  font-size: 0.86em;
+  box-decoration-break: clone;
+}
+
+body .jp-RenderedHTMLCommon a {
+  color: var(--lectern-accent);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+
+.lectern-Missing {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  padding: 64px 32px;
+  color: var(--lectern-muted);
+  font-size: 15px;
+  text-align: center;
+}
+
+.lectern-Missing h2 {
+  margin: 0 0 8px;
+  color: var(--lectern-text);
+  font-family: var(--lectern-serif);
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.lectern-Missing p {
+  margin: 0;
+}
+
+/*
+ * Notebook pane.
+ */
+#lectern-main .jp-NotebookPanel-toolbar {
+  gap: 2px;
+  min-height: 42px;
+  padding: 0 max(14px, calc((100% - 860px) / 2));
+  border-bottom: 1px solid var(--lectern-rule);
+  background: var(--lectern-paper);
+  box-shadow: none;
+}
+
+#lectern-main .jp-NotebookPanel-toolbar .jp-ToolbarButtonComponent {
+  height: 30px;
+  padding: 0 9px;
+  border-radius: 6px;
+}
+
+#lectern-main .jp-NotebookPanel-toolbar .jp-ToolbarButtonComponent:hover {
+  background: #ece5d6;
+}
+
+#lectern-main .jp-NotebookPanel-toolbar .jp-ToolbarButtonComponent-label {
+  margin-left: 5px;
+  font-size: 13px;
+}
+
+#lectern-main .jp-NotebookPanel-toolbar .jp-HTMLSelect select {
+  height: 28px;
+  margin-left: 6px;
+  border: 1px solid var(--lectern-rule-strong);
+  border-radius: 6px;
+  background: var(--lectern-card);
+  font-family: var(--lectern-sans);
+  font-size: 13px;
+}
+
+#lectern-main .jp-Notebook {
+  background: var(--lectern-desk);
+}
+
+#lectern-main .jp-Notebook .jp-WindowedPanel-outer {
+  box-sizing: border-box;
+  padding-top: 16px;
+  padding-left: max(12px, calc((100% - 860px) / 2)) !important;
+  padding-right: max(12px, calc((100% - 860px) / 2)) !important;
+}
+
+#lectern-main .jp-InputArea-editor {
+  border-radius: 6px;
+}
+
+#lectern-main .jp-OutputArea-output pre {
+  font-family: var(--lectern-mono);
+  line-height: 1.5;
+}
+
+#lectern-main .jp-MarkdownOutput.jp-RenderedHTMLCommon {
+  font-size: 15.5px;
+}
+
+.lectern-Text,
+#lectern-main .jp-WindowedPanel-outer,
+.lectern-Start {
+  scrollbar-color: var(--lectern-rule-strong) transparent;
+  scrollbar-width: thin;
+}

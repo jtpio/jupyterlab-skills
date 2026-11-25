@@ -1,0 +1,10 @@
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--jp-layout-color0);
+}
+
+#main {
+  position: absolute;
+  inset: 0;
+}

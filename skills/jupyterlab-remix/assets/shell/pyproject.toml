@@ -1,0 +1,42 @@
+[build-system]
+requires = ["hatchling>=1.21", "hatch-jupyter-builder>=0.9"]
+build-backend = "hatchling.build"
+
+[project]
+name = "my-app"
+version = "0.1.0"
+description = "A single-document notebook application made of JupyterLab components"
+requires-python = ">=3.10"
+dependencies = [
+    "ipykernel",
+    "jupyter_server>=2.19.0,<3",
+    "jupyterlab_server>=2.28.0,<3",
+]
+
+[project.scripts]
+my-app = "my_app.app:main"
+
+# The frontend build output is not in version control but belongs to the package.
+[tool.hatch.build]
+artifacts = ["my_app/static", "my_app/schemas", "my_app/themes"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["my_app"]
+
+[tool.hatch.build.targets.sdist]
+exclude = ["node_modules", "build"]
+
+# Build the frontend when it is missing, and refuse to make a package without it.
+[tool.hatch.build.hooks.jupyter-builder]
+dependencies = ["hatch-jupyter-builder>=0.9"]
+build-function = "hatch_jupyter_builder.npm_builder"
+ensured-targets = [
+    "my_app/static/bundle.js",
+    "my_app/schemas/@jupyterlab/apputils-extension/themes.json",
+    "my_app/themes/@jupyterlab/theme-light-extension/index.css",
+]
+skip-if-exists = ["my_app/static/bundle.js"]
+
+[tool.hatch.build.hooks.jupyter-builder.build-kwargs]
+build_cmd = "build:prod"
+editable_build_cmd = "build"

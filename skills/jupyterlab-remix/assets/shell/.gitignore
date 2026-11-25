@@ -1,0 +1,8 @@
+node_modules/
+build/
+dist/
+my_app/static/
+my_app/schemas/
+my_app/themes/
+__pycache__/
+*.egg-info/

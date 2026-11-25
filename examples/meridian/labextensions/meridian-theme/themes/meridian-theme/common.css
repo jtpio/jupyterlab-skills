@@ -1,0 +1,484 @@
+/*
+ * Rules of both Meridian themes. Each index.css sets the --mrd-* colors.
+ */
+
+@font-face {
+  font-family: 'Inter Variable';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('fonts/inter-latin-wght-normal.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Inter Variable';
+  font-style: italic;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('fonts/inter-latin-wght-italic.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'JetBrains Mono Variable';
+  font-style: normal;
+  font-weight: 100 800;
+  font-display: swap;
+  src: url('fonts/jetbrains-mono-latin-wght-normal.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'JetBrains Mono Variable';
+  font-style: italic;
+  font-weight: 100 800;
+  font-display: swap;
+  src: url('fonts/jetbrains-mono-latin-wght-italic.woff2') format('woff2');
+}
+
+:root {
+  --jp-ui-font-family: 'Inter Variable', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --jp-content-font-family: var(--jp-ui-font-family);
+  --jp-code-font-family-default: 'JetBrains Mono Variable', menlo, consolas, monospace;
+  --jp-code-font-family: var(--jp-code-font-family-default);
+  --jp-ui-font-size1: 13px;
+  --jp-code-font-size: 13px;
+  --jp-code-line-height: 1.5;
+  --jp-border-radius: 4px;
+  --jp-statusbar-height: 22px;
+  --jp-scrollbar-thumb-radius: 0;
+  --jp-elevation-z4: 0 2px 8px var(--mrd-shadow);
+  --jp-elevation-z6: 0 2px 8px var(--mrd-shadow);
+  --jp-elevation-z8: 0 4px 16px var(--mrd-shadow);
+}
+
+/*
+ * Activity bar: the tab bar of the left side area, with icons of the
+ * codicons set (CC BY 4.0).
+ */
+.jp-SideBar.lm-TabBar {
+  background: var(--mrd-sidebar-bg);
+  border-color: var(--mrd-border);
+}
+
+.jp-SideBar.lm-TabBar .lm-TabBar-tab,
+.jp-SideBar.lm-TabBar .lm-TabBar-tab:not(.lm-mod-current),
+.jp-SideBar.lm-TabBar .lm-TabBar-tab.lm-mod-current {
+  background: transparent;
+  border: none;
+  color: var(--mrd-activity-inactive-fg);
+}
+
+.jp-SideBar .lm-TabBar-tab:hover,
+.jp-SideBar .lm-TabBar-tab.lm-mod-current {
+  color: var(--mrd-activity-fg);
+}
+
+.jp-SideBar.jp-mod-left .lm-TabBar-tab.lm-mod-current {
+  box-shadow: inset 2px 0 0 var(--mrd-accent);
+}
+
+.jp-SideBar.jp-mod-right .lm-TabBar-tab.lm-mod-current {
+  box-shadow: inset -2px 0 0 var(--mrd-accent);
+}
+
+.jp-SideBar .lm-TabBar-tab .jp-icon3[fill] {
+  fill: currentColor;
+}
+
+.jp-SideBar .lm-TabBar-tab[data-id='filebrowser'] {
+  --mrd-icon: url('icons/files.svg');
+}
+
+.jp-SideBar .lm-TabBar-tab[data-id='jp-search-replace'] {
+  --mrd-icon: url('icons/search.svg');
+}
+
+.jp-SideBar .lm-TabBar-tab[data-id='jp-git-sessions'] {
+  --mrd-icon: url('icons/source-control.svg');
+}
+
+.jp-SideBar .lm-TabBar-tab[data-id='jp-debugger-sidebar'] {
+  --mrd-icon: url('icons/debug-alt.svg');
+}
+
+.jp-SideBar .lm-TabBar-tab[data-id='extensionmanager.main-view'] {
+  --mrd-icon: url('icons/extensions.svg');
+}
+
+.jp-SideBar .lm-TabBar-tab[data-id='jp-running-sessions'] {
+  --mrd-icon: url('icons/server-process.svg');
+}
+
+.jp-SideBar .lm-TabBar-tab[data-id='table-of-contents'] {
+  --mrd-icon: url('icons/list-tree.svg');
+}
+
+.jp-SideBar .lm-TabBar-tab[data-id='jp-property-inspector'] {
+  --mrd-icon: url('icons/symbol-property.svg');
+}
+
+.jp-SideBar .lm-TabBar-tab:is(
+    [data-id='filebrowser'],
+    [data-id='jp-search-replace'],
+    [data-id='jp-git-sessions'],
+    [data-id='jp-debugger-sidebar'],
+    [data-id='extensionmanager.main-view'],
+    [data-id='jp-running-sessions'],
+    [data-id='table-of-contents'],
+    [data-id='jp-property-inspector']
+  )
+  .lm-TabBar-tabIcon
+  svg {
+  display: none;
+}
+
+.jp-SideBar .lm-TabBar-tab:is(
+    [data-id='filebrowser'],
+    [data-id='jp-search-replace'],
+    [data-id='jp-git-sessions'],
+    [data-id='jp-debugger-sidebar'],
+    [data-id='extensionmanager.main-view'],
+    [data-id='jp-running-sessions'],
+    [data-id='table-of-contents'],
+    [data-id='jp-property-inspector']
+  )
+  .lm-TabBar-tabIcon {
+  justify-content: center;
+}
+
+.jp-SideBar .lm-TabBar-tab:is(
+    [data-id='filebrowser'],
+    [data-id='jp-search-replace'],
+    [data-id='jp-git-sessions'],
+    [data-id='jp-debugger-sidebar'],
+    [data-id='extensionmanager.main-view'],
+    [data-id='jp-running-sessions'],
+    [data-id='table-of-contents'],
+    [data-id='jp-property-inspector']
+  )
+  .lm-TabBar-tabIcon::before {
+  content: '';
+  display: block;
+  width: 20px;
+  height: 20px;
+  background-color: currentColor;
+  mask: var(--mrd-icon) center / 20px 20px no-repeat;
+  -webkit-mask: var(--mrd-icon) center / 20px 20px no-repeat;
+}
+
+/*
+ * Side bar, panel, title bar and status bar.
+ */
+#jp-left-stack,
+#jp-right-stack,
+#jp-down-stack,
+.jp-SidePanel {
+  background: var(--mrd-sidebar-bg);
+}
+
+#jp-top-panel,
+#jp-menu-panel,
+.jp-MainMenu,
+#jp-top-bar {
+  background: var(--mrd-sidebar-bg);
+}
+
+#jp-top-panel {
+  border-bottom-color: var(--mrd-border);
+}
+
+.lm-MenuBar-item {
+  border-radius: 4px;
+  color: var(--mrd-fg);
+}
+
+.lm-MenuBar-item.lm-mod-active,
+.lm-MenuBar.lm-mod-active .lm-MenuBar-item.lm-mod-active {
+  background: var(--mrd-menubar-hover);
+  color: var(--mrd-fg);
+  border-color: transparent;
+  box-shadow: none;
+}
+
+#jp-main-statusbar {
+  background: var(--mrd-sidebar-bg);
+  color: var(--mrd-fg);
+  box-shadow: inset 0 1px 0 var(--mrd-border);
+}
+
+#jp-main-statusbar .jp-StatusBar-TextItem {
+  color: var(--mrd-fg);
+}
+
+.lm-SplitPanel-handle,
+.lm-DockPanel-handle {
+  background-color: var(--mrd-border);
+}
+
+/*
+ * Editor tabs.
+ */
+#jp-main-dock-panel,
+.lm-DockPanel-widget {
+  background: var(--mrd-editor-bg);
+}
+
+.lm-DockPanel-tabBar {
+  background: var(--mrd-sidebar-bg);
+  box-shadow: inset 0 -1px 0 var(--mrd-border);
+}
+
+.lm-DockPanel-tabBar .lm-TabBar-tab {
+  background: var(--mrd-sidebar-bg);
+  color: var(--mrd-fg-muted);
+  border: none;
+  border-right: 1px solid var(--mrd-border);
+}
+
+.lm-DockPanel-tabBar .lm-TabBar-tab:hover:not(.lm-mod-current) {
+  background: var(--mrd-sidebar-bg);
+  color: var(--mrd-fg);
+}
+
+.lm-DockPanel-tabBar .lm-TabBar-tab.lm-mod-current {
+  background: var(--mrd-editor-bg);
+  color: var(--mrd-fg-strong);
+}
+
+/*
+ * Panel below the editors: text tabs with an underline.
+ */
+#jp-down-stack > .lm-TabBar {
+  background: var(--mrd-sidebar-bg);
+  border-top: 1px solid var(--mrd-border);
+  border-bottom: none;
+}
+
+#jp-down-stack > .lm-TabBar .lm-TabBar-tab {
+  background: transparent;
+  border: none;
+  color: var(--mrd-fg-muted);
+}
+
+#jp-down-stack > .lm-TabBar .lm-TabBar-tab.lm-mod-current {
+  color: var(--mrd-fg-strong);
+  box-shadow: inset 0 -1px 0 var(--mrd-accent);
+}
+
+#jp-down-stack .jp-Terminal {
+  background: var(--mrd-sidebar-bg);
+}
+
+/*
+ * Lists: file browser, search results, completer.
+ */
+.jp-DirListing-content .jp-DirListing-item:hover {
+  background: var(--mrd-list-hover-bg);
+}
+
+.jp-DirListing-content .jp-DirListing-item.jp-mod-selected {
+  background: var(--mrd-list-active-bg);
+  color: var(--mrd-list-active-fg);
+}
+
+.jp-DirListing:focus-within .jp-DirListing-item.jp-mod-selected {
+  outline: 1px solid var(--mrd-accent);
+  outline-offset: -1px;
+}
+
+.jp-DirListing-header {
+  background: var(--mrd-sidebar-bg);
+  border-bottom: none;
+  box-shadow: none;
+}
+
+/*
+ * Menus, command palette, Quick Open, dialogs and notifications.
+ */
+.lm-Menu {
+  background: var(--mrd-widget-bg);
+  border: 1px solid var(--mrd-widget-border);
+  border-radius: 6px;
+  padding: 4px 0;
+  color: var(--mrd-fg);
+  box-shadow: 0 2px 8px var(--mrd-shadow);
+}
+
+.lm-Menu-item.lm-mod-active {
+  background: var(--mrd-accent);
+  color: #ffffff;
+}
+
+.lm-Menu-item.lm-mod-active .jp-icon3[fill],
+.lm-Menu-item.lm-mod-active .jp-icon-selectable[fill] {
+  fill: #ffffff;
+}
+
+.lm-Menu-separator > div {
+  border-color: var(--mrd-widget-border);
+}
+
+.jp-ModalCommandPalette {
+  background: var(--mrd-widget-bg);
+  border: 1px solid var(--mrd-widget-border);
+  border-radius: 6px;
+  box-shadow: 0 0 12px var(--mrd-shadow);
+  overflow: hidden;
+}
+
+.lm-CommandPalette,
+.lm-CommandPalette-content,
+.lm-CommandPalette-search {
+  background: var(--mrd-widget-bg);
+}
+
+.lm-CommandPalette-wrapper {
+  background: var(--mrd-input-bg);
+  border: 1px solid var(--mrd-accent);
+  border-radius: 2px;
+  box-shadow: none;
+}
+
+.lm-CommandPalette-input {
+  background: transparent;
+  color: var(--mrd-fg);
+}
+
+.lm-CommandPalette-header {
+  color: var(--mrd-accent);
+  border-bottom-color: var(--mrd-border);
+}
+
+.lm-CommandPalette-item {
+  color: var(--mrd-fg);
+}
+
+.lm-CommandPalette-item.lm-mod-active,
+.jp-ModalCommandPalette .lm-CommandPalette-item.lm-mod-active {
+  background: var(--mrd-list-active-bg);
+  color: var(--mrd-list-active-fg);
+  outline: 1px solid var(--mrd-accent);
+  outline-offset: -1px;
+}
+
+.lm-CommandPalette-item.lm-mod-active .lm-CommandPalette-itemShortcut,
+.lm-CommandPalette-item.lm-mod-active .lm-CommandPalette-itemCaption {
+  color: var(--mrd-list-active-fg);
+}
+
+.lm-CommandPalette-item:hover:not(.lm-mod-active) {
+  background: var(--mrd-list-hover-bg);
+}
+
+.jp-Dialog-content {
+  background: var(--mrd-widget-bg);
+  border: 1px solid var(--mrd-widget-border);
+  border-radius: 6px;
+  color: var(--mrd-fg);
+  box-shadow: 0 0 12px var(--mrd-shadow);
+}
+
+.jp-Dialog-button.jp-mod-styled {
+  border-radius: 2px;
+}
+
+.jp-Dialog-button.jp-mod-reject {
+  color: var(--mrd-fg);
+}
+
+.jp-Notification-Toast,
+.Toastify__toast {
+  background: var(--mrd-widget-bg);
+  color: var(--mrd-fg);
+  border: 1px solid var(--mrd-widget-border);
+  border-radius: 4px;
+  box-shadow: 0 2px 8px var(--mrd-shadow);
+}
+
+/*
+ * Buttons and inputs.
+ */
+.jp-mod-styled:focus,
+input.jp-mod-styled:focus,
+select.jp-mod-styled:focus {
+  outline: 1px solid var(--mrd-accent);
+  outline-offset: -1px;
+}
+
+/*
+ * Editor: gutter, line numbers, current line.
+ */
+.jp-FileEditor .cm-editor,
+.jp-FileEditor .cm-editor .cm-gutters {
+  background: var(--mrd-editor-bg);
+}
+
+.jp-FileEditor .cm-editor .cm-gutter {
+  background: transparent;
+}
+
+.cm-editor .cm-gutters {
+  border-right: none;
+  color: var(--mrd-line-number);
+}
+
+.cm-editor .cm-content {
+  font-variant-ligatures: none;
+}
+
+.jp-FileEditor .cm-activeLine {
+  background: transparent;
+  box-shadow: inset 0 0 0 2px var(--mrd-line-highlight-border);
+}
+
+.jp-FileEditor .cm-activeLineGutter {
+  background: transparent;
+  color: var(--mrd-fg);
+}
+
+/*
+ * Notebook: keep the cells, use the colors of the editor.
+ */
+.jp-NotebookPanel-toolbar {
+  border-bottom: 1px solid var(--mrd-border);
+}
+
+.jp-Notebook .jp-Cell .jp-InputArea-editor {
+  border-radius: 4px;
+}
+
+.lm-CommandPalette-item .lm-CommandPalette-itemLabel > mark {
+  background: transparent;
+  color: var(--mrd-list-highlight-fg);
+  font-weight: 600;
+}
+
+.lm-CommandPalette-item.lm-mod-active .lm-CommandPalette-itemLabel > mark {
+  color: var(--mrd-list-active-highlight-fg);
+}
+
+/*
+ * Tree views (search results, outline) are web components: their rows
+ * take the colors of the toolkit tokens, so style the shadow part.
+ */
+.jp-search-replace-tab jp-tree-item,
+.jp-search-replace-tab jp-tree-item::part(positioning-region),
+.jp-TableOfContents-content .jp-tocItem,
+.jp-TableOfContents-content .jp-tocItem::part(positioning-region) {
+  background: transparent;
+}
+
+.jp-search-replace-tab jp-tree-item::part(positioning-region):hover,
+.jp-TableOfContents-content .jp-tocItem::part(positioning-region):hover {
+  background: var(--mrd-list-hover-bg);
+}
+
+.jp-search-replace-tab jp-tree-item[selected]::part(positioning-region),
+.jp-TableOfContents-content .jp-tocItem[selected]::part(positioning-region) {
+  background: var(--mrd-list-active-bg);
+  color: var(--mrd-list-active-fg);
+}
+
+.jp-search-replace-tab mark {
+  background: rgba(234, 92, 0, 0.33);
+  color: inherit;
+}

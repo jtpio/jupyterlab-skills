@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>{{ page_config['appName'] | e }}</title>
+    <script id="jupyter-config-data" type="application/json">
+      {{ page_config | tojson }}
+    </script>
+    <script src="{{ static_url('bundle.js') }}"></script>
+  </head>
+  <body>
+    <script>
+      // Remove the token from the URL.
+      (function () {
+        const url = new URL(window.location.href);
+        if (url.searchParams.get('token')) {
+          url.searchParams.delete('token');
+          window.history.replaceState({}, '', url.href);
+        }
+      })();
+    </script>
+  </body>
+</html>

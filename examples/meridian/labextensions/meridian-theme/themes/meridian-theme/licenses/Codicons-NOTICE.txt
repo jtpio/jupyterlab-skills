@@ -1,0 +1,8 @@
+The SVG files of the folder "icons" are icons of Codicons
+(npm package @vscode/codicons, version 0.0.46-24),
+Copyright (c) Microsoft Corporation.
+
+They are licensed under the Creative Commons Attribution 4.0 International
+Public License (CC BY 4.0): https://creativecommons.org/licenses/by/4.0/legalcode
+
+The files are used without change.
